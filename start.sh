@@ -18,11 +18,19 @@ echo ""
 # Function to check if a port is available
 check_port() {
     local port=$1
-    if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1 || netstat -an | grep ":$port " | grep LISTEN >/dev/null 2>&1; then
-        return 1
-    else
-        return 0
+    # Try lsof first (common on macOS/Linux)
+    if command -v lsof >/dev/null 2>&1; then
+        if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then
+            return 1  # Port in use
+        fi
     fi
+    # Fallback to netstat (more universal)
+    if command -v netstat >/dev/null 2>&1; then
+        if netstat -an | grep ":$port " | grep LISTEN >/dev/null 2>&1; then
+            return 1  # Port in use
+        fi
+    fi
+    return 0  # Port available
 }
 
 # Check if ports are available
