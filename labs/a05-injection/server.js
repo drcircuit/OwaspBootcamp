@@ -66,7 +66,7 @@ app.get('/', (req, res) => {
 // VULNERABLE: String concatenation simulation
 app.get('/api/search/vulnerable', (req, res) => {
   const query = req.query.q || '';
-  const simulatedSQL = \`SELECT * FROM products WHERE name LIKE '%\${query}%'\`;
+  const simulatedSQL = `SELECT * FROM products WHERE name LIKE '%${query}%'`;
   
   if (query.includes("'") || query.toLowerCase().includes('drop') || query.toLowerCase().includes('delete')) {
     res.json({ 
@@ -88,7 +88,7 @@ app.get('/api/search/secure', (req, res) => {
   res.json({ 
     message: 'Using parameterized query (safe)',
     query: 'SELECT * FROM products WHERE name LIKE ?',
-    parameters: [\`%\${query}%\`],
+    parameters: [`%${query}%`],
     results 
   });
 });
