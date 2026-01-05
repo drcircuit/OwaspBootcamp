@@ -48,8 +48,8 @@ const requireAuth = async (req, res, next) => {
 // Check if first time setup is needed
 const checkFirstTimeSetup = async (req, res, next) => {
   try {
-    const result = await pool.query('SELECT COUNT(*) as count FROM portal_users');
-    if (result.rows[0].count === '0') {
+    const result = await pool.query('SELECT COUNT(*)::int as count FROM portal_users');
+    if (result.rows[0].count === 0) {
       return res.redirect('/setup');
     }
     next();
@@ -71,8 +71,8 @@ app.get('/', checkFirstTimeSetup, (req, res) => {
 // First time setup page
 app.get('/setup', async (req, res) => {
   try {
-    const result = await pool.query('SELECT COUNT(*) as count FROM portal_users');
-    if (result.rows[0].count !== '0') {
+    const result = await pool.query('SELECT COUNT(*)::int as count FROM portal_users');
+    if (result.rows[0].count !== 0) {
       return res.redirect('/login');
     }
     res.render('setup', { error: null });
@@ -87,8 +87,8 @@ app.post('/setup', async (req, res) => {
   const { username, password, hacker_alias } = req.body;
   
   try {
-    const userCount = await pool.query('SELECT COUNT(*) as count FROM portal_users');
-    if (userCount.rows[0].count !== '0') {
+    const userCount = await pool.query('SELECT COUNT(*)::int as count FROM portal_users');
+    if (userCount.rows[0].count !== 0) {
       return res.redirect('/login');
     }
     

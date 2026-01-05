@@ -184,13 +184,32 @@ Total Points: <%= points %>
         }
         
         function copyToClipboard(text) {
+            // Use modern Clipboard API with fallback
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Victory message copied to clipboard! Share it on social media! 🎉');
+                }).catch(() => {
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        }
+        
+        function fallbackCopy(text) {
             const textarea = document.createElement('textarea');
             textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
             document.body.appendChild(textarea);
             textarea.select();
-            document.execCommand('copy');
+            try {
+                document.execCommand('copy');
+                alert('Victory message copied to clipboard! Share it on social media! 🎉');
+            } catch (err) {
+                alert('Could not copy to clipboard. Please copy manually.');
+            }
             document.body.removeChild(textarea);
-            alert('Victory message copied to clipboard! Share it on social media! 🎉');
         }
     </script>
 </body>
