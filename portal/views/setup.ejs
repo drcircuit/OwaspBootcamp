@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>First Time Setup - NotSoAnonymous Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1 class="form-title">🎭 WELCOME HACKER</h1>
+            <p class="form-subtitle">Join NotSoAnonymous in taking down Evil Capitalistic Corp</p>
+            
+            <% if (error) { %>
+                <div class="error-message"><%= error %></div>
+            <% } %>
+            
+            <form method="POST" action="/setup">
+                <div class="form-group">
+                    <label for="username">USERNAME</label>
+                    <input type="text" id="username" name="username" required 
+                           placeholder="Enter your username" autocomplete="off">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">PASSWORD</label>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="Min 6 characters" minlength="6">
+                </div>
+                
+                <div class="form-group">
+                    <label for="hacker_alias">HACKER ALIAS (Optional)</label>
+                    <input type="text" id="hacker_alias" name="hacker_alias" 
+                           placeholder="e.g., CyberPhantom, DataGhost">
+                </div>
+                
+                <button type="submit" class="form-submit">
+                    &gt; INITIALIZE MISSION_
+                </button>
+            </form>
+            
+            <div class="mt-3 text-center" style="color: var(--neon-blue); font-size: 0.85rem;">
+                <p>⚠️ This portal runs locally only</p>
+                <p>No data is sent to external servers</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

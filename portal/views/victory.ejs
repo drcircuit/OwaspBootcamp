@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Victory! - NotSoAnonymous Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--terminal-green);
+            animation: confetti-fall 3s linear infinite;
+            z-index: 1000;
+        }
+        
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .glitch {
+            animation: glitch 1s infinite;
+        }
+        
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            25% { transform: translate(-2px, 2px); }
+            50% { transform: translate(2px, -2px); }
+            75% { transform: translate(-2px, -2px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🎭</span>
+                    <h1>NOTSO<span style="color: var(--neon-pink);">ANONYMOUS</span></h1>
+                </div>
+                
+                <nav>
+                    <a href="/dashboard">Dashboard</a>
+                    <a href="/logout">Logout</a>
+                </nav>
+            </div>
+        </header>
+        
+        <main>
+            <div class="victory-container">
+                <h1 class="victory-title glitch">🎉 MISSION ACCOMPLISHED! 🎉</h1>
+                
+                <div class="victory-emoji">💀🔥💀</div>
+                
+                <p style="font-size: 1.5rem; color: var(--neon-pink); margin: 20px 0;">
+                    Evil Capitalistic Corp has been EXPOSED!
+                </p>
+                
+                <div class="diploma">
+                    <h2 class="diploma-title">🏆 CERTIFICATE OF PWNERSHIP 🏆</h2>
+                    
+                    <div class="diploma-text">
+                        <p>This certifies that</p>
+                        <h3 style="color: var(--neon-pink); font-size: 2rem; margin: 20px 0; font-family: 'Orbitron', monospace;">
+                            <%= user.hacker_alias || user.username %>
+                        </h3>
+                        <p>Has successfully completed all challenges in the</p>
+                        <h3 style="color: var(--neon-blue); font-size: 1.8rem; margin: 15px 0; font-family: 'Orbitron', monospace;">
+                            OWASP BOOTCAMP 2025
+                        </h3>
+                        <p style="margin: 20px 0;">
+                            By exploiting <strong style="color: var(--terminal-green);"><%= points %> points</strong> worth of vulnerabilities
+                            in Evil Capitalistic Corp's infrastructure
+                        </p>
+                        <p style="margin: 20px 0;">
+                            Master of: <strong style="color: var(--neon-blue);">
+                            Recon, Scanning, Initial Access, Maintained Access, and Covering Tracks
+                            </strong>
+                        </p>
+                        <p style="margin-top: 30px; font-size: 0.9rem; color: var(--primary-green);">
+                            Completed on: <%= new Date(completedAt).toLocaleDateString('en-US', { 
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric' 
+                            }) %>
+                        </p>
+                    </div>
+                    
+                    <div class="diploma-signature">
+                        <p style="margin-top: 40px;">
+                            - The NotSoAnonymous Collective -
+                        </p>
+                        <p style="font-size: 0.85rem; margin-top: 10px;">
+                            "We are all script kiddies on this blessed day" 
+                        </p>
+                    </div>
+                </div>
+                
+                <div style="margin: 40px 0; padding: 30px; background: rgba(0, 255, 65, 0.1); border: 2px solid var(--terminal-green); border-radius: 8px;">
+                    <h3 style="color: var(--terminal-green); font-family: 'Orbitron', monospace; margin-bottom: 15px;">
+                        🎓 YOU'VE LEARNED:
+                    </h3>
+                    <ul style="color: var(--neon-blue); text-align: left; max-width: 600px; margin: 0 auto; line-height: 2;">
+                        <li>✓ OWASP Top 10 2025 vulnerabilities</li>
+                        <li>✓ Attack methodology: Recon → Scanning → Exploitation</li>
+                        <li>✓ Real-world hacking techniques</li>
+                        <li>✓ How to identify and exploit security flaws</li>
+                        <li>✓ Why security matters in software development</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-top: 40px;">
+                    <h3 style="color: var(--neon-pink); font-family: 'Orbitron', monospace; margin-bottom: 15px;">
+                        🚀 WHAT'S NEXT?
+                    </h3>
+                    <p style="color: var(--primary-green); margin-bottom: 15px;">
+                        Use this knowledge for good! Build secure applications and help make the internet safer.
+                    </p>
+                    <a href="/dashboard" class="btn" style="margin: 10px;">View Dashboard</a>
+                    <button onclick="shareVictory()" class="btn" style="margin: 10px;">Share Achievement 🎉</button>
+                </div>
+                
+                <div style="margin-top: 40px; font-size: 2rem;">
+                    <div style="animation: float 3s ease-in-out infinite;">
+                        🎭 💀 🔓 💻 🔥 🎯 ⚡ 🏴 ✨
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>🎭 NotSoAnonymous Collective - Mission Accomplished!</p>
+            <div class="footer-warning">
+                <strong>⚠️ USE YOUR POWERS RESPONSIBLY</strong><br>
+                With great hacking knowledge comes great responsibility. Only test systems you own or have permission to test!
+            </div>
+        </footer>
+    </div>
+    
+    <script>
+        // Confetti animation
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.background = ['var(--terminal-green)', 'var(--neon-blue)', 'var(--neon-pink)', 'var(--neon-purple)'][Math.floor(Math.random() * 4)];
+            confetti.style.animationDelay = Math.random() * 3 + 's';
+            confetti.style.animationDuration = (Math.random() * 2 + 3) + 's';
+            document.body.appendChild(confetti);
+            
+            setTimeout(() => confetti.remove(), 5000);
+        }
+        
+        // Create confetti continuously
+        setInterval(createConfetti, 200);
+        
+        // Initial burst
+        for (let i = 0; i < 50; i++) {
+            setTimeout(createConfetti, i * 30);
+        }
+        
+        function shareVictory() {
+            const text = `🎉 I just pwned all OWASP Top 10 2025 vulnerabilities in the NotSoAnonymous Bootcamp! 💀🔥 
+            
+Evil Capitalistic Corp has been EXPOSED!
+Total Points: <%= points %>
+
+#OWASP #CyberSecurity #EthicalHacking #NotSoAnonymous`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'OWASP Bootcamp Victory!',
+                    text: text
+                }).catch(() => {
+                    copyToClipboard(text);
+                });
+            } else {
+                copyToClipboard(text);
+            }
+        }
+        
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('Victory message copied to clipboard! Share it on social media! 🎉');
+        }
+    </script>
+</body>
+</html>

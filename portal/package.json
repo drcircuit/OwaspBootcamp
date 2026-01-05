@@ -1,0 +1,21 @@
+{
+  "name": "notso-anonymous-portal",
+  "version": "1.0.0",
+  "description": "NotSoAnonymous Hacker Portal - Track your progress in taking down Evil Capitalistic Corp",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": ["owasp", "security", "workshop", "hacker", "ctf"],
+  "author": "NotSoAnonymous Collective",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "pg": "^8.11.3",
+    "cookie-parser": "^1.4.6",
+    "body-parser": "^1.20.2",
+    "ejs": "^3.1.9",
+    "bcrypt": "^5.1.1"
+  }
+}

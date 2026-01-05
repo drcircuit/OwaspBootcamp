@@ -1,19 +1,52 @@
-# OWASP Bootcamp Workshop
+# OWASP Bootcamp Workshop - NotSoAnonymous Edition 🎭
 
-A comprehensive, hands-on workshop covering the OWASP Top 10 2025 security vulnerabilities. This workshop runs as a self-contained local cluster using Docker Compose with lightweight containers optimized for Azure VDI environments.
+A comprehensive, hands-on workshop covering the OWASP Top 10 2025 security vulnerabilities with a **hacker-themed twist**! Join the NotSoAnonymous collective in exposing Evil Capitalistic Corp's security failures through real-world attack scenarios.
+
+This workshop runs as a self-contained local cluster using Docker Compose with lightweight containers optimized for Azure VDI environments.
+
+## 🎯 What's New in This Edition
+
+### 🎭 NotSoAnonymous Portal - Mission Control
+A brand new **student progress tracking portal** featuring:
+- 🏆 Track your progress through all challenges
+- 🎯 Follow real hacking methodology: Recon → Scanning → Initial Access → Maintained Access → Cover Tracks
+- 🎉 **Epic victory animation and diploma** when you complete 100% of challenges
+- 🔐 Local-only authentication (first-time setup on initial visit)
+- 💀 Cyberpunk/hacker themed UI - totally meme-worthy!
+
+### 🏴 The Storyline
+You're part of the **NotSoAnonymous** hacker collective, and your mission is to expose the security failures of **Evil Capitalistic Corp (ECC)**. Each challenge represents a real-world vulnerability in their systems that you must identify and exploit.
+
+### 🎯 Attack Methodology
+Challenges are now organized by **professional hacking stages**:
+1. **Recon** 🔍 - Passive information gathering about the target
+2. **Scanning** 📡 - Active probing to identify vulnerabilities
+3. **Initial Access** 🔓 - Exploitation to gain entry
+4. **Maintained Access** 🔐 - Establishing persistence (optional advanced)
+5. **Cover Tracks** 👻 - Hiding evidence of intrusion (optional advanced)
 
 ## 🎯 Workshop Structure
 
-The workshop is divided into two modes:
+The workshop is divided into three modes:
 
-### 1. **Instructional Labs** (Individual Concepts)
+### 1. **NotSoAnonymous Portal** (NEW! - Port 3100)
+Your mission control hub where you:
+- Set up your hacker identity on first visit
+- Track progress through all challenges
+- Follow the professional attack methodology
+- Earn reputation points for each exploit
+- Get your diploma when you complete 100%
+- Experience epic hacker-themed design with animations
+
+### 2. **Instructional Labs** (Individual Concepts)
 Each lab focuses on a single OWASP vulnerability with:
 - Clear explanation of the vulnerability
 - Side-by-side comparison of vulnerable vs. secure code
 - Interactive demonstrations
 - Hands-on exercises
+- Real-world context and tools
 
-### 2. **Citadel Mode** (Full Application)
+### 3. **Citadel Mode** (Full Application)
 A complete vulnerable web application containing all OWASP Top 10 2025 vulnerabilities where students:
 - Break through multiple security layers
 - Practice penetration testing techniques
@@ -74,8 +107,9 @@ docker-compose up -d citadel citadel-db
 
 ## 📚 Lab Access
 
-Once started, access the labs at:
+Once started, access the services at:
 
+- **🎭 NotSoAnonymous Portal (Mission Control)**: http://localhost:3100 ⭐ **START HERE!**
 - **Citadel (Main App)**: http://localhost:3000
 - **A01 - Broken Access Control**: http://localhost:3001
 - **A02 - Security Misconfiguration**: http://localhost:3002
@@ -108,23 +142,37 @@ For students using Azure VDI machines:
 
 ### Recommended Order:
 
-1. **Introduction** (15 min)
-   - OWASP Top 10 overview
-   - Workshop structure explanation
+1. **Portal Setup** (5 min)
+   - Visit http://localhost:3100
+   - Create your hacker identity
+   - Get familiar with the mission control dashboard
 
-2. **Instructional Labs** (2-3 hours)
-   - Work through labs A01-A10 in order
-   - 15-20 minutes per lab
+2. **Introduction** (15 min)
+   - OWASP Top 10 overview
+   - Hacking methodology explanation
+   - Workshop structure and goals
+
+3. **Attack Stages** (3-4 hours)
+   - **Stage 1: Recon** - Information gathering challenges
+   - **Stage 2: Scanning** - Vulnerability identification
+   - **Stage 3: Initial Access** - Exploitation and entry
+   - Work through challenges in each stage
+   - Submit flags to track progress
    - Instructor-led with hands-on practice
 
-3. **Break** (15 min)
+4. **Break** (15 min)
 
-4. **Citadel Challenge** (2-3 hours)
-   - Apply learned concepts to break the Citadel
+5. **Citadel Challenge** (2-3 hours)
+   - Apply learned concepts to break the full Citadel app
    - Capture flags for each vulnerability
    - Group or individual work
 
-5. **Review & Discussion** (30 min)
+6. **Victory Celebration** 🎉
+   - Complete all challenges
+   - Get your diploma
+   - Share your achievement
+
+7. **Review & Discussion** (30 min)
    - Share findings
    - Discuss real-world applications
    - Q&A
