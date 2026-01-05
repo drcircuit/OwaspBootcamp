@@ -1,0 +1,156 @@
+version: '3.8'
+
+services:
+  # Citadel - The main vulnerable web application
+  citadel:
+    build:
+      context: ./citadel
+      dockerfile: Dockerfile
+    container_name: owasp-citadel
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=citadel-db
+      - DB_PORT=5432
+      - DB_NAME=citadel
+      - DB_USER=citadel_user
+      - DB_PASSWORD=citadel_pass
+    depends_on:
+      - citadel-db
+    networks:
+      - owasp-network
+    restart: unless-stopped
+
+  # Database for Citadel
+  citadel-db:
+    image: postgres:16-alpine
+    container_name: owasp-citadel-db
+    environment:
+      - POSTGRES_DB=citadel
+      - POSTGRES_USER=citadel_user
+      - POSTGRES_PASSWORD=citadel_pass
+    volumes:
+      - citadel-db-data:/var/lib/postgresql/data
+      - ./citadel/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - owasp-network
+    restart: unless-stopped
+
+  # Instructional Labs - Lightweight containers for individual labs
+  lab-a01-broken-access:
+    build:
+      context: ./labs/a01-broken-access
+      dockerfile: Dockerfile
+    container_name: owasp-lab-a01
+    ports:
+      - "3001:3000"
+    networks:
+      - owasp-network
+    restart: unless-stopped
+
+  lab-a02-misconfiguration:
+    build:
+      context: ./labs/a02-misconfiguration
+      dockerfile: Dockerfile
+    container_name: owasp-lab-a02
+    ports:
+      - "3002:3000"
+    networks:
+      - owasp-network
+    restart: unless-stopped
+
+  lab-a03-supply-chain:
+    build:
+      context: ./labs/a03-supply-chain
+      dockerfile: Dockerfile
+    container_name: owasp-lab-a03
+    ports:
+      - "3003:3000"
+    networks:
+      - owasp-network
+    restart: unless-stopped
+
+  lab-a04-crypto:
+    build:
+      context: ./labs/a04-crypto
+      dockerfile: Dockerfile
+    container_name: owasp-lab-a04
+    ports:
+      - "3004:3000"
+    networks:
+      - owasp-network
+    restart: unless-stopped
+
+  lab-a05-injection:
+    build:
+      context: ./labs/a05-injection
+      dockerfile: Dockerfile
+    container_name: owasp-lab-a05
+    ports:
+      - "3005:3000"
+    networks:
+      - owasp-network
+    restart: unless-stopped
+
+  lab-a06-insecure-design:
+    build:
+      context: ./labs/a06-insecure-design
+      dockerfile: Dockerfile
+    container_name: owasp-lab-a06
+    ports:
+      - "3006:3000"
+    networks:
+      - owasp-network
+    restart: unless-stopped
+
+  lab-a07-auth-failures:
+    build:
+      context: ./labs/a07-auth-failures
+      dockerfile: Dockerfile
+    container_name: owasp-lab-a07
+    ports:
+      - "3007:3000"
+    networks:
+      - owasp-network
+    restart: unless-stopped
+
+  lab-a08-integrity:
+    build:
+      context: ./labs/a08-integrity
+      dockerfile: Dockerfile
+    container_name: owasp-lab-a08
+    ports:
+      - "3008:3000"
+    networks:
+      - owasp-network
+    restart: unless-stopped
+
+  lab-a09-logging:
+    build:
+      context: ./labs/a09-logging
+      dockerfile: Dockerfile
+    container_name: owasp-lab-a09
+    ports:
+      - "3009:3000"
+    networks:
+      - owasp-network
+    restart: unless-stopped
+
+  lab-a10-exceptions:
+    build:
+      context: ./labs/a10-exceptions
+      dockerfile: Dockerfile
+    container_name: owasp-lab-a10
+    ports:
+      - "3010:3000"
+    networks:
+      - owasp-network
+    restart: unless-stopped
+
+networks:
+  owasp-network:
+    driver: bridge
+
+volumes:
+  citadel-db-data:

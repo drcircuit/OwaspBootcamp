@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏰 <%= title %></h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/login">Login</a>
+                <a href="/register">Register</a>
+            </nav>
+        </header>
+        
+        <main>
+            <div class="hero">
+                <h2><%= message %></h2>
+                <p>This application contains all 10 vulnerabilities from the OWASP Top 10 2025.</p>
+                <p>Your mission: Find and exploit each vulnerability to break through the security layers.</p>
+            </div>
+            
+            <div class="challenges">
+                <h3>Security Layers to Break:</h3>
+                <div class="challenge-grid">
+                    <div class="challenge-card">
+                        <h4>A01: Broken Access Control</h4>
+                        <p>Can you access other users' data?</p>
+                        <a href="/user/1">Try accessing user profiles</a>
+                    </div>
+                    
+                    <div class="challenge-card">
+                        <h4>A02: Security Misconfiguration</h4>
+                        <p>Find exposed debug endpoints</p>
+                        <a href="/debug/config">Check configuration</a>
+                    </div>
+                    
+                    <div class="challenge-card">
+                        <h4>A03: Supply Chain Failures</h4>
+                        <p>Exploit vulnerable dependencies</p>
+                    </div>
+                    
+                    <div class="challenge-card">
+                        <h4>A04: Cryptographic Failures</h4>
+                        <p>Passwords stored insecurely</p>
+                        <a href="/register">Register account</a>
+                    </div>
+                    
+                    <div class="challenge-card">
+                        <h4>A05: Injection</h4>
+                        <p>SQL Injection vulnerability</p>
+                        <a href="/search">Search products</a>
+                    </div>
+                    
+                    <div class="challenge-card">
+                        <h4>A06: Insecure Design</h4>
+                        <p>Flawed business logic</p>
+                    </div>
+                    
+                    <div class="challenge-card">
+                        <h4>A07: Authentication Failures</h4>
+                        <p>Weak session management</p>
+                        <a href="/login">Login</a>
+                    </div>
+                    
+                    <div class="challenge-card">
+                        <h4>A08: Integrity Failures</h4>
+                        <p>Unverified code execution</p>
+                    </div>
+                    
+                    <div class="challenge-card">
+                        <h4>A09: Logging Failures</h4>
+                        <p>No security monitoring</p>
+                    </div>
+                    
+                    <div class="challenge-card">
+                        <h4>A10: Exception Mishandling</h4>
+                        <p>Information disclosure</p>
+                        <a href="/api/data/999">Trigger error</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>⚠️ Warning: This is a deliberately vulnerable application for educational purposes only!</p>
+        </footer>
+    </div>
+</body>
+</html>
