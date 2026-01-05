@@ -76,5 +76,5 @@ app.get('/api/update/check', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(\`A08 Lab running on port \${PORT}\`);
+  console.log(`A08 Lab running on port ${PORT}`);
 });

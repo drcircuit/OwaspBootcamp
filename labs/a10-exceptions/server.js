@@ -121,5 +121,5 @@ app.get('/api/secure/error', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(\`A10 Lab running on port \${PORT}\`);
+  console.log(`A10 Lab running on port ${PORT}`);
 });

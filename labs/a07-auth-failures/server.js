@@ -89,5 +89,5 @@ app.post('/api/login', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(\`A07 Lab running on port \${PORT}\`);
+  console.log(`A07 Lab running on port ${PORT}`);
 });
