@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - NotSoAnonymous Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1 class="form-title">🔓 ACCESS PORTAL</h1>
+            <p class="form-subtitle">NotSoAnonymous Mission Control</p>
+            
+            <% if (error) { %>
+                <div class="error-message"><%= error %></div>
+            <% } %>
+            
+            <form method="POST" action="/login">
+                <div class="form-group">
+                    <label for="username">USERNAME</label>
+                    <input type="text" id="username" name="username" required 
+                           placeholder="Enter your username" autocomplete="username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">PASSWORD</label>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="Enter your password" autocomplete="current-password">
+                </div>
+                
+                <button type="submit" class="form-submit">
+                    &gt; LOGIN_
+                </button>
+            </form>
+            
+            <div class="mt-3 text-center" style="color: var(--neon-blue); font-size: 0.85rem;">
+                <p>🎯 Target: Evil Capitalistic Corp</p>
+                <p>💀 Status: Vulnerable</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

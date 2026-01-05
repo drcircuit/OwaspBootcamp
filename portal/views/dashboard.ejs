@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission Control - NotSoAnonymous Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🎭</span>
+                    <h1>NOTSO<span style="color: var(--neon-pink);">ANONYMOUS</span></h1>
+                </div>
+                
+                <div class="target-info">
+                    <span class="target-label">TARGET:</span>
+                    <span class="target-name">Evil Capitalistic Corp</span>
+                </div>
+                
+                <nav>
+                    <a href="/dashboard">Dashboard</a>
+                    <a href="/logout">Logout</a>
+                </nav>
+            </div>
+        </header>
+        
+        <main>
+            <div class="hero">
+                <h1>🔥 MISSION CONTROL 🔥</h1>
+                <p>Welcome back, <span class="hacker-alias"><%= user.hacker_alias || user.username %></span></p>
+                <p style="color: var(--warning-red);">Your mission: Expose Evil Capitalistic Corp's security failures</p>
+            </div>
+            
+            <!-- Progress Overview -->
+            <section class="progress-section">
+                <h2 style="font-family: 'Orbitron', monospace; color: var(--neon-blue); margin-bottom: 20px;">
+                    📊 OPERATION PROGRESS
+                </h2>
+                
+                <div class="progress-stats">
+                    <div class="stat-card">
+                        <div class="stat-value"><%= progress.completed %></div>
+                        <div class="stat-label">Challenges Pwned</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value"><%= progress.total %></div>
+                        <div class="stat-label">Total Challenges</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value"><%= progress.points %></div>
+                        <div class="stat-label">Reputation Points</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value"><%= progress.percentage %>%</div>
+                        <div class="stat-label">Mission Complete</div>
+                    </div>
+                </div>
+                
+                <div class="progress-bar-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: <%= progress.percentage %>%"></div>
+                    </div>
+                    <div class="progress-text">
+                        <% if (progress.percentage === 100) { %>
+                            🎉 MISSION ACCOMPLISHED! <a href="/victory">Claim Your Diploma</a>
+                        <% } else { %>
+                            <%= progress.completed %> / <%= progress.total %> Challenges Completed
+                        <% } %>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Hacking Stages -->
+            <section>
+                <h2 style="font-family: 'Orbitron', monospace; color: var(--neon-blue); margin-bottom: 20px;">
+                    🎯 ATTACK METHODOLOGY
+                </h2>
+                
+                <div class="stages-grid">
+                    <% stages.forEach(stage => { %>
+                        <a href="/stage/<%= stage.id %>" style="text-decoration: none;">
+                            <div class="stage-card">
+                                <div class="stage-header">
+                                    <span class="stage-icon"><%= stage.icon %></span>
+                                    <h3 class="stage-title"><%= stage.stage_name %></h3>
+                                </div>
+                                <p class="stage-description"><%= stage.description %></p>
+                                <div class="stage-progress">
+                                    <span class="challenge-count">
+                                        <%= stage.total_challenges %> Challenges
+                                    </span>
+                                    <span class="completed">
+                                        <% 
+                                        const completed = parseInt(stage.completed_challenges) || 0;
+                                        const total = parseInt(stage.total_challenges) || 0;
+                                        %>
+                                        <%= completed %> / <%= total %> ✓
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    <% }) %>
+                </div>
+            </section>
+            
+            <div class="mt-3 text-center" style="padding: 30px; background: rgba(255, 0, 110, 0.1); border: 2px solid var(--neon-pink); border-radius: 8px;">
+                <h3 style="color: var(--neon-pink); font-family: 'Orbitron', monospace; margin-bottom: 10px;">
+                    💡 HACKER TIP
+                </h3>
+                <p style="color: var(--primary-green);">
+                    Follow the methodology: <strong>Recon → Scanning → Initial Access</strong>
+                    <br>
+                    Each stage builds on the previous one. Use tools like Browser DevTools, Burp Suite, and SQLMap!
+                </p>
+            </div>
+        </main>
+        
+        <footer>
+            <p>🎭 NotSoAnonymous Collective - Fighting Corporate Security Theater Since 2025</p>
+            <div class="footer-warning">
+                <strong>⚠️ EDUCATIONAL PURPOSES ONLY</strong><br>
+                These are deliberately vulnerable applications for learning. Never use these techniques on systems you don't own!
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

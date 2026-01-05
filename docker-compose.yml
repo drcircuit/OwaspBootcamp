@@ -1,4 +1,40 @@
 services:
+  # NotSoAnonymous Portal - Student progress tracking and mission control
+  portal:
+    build:
+      context: ./portal
+      dockerfile: Dockerfile
+    container_name: notso-anonymous-portal
+    ports:
+      - "3100:3100"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=portal-db
+      - DB_PORT=5432
+      - DB_NAME=portal
+      - DB_USER=portal_user
+      - DB_PASSWORD=portal_pass
+    depends_on:
+      - portal-db
+    networks:
+      - owasp-network
+    restart: unless-stopped
+
+  # Database for Portal
+  portal-db:
+    image: postgres:16-alpine
+    container_name: notso-anonymous-portal-db
+    environment:
+      - POSTGRES_DB=portal
+      - POSTGRES_USER=portal_user
+      - POSTGRES_PASSWORD=portal_pass
+    volumes:
+      - portal-db-data:/var/lib/postgresql/data
+      - ./portal/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - owasp-network
+    restart: unless-stopped
+
   # Citadel - The main vulnerable web application
   citadel:
     build:
@@ -152,3 +188,4 @@ networks:
 
 volumes:
   citadel-db-data:
+  portal-db-data:

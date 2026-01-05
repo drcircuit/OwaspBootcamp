@@ -1,8 +1,18 @@
-# OWASP Bootcamp - Student Guide
+# OWASP Bootcamp - Student Guide 🎭
 
-## Welcome! 👋
+## Welcome to NotSoAnonymous! 👋
 
-You're about to learn about the most critical security vulnerabilities in web applications through hands-on practice. This guide will help you get started.
+You're about to join the **NotSoAnonymous hacker collective** and learn about the most critical security vulnerabilities in web applications through hands-on practice targeting **Evil Capitalistic Corp (ECC)**. This guide will help you get started on your mission.
+
+## 🎯 The Mission
+
+Evil Capitalistic Corp has terrible security practices, and it's your job to expose them! You'll learn real-world hacking techniques following professional attack methodology:
+
+1. **Recon** 🔍 - Gather intelligence about the target
+2. **Scanning** 📡 - Identify vulnerabilities
+3. **Initial Access** 🔓 - Exploit vulnerabilities to gain entry
+4. **Maintained Access** 🔐 - Establish persistence (advanced)
+5. **Cover Tracks** 👻 - Hide your activities (advanced)
 
 ## What You'll Learn
 
@@ -19,11 +29,11 @@ By the end of this workshop, you'll understand:
 - Web browser (Chrome, Firefox, or Edge recommended)
 - Text editor (VS Code, Notepad++, etc.) for viewing code
 
-### Starting the Labs
+### Starting the Workshop
 
 1. **Open Terminal/PowerShell** in the workshop directory
 
-2. **Start all labs:**
+2. **Start all services (including the portal):**
    ```bash
    docker compose up -d
    ```
@@ -35,13 +45,28 @@ By the end of this workshop, you'll understand:
    docker compose ps
    ```
    
-   You should see 12 containers running.
+   You should see 14 containers running (portal + portal-db + citadel + citadel-db + 10 labs).
 
-5. **Open your browser** and navigate to http://localhost:3000
+5. **🎭 Open your browser** and navigate to http://localhost:3100
+   - This is your **Mission Control** - the NotSoAnonymous Portal
+   - Create your hacker identity on first visit
+   - Track your progress through all challenges
 
 ## Lab Structure
 
-### Instructional Labs (Ports 3001-3010)
+### 0. **NotSoAnonymous Portal** - Your Mission Control (NEW! ⭐)
+
+**Access:** http://localhost:3100
+
+Your central hub where you:
+- Set up your hacker identity (username, password, hacker alias)
+- View all challenges organized by hacking stage
+- Track completion progress
+- Submit flags when you complete challenges
+- Get your diploma when you complete 100% 🎉
+- Enjoy the epic hacker-themed design!
+
+### 1. **Instructional Labs** (Ports 3001-3010)
 
 Each lab teaches ONE vulnerability:
 
@@ -63,7 +88,7 @@ Each lab teaches ONE vulnerability:
 - ✅ A secure implementation
 - 📚 Explanation of the vulnerability
 
-### Citadel Challenge (Port 3000)
+### 2. **Citadel Challenge** (Port 3000)
 
 The Citadel is a complete web application with ALL 10 vulnerabilities. Your mission:
 - Find and exploit each vulnerability
@@ -72,26 +97,69 @@ The Citadel is a complete web application with ALL 10 vulnerabilities. Your miss
 
 **Access:** http://localhost:3000
 
-## How to Use the Labs
+## How to Use the Workshop
 
-### Step 1: Instructional Labs (Work Through A01-A10)
+### Recommended Workflow:
 
-For each lab:
+**START HERE:** Visit http://localhost:3100
 
-1. **Read** the explanation
-2. **Try** the vulnerable endpoint
-3. **Compare** with the secure implementation
-4. **Understand** why the vulnerability is dangerous
+1. **Set up your hacker identity** (first visit)
+   - Choose a username and password
+   - Pick a cool hacker alias (optional but recommended!)
+   - This is stored locally only - never sent externally
+
+2. **Explore Mission Control Dashboard**
+   - View all hacking stages
+   - See your progress and points
+   - Choose which stage to start with
+
+3. **Work Through Challenges by Stage**
+   - Click on a stage (e.g., "Recon")
+   - Read each challenge description
+   - Click the lab URL to access the vulnerable app
+   - Find and exploit the vulnerability
+   - Look for the flag (format: NSA{...})
+   - Submit the flag in the portal
+   - Get points and move to next challenge!
+
+4. **Follow the Attack Methodology**
+   - Start with **Recon** - Learn to gather information
+   - Move to **Scanning** - Identify vulnerabilities
+   - Then **Initial Access** - Exploit and gain entry
+   - (Optional) Advanced stages for extra credit
+
+5. **Celebrate Your Victory! 🎉**
+   - Complete all challenges to get 100%
+   - Watch the epic victory animation
+   - Get your NotSoAnonymous diploma
+   - Share your achievement!
+
+### Step 1: Portal-Guided Learning (Recommended for Most Students)
+
+Use the portal to guide you through challenges organized by hacking stages:
+
+1. **Visit** http://localhost:3100
+2. **Set up** your hacker identity
+3. **Pick a stage** (start with Recon)
+4. **Complete challenges** in that stage
+5. **Submit flags** to track progress
+6. **Move to next stage**
+
+The portal tracks everything and shows you exactly what to do next!
+
+### Step 2: Direct Lab Exploration (Alternative Approach)
+
+If you prefer exploring labs directly without the portal:
+
+1. **Visit** individual lab URLs (3001-3010)
+2. **Read** the vulnerability explanation
+3. **Try** the vulnerable endpoint
+4. **Compare** with the secure implementation
 5. **Take notes** on key concepts
 
-**Example - Lab A01:**
-1. Visit http://localhost:3001
-2. Click "View Alice's Profile"
-3. Notice you can see data you shouldn't access
-4. Try changing the URL to see other users
-5. Compare with the secure endpoint that checks authorization
+But remember: The portal makes it way more fun and tracks your progress!
 
-### Step 2: Citadel Challenge
+### Step 3: Citadel Challenge
 
 After completing instructional labs:
 
