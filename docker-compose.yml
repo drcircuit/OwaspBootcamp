@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Citadel - The main vulnerable web application
   citadel:
