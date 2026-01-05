@@ -1,0 +1,8 @@
+{
+  "name": "owasp-lab-a08",
+  "version": "1.0.0",
+  "description": "Instructional lab for A08: Software and Data Integrity Failures",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "express": "^4.18.2" }
+}

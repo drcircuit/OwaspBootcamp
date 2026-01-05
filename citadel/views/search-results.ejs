@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏰 OWASP Citadel</h1>
+            <nav>
+                <a href="/">Home</a>
+            </nav>
+        </header>
+        
+        <main>
+            <h2>Search Results for: "<%= query %>"</h2>
+            
+            <% if (results.length > 0) { %>
+                <div class="results">
+                    <% results.forEach(product => { %>
+                        <div class="product">
+                            <h3><%= product.name %></h3>
+                            <p><%= product.description %></p>
+                            <p><strong>Price:</strong> $<%= product.price %></p>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <p>No products found.</p>
+            <% } %>
+            
+            <div class="vulnerability-note">
+                <h3>🔓 Vulnerability Found: Injection (A05)</h3>
+                <p>This search is vulnerable to SQL injection!</p>
+                <p>Try searching for: <code>' OR '1'='1</code></p>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

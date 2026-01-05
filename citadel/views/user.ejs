@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏰 OWASP Citadel</h1>
+            <nav>
+                <a href="/">Home</a>
+            </nav>
+        </header>
+        
+        <main>
+            <div class="profile">
+                <h2>User Profile</h2>
+                <p><strong>ID:</strong> <%= user.id %></p>
+                <p><strong>Username:</strong> <%= user.username %></p>
+                <p><strong>Email:</strong> <%= user.email %></p>
+                <p><strong>Role:</strong> <%= user.role %></p>
+                
+                <div class="vulnerability-note">
+                    <h3>🔓 Vulnerability Found: Broken Access Control (A01)</h3>
+                    <p>You can access any user's profile by changing the ID in the URL!</p>
+                    <p>Try: /user/1, /user/2, /user/3</p>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "owasp-lab-a02",
+  "version": "1.0.0",
+  "description": "Instructional lab for A02: Security Misconfiguration",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
