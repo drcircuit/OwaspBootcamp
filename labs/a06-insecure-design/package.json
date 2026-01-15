@@ -4,5 +4,5 @@
   "description": "Instructional lab for A06: Insecure Design",
   "main": "server.js",
   "scripts": { "start": "node server.js" },
-  "dependencies": { "express": "^4.18.2" }
+  "dependencies": { "express": "^4.21.2" }
 }
