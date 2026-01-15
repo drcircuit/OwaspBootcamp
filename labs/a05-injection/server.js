@@ -73,6 +73,8 @@ app.get('/api/search/vulnerable', (req, res) => {
       vulnerability: 'SQL Injection detected!',
       query: simulatedSQL,
       message: 'Malicious input could modify or delete data',
+      flag: 'NSA{1NJ3CT_Y0UR_W4Y_1N}',
+      exploited: 'You successfully performed SQL injection!',
       results: []
     });
   } else {

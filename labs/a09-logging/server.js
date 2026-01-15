@@ -73,7 +73,8 @@ app.delete('/api/user/delete/:id', (req, res) => {
   res.json({ 
     message: 'User deleted',
     userId: req.params.id,
-    vulnerability: 'This critical action was not logged!'
+    vulnerability: 'This critical action was not logged!',
+    flag: 'NSA{L0GG1NG_F41LURE_1S_RE4L}'
   });
 });
 
@@ -81,6 +82,16 @@ app.post('/api/login/fail', (req, res) => {
   res.json({ 
     message: 'Failed login attempt',
     vulnerability: 'Failed logins should be logged to detect brute force attacks!'
+  });
+});
+
+// Advanced: Log manipulation endpoint
+app.get('/api/logs/clear', (req, res) => {
+  res.json({
+    message: 'Logs cleared',
+    flag: 'NSA{N0_L0GS_N0_CR1M3}',
+    exploited: 'You manipulated the logs to hide your tracks!',
+    vulnerability: 'Missing audit logs mean no evidence of intrusion'
   });
 });
 

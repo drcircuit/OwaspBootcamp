@@ -133,7 +133,11 @@ const encryptionKey = 'my-secret-key-123'; // ❌ Hard-coded!
 
 // VULNERABLE: Returns users with plain text passwords
 app.get('/api/users/vulnerable', (req, res) => {
-  res.json(users);
+  res.json({
+    users,
+    flag: 'NSA{PL41N_T3XT_P4SSW0RDS}',
+    exploited: 'You accessed the database with plain text passwords!'
+  });
 });
 
 // VULNERABLE: MD5 hashing (weak)

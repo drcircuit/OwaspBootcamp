@@ -156,7 +156,8 @@ app.get('/api/dependencies', (req, res) => {
       low: 8
     },
     outdated: 18,
-    message: 'This demonstrates why supply chain security is critical!'
+    message: 'This demonstrates why supply chain security is critical!',
+    flag: 'NSA{0LD_P4CK4G3S_M34N_0LD_BUG5}'
   });
 });
 
