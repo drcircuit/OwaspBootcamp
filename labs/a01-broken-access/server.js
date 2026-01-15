@@ -101,7 +101,7 @@ app.get('/api/vulnerable/user/:id', (req, res) => {
     const response = { ...user };
     if (currentUserId !== userId) {
       response.flag = 'NSA{1D0R_V1A_1NC3PT10N}';
-      response.exploited = 'You accessed another user\'s data!';
+      response.exploited = "You accessed another user's data!";
     }
     res.json(response);
   } else {

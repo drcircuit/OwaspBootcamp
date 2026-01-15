@@ -79,16 +79,16 @@ app.post('/register', async (req, res) => {
     // Award flag for creating a backdoor account
     const flag = 'NSA{P3RS1ST3NC3_1S_K3Y}';
     
-    // Check if client expects JSON (API call) or redirect (form submission)
-    if (req.headers.accept && req.headers.accept.includes('application/json')) {
+    // Check if client expects JSON using Express's accepts() method
+    if (req.accepts('json') && !req.accepts('html')) {
       res.json({ 
         message: 'User registered successfully',
         flag,
         exploited: 'You created a persistent backdoor account!'
       });
     } else {
-      // For form submissions, add flag as query parameter
-      res.redirect('/login?flag=' + encodeURIComponent(flag));
+      // For form submissions, just redirect - flag discovery is via API call
+      res.redirect('/login');
     }
   } catch (err) {
     res.status(500).send('Error: ' + err.message);
