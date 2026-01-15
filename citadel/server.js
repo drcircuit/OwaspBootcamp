@@ -79,8 +79,8 @@ app.post('/register', async (req, res) => {
     // Award flag for creating a backdoor account
     const flag = 'NSA{P3RS1ST3NC3_1S_K3Y}';
     
-    // Check if client expects JSON using Express's accepts() method
-    if (req.accepts('json') && !req.accepts('html')) {
+    // Check if client prefers JSON over HTML using Express's accepts() method
+    if (req.accepts(['json', 'html']) === 'json') {
       res.json({ 
         message: 'User registered successfully',
         flag,
