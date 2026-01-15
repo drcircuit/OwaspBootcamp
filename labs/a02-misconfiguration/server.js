@@ -116,6 +116,7 @@ app.get('/', (req, res) => {
 app.get('/debug', (req, res) => {
   res.json({
     vulnerability: 'Debug endpoint should not be accessible in production!',
+    flag: 'NSA{DEBUG_1S_N0T_4_F3ATUR3}',
     environment: process.env.NODE_ENV || 'development',
     nodeVersion: process.version,
     platform: process.platform,

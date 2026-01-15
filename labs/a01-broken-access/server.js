@@ -97,7 +97,13 @@ app.get('/api/vulnerable/user/:id', (req, res) => {
   const user = users[userId];
   
   if (user) {
-    res.json(user);
+    // Add flag when accessing user data you shouldn't see
+    const response = { ...user };
+    if (currentUserId !== userId) {
+      response.flag = 'NSA{1D0R_V1A_1NC3PT10N}';
+      response.exploited = 'You accessed another user\'s data!';
+    }
+    res.json(response);
   } else {
     res.status(404).json({ error: 'User not found' });
   }

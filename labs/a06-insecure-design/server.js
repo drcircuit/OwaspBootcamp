@@ -61,12 +61,21 @@ app.post('/api/transfer', (req, res) => {
   // VULNERABLE: No rate limiting, no validation
   transferCount++;
   accountBalance -= 100;
-  res.json({ 
+  
+  // Award flag after multiple rapid transfers
+  const response = { 
     message: 'Transfer successful',
     newBalance: accountBalance,
     transferCount,
     vulnerability: 'No rate limiting or business logic validation!'
-  });
+  };
+  
+  if (transferCount >= 5) {
+    response.flag = 'NSA{L0G1C_0V3R_S3CUR1TY}';
+    response.exploited = 'You bypassed rate limiting by spamming transfers!';
+  }
+  
+  res.json(response);
 });
 
 app.listen(PORT, '0.0.0.0', () => {

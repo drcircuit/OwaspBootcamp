@@ -66,6 +66,8 @@ app.get('/api/update/check', (req, res) => {
     version: '2.0.0',
     downloadUrl: 'https://cdn.example.com/app-2.0.0.zip',
     vulnerability: 'No signature or checksum provided!',
+    flag: 'NSA{N0_CHK5UM_N0_PR0BL3M}',
+    exploited: 'You found an unsigned update mechanism!',
     secureAlternative: {
       downloadUrl: 'https://cdn.example.com/app-2.0.0.zip',
       sha256: 'abc123...',

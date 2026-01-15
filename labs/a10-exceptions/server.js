@@ -90,7 +90,8 @@ app.get('/api/vulnerable/error', (req, res) => {
     res.status(500).json({
       error: error.message,
       stack: error.stack,
-      vulnerability: 'Full stack trace exposed to user!'
+      vulnerability: 'Full stack trace exposed to user!',
+      flag: 'NSA{3RR0RS_T3LL_T4L3S}'
     });
   }
 });
@@ -118,6 +119,16 @@ app.get('/api/secure/error', (req, res) => {
       note: 'Detailed error logged server-side only'
     });
   }
+});
+
+// Advanced: Error suppression endpoint
+app.get('/api/suppress/errors', (req, res) => {
+  res.json({
+    message: 'Error messages suppressed',
+    flag: 'NSA{S1L3NCE_1S_G0LD3N}',
+    exploited: 'You suppressed error messages to hide exploitation!',
+    vulnerability: 'Generic errors hide exploitation attempts'
+  });
 });
 
 app.listen(PORT, '0.0.0.0', () => {

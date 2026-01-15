@@ -79,12 +79,14 @@ app.post('/api/login', (req, res) => {
     success: true,
     sessionId,
     message: 'Login successful',
+    flag: 'NSA{S3SS10N_H1J4CK3D}',
     vulnerabilities: [
       'No password validation',
       'Predictable session ID',
       'Session never expires',
       'No MFA'
-    ]
+    ],
+    exploited: 'You bypassed authentication with predictable session tokens!'
   });
 });
 

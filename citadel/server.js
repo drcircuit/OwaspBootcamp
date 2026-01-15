@@ -39,7 +39,13 @@ app.get('/user/:id', async (req, res) => {
     // Vulnerability: No authorization check
     const result = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
     if (result.rows.length > 0) {
-      res.render('user', { user: result.rows[0] });
+      const user = result.rows[0];
+      // Award flag when accessing admin account
+      if (user.role === 'admin') {
+        user.flag = 'NSA{R00T_4CC3SS_4CH13V3D}';
+        user.exploited = 'You escalated privileges to admin!';
+      }
+      res.render('user', { user });
     } else {
       res.status(404).send('User not found');
     }
@@ -70,7 +76,13 @@ app.post('/register', async (req, res) => {
       'INSERT INTO users (username, password, email) VALUES ($1, $2, $3)',
       [username, password, email]
     );
-    res.redirect('/login');
+    // Award flag for creating a backdoor account
+    const flag = 'NSA{P3RS1ST3NC3_1S_K3Y}';
+    res.json({ 
+      message: 'User registered successfully',
+      flag,
+      exploited: 'You created a persistent backdoor account!'
+    });
   } catch (err) {
     res.status(500).send('Error: ' + err.message);
   }
