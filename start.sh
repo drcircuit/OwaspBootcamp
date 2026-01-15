@@ -1,93 +1,73 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+OK="✅"
+NO="❌"
+
+is_wsl() {
+  grep -qi microsoft /proc/version 2>/dev/null
+}
+
+platform() {
+  case "$(uname -s)" in
+    Darwin) echo "macos" ;;
+    Linux)
+      if is_wsl; then echo "wsl"; else echo "linux"; fi
+      ;;
+    *) echo "other" ;;
+  esac
+}
+
+PLAT="$(platform)"
 
 echo "======================================"
 echo "OWASP Bootcamp Workshop"
 echo "======================================"
 echo ""
 
-# Check if Docker is running
-if ! docker info > /dev/null 2>&1; then
-    echo "❌ Docker is not running!"
-    echo "Please start Docker Desktop and try again."
+# Docker connectivity check
+docker_err="$(docker info >/dev/null 2>&1 || docker info 2>&1 || true)"
+
+if ! docker info >/dev/null 2>&1; then
+  if echo "$docker_err" | grep -qi "permission denied.*docker.sock"; then
+    echo "${NO} Docker is running, but you don't have permission to use it."
+    echo ""
+    echo "Fix (Linux/WSL):"
+    echo "  sudo usermod -aG docker \"$USER\""
+    echo "  newgrp docker"
+    echo ""
+    echo "Or log out and back in."
     exit 1
-fi
+  fi
 
-echo "✅ Docker is running"
-echo ""
-
-# Function to check if a port is available
-check_port() {
-    local port=$1
-    # Try lsof first (common on macOS/Linux)
-    if command -v lsof >/dev/null 2>&1; then
-        if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then
-            return 1  # Port in use
-        fi
-    fi
-    # Fallback to netstat (more universal)
-    if command -v netstat >/dev/null 2>&1; then
-        if netstat -an | grep ":$port " | grep LISTEN >/dev/null 2>&1; then
-            return 1  # Port in use
-        fi
-    fi
-    return 0  # Port available
-}
-
-# Check if ports are available
-echo "Checking ports..."
-ports_in_use=""
-for port in {3000..3010}; do
-    if ! check_port $port; then
-        ports_in_use="$ports_in_use $port"
-    fi
-done
-
-if [ ! -z "$ports_in_use" ]; then
-    echo "⚠️  Warning: The following ports are already in use:$ports_in_use"
-    echo "You may need to stop other applications using these ports."
-    read -p "Continue anyway? (y/n) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        exit 1
-    fi
-fi
-
-echo "✅ Ports available"
-echo ""
-
-# Build and start containers
-echo "Building and starting containers..."
-echo "This may take a few minutes on first run..."
-echo ""
-
-docker compose up -d
-
-if [ $? -eq 0 ]; then
+  if echo "$docker_err" | grep -qiE "Cannot connect to the Docker daemon|is the docker daemon running|connection refused|no such file|dial unix"; then
+    echo "${NO} Docker is not available."
     echo ""
-    echo "======================================"
-    echo "✅ Workshop is ready!"
-    echo "======================================"
-    echo ""
-    echo "Access the labs at:"
-    echo "  Citadel (Main App):  http://localhost:3000"
-    echo "  Lab A01:             http://localhost:3001"
-    echo "  Lab A02:             http://localhost:3002"
-    echo "  Lab A03:             http://localhost:3003"
-    echo "  Lab A04:             http://localhost:3004"
-    echo "  Lab A05:             http://localhost:3005"
-    echo "  Lab A06:             http://localhost:3006"
-    echo "  Lab A07:             http://localhost:3007"
-    echo "  Lab A08:             http://localhost:3008"
-    echo "  Lab A09:             http://localhost:3009"
-    echo "  Lab A10:             http://localhost:3010"
-    echo ""
-    echo "To stop the workshop, run: ./stop.sh"
-    echo "Or: docker compose down"
-    echo ""
-    echo "View logs: docker compose logs -f"
-    echo ""
-else
-    echo "❌ Failed to start containers"
-    echo "Check the error messages above"
+    case "$PLAT" in
+      macos)
+        echo "Start Docker Desktop (Applications → Docker) and wait for it to say 'Running'."
+        ;;
+      wsl)
+        echo "If using Docker Desktop integration: start Docker Desktop on Windows."
+        echo "If running dockerd inside WSL: start it with:"
+        echo "  sudo service docker start   (or)   sudo dockerd"
+        ;;
+      linux)
+        echo "Start it with:"
+        echo "  sudo systemctl enable --now docker"
+        echo "  sudo systemctl enable --now containerd"
+        ;;
+      *)
+        echo "Start your Docker engine and try again."
+        ;;
+    esac
     exit 1
+  fi
+
+  echo "${NO} Docker check failed:"
+  echo "$docker_err"
+  exit 1
 fi
+
+echo "${OK} Docker is available"
+echo ""
