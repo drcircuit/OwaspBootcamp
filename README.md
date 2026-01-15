@@ -189,35 +189,49 @@ For students using Azure VDI machines:
 
 ## 🛠️ Troubleshooting
 
+### Port conflicts / "address already in use"
+If you see errors like `failed to bind host port... address already in use`, containers are already running.
+
+```bash
+# Stop all running containers first
+docker compose down
+
+# Or use the cleanup script
+./cleanup.sh
+
+# Then start fresh
+docker compose up -d
+```
+
 ### Containers won't start
 ```bash
 # Check Docker is running
 docker ps
 
-# Check port conflicts
-netstat -ano | findstr :3000
+# Stop any running containers
+docker compose down
 
 # Rebuild containers
-docker-compose build --no-cache
-docker-compose up -d
+docker compose build --no-cache
+docker compose up -d
 ```
 
 ### Out of memory
 ```bash
 # Stop unnecessary containers
-docker-compose down
+docker compose down
 
 # Start only needed labs
-docker-compose up -d lab-a01-broken-access
+docker compose up -d lab-a01-broken-access
 ```
 
 ### Clean up everything
 ```bash
 # Remove all containers and volumes
-docker-compose down -v
+docker compose down -v
 
 # Remove all images
-docker-compose down --rmi all
+docker compose down --rmi all
 ```
 
 ## 📖 Additional Resources
