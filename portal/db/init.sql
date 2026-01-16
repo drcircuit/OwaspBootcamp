@@ -47,11 +47,24 @@ CREATE TABLE IF NOT EXISTS user_progress (
 -- A01: BROKEN ACCESS CONTROL
 -- Natural Progression: Understanding → Enumeration → Exploitation → Escalation
 -- ========================================
+-- Example consists of multiple sub-challenges demonstrating all tools
 INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order) VALUES
-    ('A01', 'A01 Example: Understanding IDOR', 'Learn about Insecure Direct Object References and how to exploit them using real tools.', 'Tutorial', 50, 'NSA{IDOR_EXAMPLE_COMPLETE}', 'This is a guided walkthrough', 'http://localhost:3001/example', 'example', NULL, 1),
-    ('A01', 'A01 Lab 1: User Enumeration', 'Enumerate users in the system to identify potential targets.', 'Easy', 100, 'NSA{F0UND_TH3_US3RS}', 'User IDs are sequential', 'http://localhost:3001/lab1', 'lab', 1, 2),
-    ('A01', 'A01 Lab 2: Access Other Profiles', 'Exploit IDOR to access data belonging to other users.', 'Medium', 150, 'NSA{1D0R_V1A_1NC3PT10N}', 'Try different IDs', 'http://localhost:3001/lab2', 'lab', 2, 3),
-    ('A01', 'A01 Lab 3: Privilege Escalation', 'Escalate privileges to gain administrator access.', 'Hard', 200, 'NSA{R00T_4CC3SS_4CH13V3D}', 'Admin is just another user', 'http://localhost:3001/lab3', 'lab', 3, 4);
+    ('A01', 'A01 Example Part 1: Browser DevTools', 'Use browser DevTools to inspect API requests and responses.', 'Tutorial', 10, 'NSA{D3VT00LS_M4ST3R}', 'Open DevTools (F12) and check Network tab', 'http://localhost:3001/example', 'example', NULL, 1),
+    ('A01', 'A01 Example Part 2: Using cURL', 'Learn to use cURL for making HTTP requests to test endpoints.', 'Tutorial', 10, 'NSA{CURL_C0MM4ND3R}', 'Use curl to make GET requests', 'http://localhost:3001/example', 'example', NULL, 2),
+    ('A01', 'A01 Example Part 3: Burp Suite Basics', 'Use Burp Suite to intercept and modify HTTP requests.', 'Tutorial', 10, 'NSA{BURP_1NT3RC3PT0R}', 'Configure browser proxy and use Burp Repeater', 'http://localhost:3001/example', 'example', NULL, 3),
+    ('A01', 'A01 Example Part 4: ID Enumeration', 'Practice enumerating user IDs systematically.', 'Tutorial', 20, 'NSA{3NUM3R4T10N_PR0}', 'Iterate through sequential IDs', 'http://localhost:3001/example', 'example', NULL, 4);
+
+-- Lab 1 (Enumeration) - Easy
+INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order) VALUES
+    ('A01', 'A01 Lab 1: User Enumeration', 'Enumerate users in the system to identify potential targets.', 'Easy', 100, 'NSA{F0UND_TH3_US3RS}', 'User IDs are sequential', 'http://localhost:3001/lab1', 'lab', 1, 5);
+
+-- Lab 2 (Exploitation) - Medium
+INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order) VALUES
+    ('A01', 'A01 Lab 2: Access Other Profiles', 'Exploit IDOR to access data belonging to other users.', 'Medium', 150, 'NSA{1D0R_V1A_1NC3PT10N}', 'Try different IDs', 'http://localhost:3001/lab2', 'lab', 2, 6);
+
+-- Lab 3 (Escalation) - Hard
+INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order) VALUES
+    ('A01', 'A01 Lab 3: Privilege Escalation', 'Escalate privileges to gain administrator access.', 'Hard', 200, 'NSA{R00T_4CC3SS_4CH13V3D}', 'Admin is just another user', 'http://localhost:3001/lab3', 'lab', 3, 7);
 
 -- ========================================
 -- A02: SECURITY MISCONFIGURATION

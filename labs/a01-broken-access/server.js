@@ -103,8 +103,9 @@ app.get('/', (req, res) => {
                 </div>
 
                 <div class="challenge">
-                    <h3>📚 Example - IDOR Explained <span class="difficulty example">TUTORIAL</span></h3>
-                    <p>Learn about Insecure Direct Object References (IDOR) with vulnerable and secure code examples. This walkthrough will teach you the concepts before attempting the labs.</p>
+                    <h3>📚 Example - Tools Walkthrough <span class="difficulty example">TUTORIAL</span></h3>
+                    <p>Comprehensive hands-on tutorial teaching Browser DevTools, cURL, Burp Suite, and ID Enumeration. Complete 4 interactive challenges to master all the tools you'll need for the labs.</p>
+                    <p><strong>⚠️ START HERE</strong> if you're new to web security testing!</p>
                     <p><a href="/example">→ Start Tutorial</a></p>
                 </div>
 
@@ -144,13 +145,13 @@ app.get('/', (req, res) => {
     `);
 });
 
-// Example page - Educational walkthrough
+// Example page - Comprehensive walkthrough with 4 sub-challenges
 app.get('/example', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Example - IDOR Explained</title>
+            <title>Example - Tools Walkthrough</title>
             <style>
                 body {
                     background-color: #1a1a1a;
@@ -160,7 +161,7 @@ app.get('/example', (req, res) => {
                     line-height: 1.6;
                 }
                 .container {
-                    max-width: 1000px;
+                    max-width: 1200px;
                     margin: 0 auto;
                 }
                 h1 {
@@ -173,24 +174,25 @@ app.get('/example', (req, res) => {
                 h2 {
                     color: #00ff00;
                     margin-top: 30px;
-                    border-bottom: 1px solid #00ff00;
+                    border-bottom: 2px solid #00ff00;
                     padding-bottom: 5px;
                 }
                 h3 {
                     color: #00ffff;
+                    margin-top: 20px;
                 }
-                .section {
+                .part {
                     background-color: #0a0a0a;
-                    border: 2px solid #00ff00;
-                    padding: 20px;
-                    margin: 20px 0;
+                    border: 3px solid #00ff00;
+                    padding: 25px;
+                    margin: 30px 0;
                     border-radius: 5px;
+                    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
                 }
-                .vulnerable {
-                    border-color: #ff0000;
-                }
-                .secure {
-                    border-color: #00ff00;
+                .part h2 {
+                    margin-top: 0;
+                    color: #00ff00;
+                    font-size: 1.8em;
                 }
                 pre {
                     background-color: #000;
@@ -202,17 +204,26 @@ app.get('/example', (req, res) => {
                 code {
                     color: #00ffff;
                 }
-                .warning {
-                    background-color: #330000;
-                    border-left: 4px solid #ff0000;
+                .endpoint {
+                    background-color: #000;
+                    padding: 15px;
+                    border-radius: 5px;
+                    border-left: 4px solid #ffaa00;
+                    margin: 15px 0;
+                    font-family: monospace;
+                }
+                .hint {
+                    background-color: #1a1a00;
+                    border-left: 4px solid #ffaa00;
                     padding: 15px;
                     margin: 15px 0;
                 }
-                .success {
-                    background-color: #003300;
+                .flag {
+                    background-color: #001a00;
                     border-left: 4px solid #00ff00;
                     padding: 15px;
                     margin: 15px 0;
+                    font-weight: bold;
                 }
                 a {
                     color: #00ffff;
@@ -223,154 +234,367 @@ app.get('/example', (req, res) => {
                     color: #00ff00;
                     border-bottom: 1px solid #00ff00;
                 }
-                .tools {
+                .intro {
                     background-color: #0a0a0a;
-                    border: 2px solid #ffaa00;
-                    padding: 15px;
+                    border: 2px solid #00ffff;
+                    padding: 20px;
                     margin: 20px 0;
+                    border-radius: 5px;
+                }
+                ul {
+                    line-height: 1.8;
+                }
+                .step {
+                    margin: 10px 0;
+                    padding-left: 10px;
                 }
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>📚 IDOR TUTORIAL</h1>
+                <h1>🎓 COMPREHENSIVE TOOLS WALKTHROUGH</h1>
                 
-                <div class="section">
-                    <h2>What is IDOR?</h2>
-                    <p><strong>Insecure Direct Object Reference (IDOR)</strong> is a vulnerability that occurs when an application exposes a reference to an internal object (like a database key) without proper authorization checks.</p>
-                    <p>Attackers can manipulate these references to access unauthorized data or functionality.</p>
+                <div class="intro">
+                    <h2>Welcome to the Example Tutorial</h2>
+                    <p>This walkthrough teaches you ALL the tools and techniques needed for the 3 labs ahead. Complete all 4 parts to master:</p>
+                    <ul>
+                        <li><strong>Browser DevTools</strong> - Inspecting network requests</li>
+                        <li><strong>cURL</strong> - Command-line HTTP requests</li>
+                        <li><strong>Burp Suite</strong> - Intercepting and modifying requests</li>
+                        <li><strong>ID Enumeration</strong> - Systematic discovery of resources</li>
+                    </ul>
+                    <p>⚠️ <strong>Important:</strong> You must use the actual tools - no buttons will do the work for you!</p>
                 </div>
 
-                <div class="section vulnerable">
-                    <h2>❌ Vulnerable Code Example</h2>
-                    <p>This code allows any authenticated user to access any user's profile:</p>
-                    <pre><code>// VULNERABLE - No authorization check
-app.get('/api/user/:id/profile', (req, res) => {
-    const userId = req.params.id;
-    const user = database.getUserById(userId);
-    
-    // ⚠️ Problem: Only checks if someone is logged in
-    // but doesn't verify if they should access this profile
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Not logged in' });
-    }
-    
-    return res.json(user); // Returns ANY user's data!
-});</code></pre>
-                    <div class="warning">
-                        <strong>⚠️ VULNERABILITY:</strong> The code checks authentication (are you logged in?) but not authorization (are you allowed to access THIS resource?).
-                    </div>
-                </div>
-
-                <div class="section secure">
-                    <h2>✅ Secure Code Example</h2>
-                    <p>This code properly validates the user can only access their own profile:</p>
-                    <pre><code>// SECURE - Proper authorization check
-app.get('/api/user/:id/profile', (req, res) => {
-    const userId = req.params.id;
-    const currentUser = req.user.id; // From session
-    
-    // Check authentication
-    if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Not logged in' });
-    }
-    
-    // ✅ Check authorization: Is this YOUR profile?
-    if (userId != currentUser) {
-        return res.status(403).json({ error: 'Forbidden' });
-    }
-    
-    const user = database.getUserById(userId);
-    return res.json(user);
-});</code></pre>
-                    <div class="success">
-                        <strong>✅ SECURE:</strong> This code verifies the authenticated user is requesting their OWN resource before returning data.
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2>How to Exploit IDOR</h2>
-                    <p>IDOR vulnerabilities are exploited by modifying object references in API calls:</p>
-                    <ol>
-                        <li><strong>Identify the pattern:</strong> Find endpoints that use IDs (/api/user/<strong>123</strong>/profile)</li>
-                        <li><strong>Test different values:</strong> Try other IDs (1, 2, 3, 4, 100, etc.)</li>
-                        <li><strong>Check responses:</strong> Look for data you shouldn't be able to access</li>
-                    </ol>
-                </div>
-
-                <div class="tools">
-                    <h2>🛠️ Tools for Testing</h2>
+                <!-- PART 1: Browser DevTools -->
+                <div class="part">
+                    <h2>🔍 Part 1: Browser DevTools</h2>
                     
-                    <h3>1. Using curl (Command Line)</h3>
-                    <pre><code># Basic GET request
-curl http://localhost:3001/api/lab1/user/1
-
-# Test different IDs
-curl http://localhost:3001/api/lab1/user/2
-curl http://localhost:3001/api/lab1/user/3
-
-# Save response to file
-curl http://localhost:3001/api/lab1/user/1 -o response.json
-
-# View headers
-curl -i http://localhost:3001/api/lab1/user/1</code></pre>
-
-                    <h3>2. Using Browser DevTools</h3>
-                    <p>1. Press <strong>F12</strong> to open DevTools</p>
-                    <p>2. Go to <strong>Network</strong> tab</p>
-                    <p>3. Interact with the page and observe API calls</p>
-                    <p>4. Right-click a request → <strong>Copy as cURL</strong> or <strong>Edit and Resend</strong></p>
-                    <p>5. In <strong>Console</strong> tab, use fetch():</p>
-                    <pre><code>// Example fetch request
-fetch('http://localhost:3001/api/lab1/user/1')
+                    <h3>What You'll Learn</h3>
+                    <p>Browser DevTools (F12) is your first line of investigation. The Network tab shows all HTTP requests your browser makes, revealing API endpoints, parameters, and responses.</p>
+                    
+                    <h3>How to Use DevTools</h3>
+                    <div class="step">
+                        <strong>Step 1:</strong> Press <code>F12</code> (or right-click → Inspect) to open DevTools<br>
+                        <strong>Step 2:</strong> Click the <strong>Network</strong> tab<br>
+                        <strong>Step 3:</strong> Refresh the page or trigger an action to see requests<br>
+                        <strong>Step 4:</strong> Click on a request to view details (Headers, Response, etc.)
+                    </div>
+                    
+                    <h3>Your Challenge</h3>
+                    <p>Use DevTools to inspect the API endpoint below and retrieve user data.</p>
+                    
+                    <div class="endpoint">
+                        <strong>API Endpoint:</strong><br>
+                        <code>GET http://localhost:3001/api/example/part1/user/:id</code>
+                    </div>
+                    
+                    <h3>Instructions</h3>
+                    <div class="step">
+                        1. Open DevTools (F12) and go to the <strong>Network</strong> tab<br>
+                        2. In the <strong>Console</strong> tab, paste this command:<br>
+                        <pre><code>fetch('http://localhost:3001/api/example/part1/user/1')
     .then(r => r.json())
     .then(data => console.log(data));</code></pre>
-
-                    <h3>3. Using Postman</h3>
-                    <p>1. Create a new GET request</p>
-                    <p>2. Enter the URL: <code>http://localhost:3001/api/lab1/user/1</code></p>
-                    <p>3. Click <strong>Send</strong></p>
-                    <p>4. Change the ID in the URL and test different values</p>
-
-                    <h3>4. Using Burp Suite</h3>
-                    <p>1. Configure browser proxy to route through Burp (127.0.0.1:8080)</p>
-                    <p>2. Navigate to the lab in your browser</p>
-                    <p>3. Intercept requests in <strong>Proxy → Intercept</strong></p>
-                    <p>4. Modify the ID parameter before forwarding</p>
-                    <p>5. Use <strong>Repeater</strong> to test multiple values quickly</p>
+                        3. Press Enter and check the response<br>
+                        4. Look in the <strong>Network</strong> tab - you'll see the request appear<br>
+                        5. Click on it to inspect headers, response, timing, etc.<br>
+                        6. Try changing the user ID to <code>42</code> to get the flag
+                    </div>
+                    
+                    <div class="hint">
+                        💡 <strong>Hint:</strong> The flag is hidden at user ID 42. Modify the fetch URL to access it.
+                    </div>
+                    
+                    <div class="flag">
+                        🎯 <strong>Flag:</strong> <code>NSA{D3VT00LS_M4ST3R}</code>
+                    </div>
                 </div>
 
-                <div class="section">
-                    <h2>Real-World Impact</h2>
-                    <p>IDOR vulnerabilities have led to serious breaches:</p>
-                    <ul>
-                        <li><strong>Financial data exposure:</strong> Accessing other users' bank statements</li>
-                        <li><strong>Privacy violations:</strong> Viewing private messages, medical records</li>
-                        <li><strong>Account takeover:</strong> Modifying other users' settings</li>
-                        <li><strong>Privilege escalation:</strong> Accessing admin functionality</li>
+                <!-- PART 2: Using cURL -->
+                <div class="part">
+                    <h2>💻 Part 2: Using cURL</h2>
+                    
+                    <h3>What You'll Learn</h3>
+                    <p>cURL is a command-line tool for making HTTP requests. It's more powerful than browser tools and essential for automation and testing.</p>
+                    
+                    <h3>Basic cURL Syntax</h3>
+                    <pre><code># Basic GET request
+curl http://localhost:3001/api/endpoint
+
+# GET with custom header
+curl -H "X-Custom-Header: value" http://localhost:3001/api/endpoint
+
+# View response headers
+curl -i http://localhost:3001/api/endpoint
+
+# Follow redirects
+curl -L http://localhost:3001/api/endpoint
+
+# Save response to file
+curl http://localhost:3001/api/endpoint -o output.json</code></pre>
+                    
+                    <h3>Your Challenge</h3>
+                    <p>The API endpoint below returns data, but only responds with the flag when accessed via cURL (checks User-Agent header).</p>
+                    
+                    <div class="endpoint">
+                        <strong>API Endpoint:</strong><br>
+                        <code>GET http://localhost:3001/api/example/part2/test</code>
+                    </div>
+                    
+                    <h3>Instructions</h3>
+                    <div class="step">
+                        1. Open a terminal/command prompt<br>
+                        2. Run this cURL command:<br>
+                        <pre><code>curl http://localhost:3001/api/example/part2/test</code></pre>
+                        3. The endpoint detects you're using cURL and returns the flag<br>
+                        4. Try it in a browser - you'll get a different response!
+                    </div>
+                    
+                    <div class="hint">
+                        💡 <strong>Hint:</strong> The server checks the User-Agent header. cURL identifies itself differently than browsers.
+                    </div>
+                    
+                    <div class="flag">
+                        🎯 <strong>Flag:</strong> <code>NSA{CURL_C0MM4ND3R}</code>
+                    </div>
+                </div>
+
+                <!-- PART 3: Burp Suite -->
+                <div class="part">
+                    <h2>🔥 Part 3: Burp Suite</h2>
+                    
+                    <h3>What You'll Learn</h3>
+                    <p>Burp Suite is an intercepting proxy that sits between your browser and the server. You can capture, inspect, and modify requests before they're sent.</p>
+                    
+                    <h3>Setting Up Burp Suite</h3>
+                    <div class="step">
+                        <strong>Step 1:</strong> Download and install Burp Suite Community Edition<br>
+                        <strong>Step 2:</strong> Start Burp and go to the <strong>Proxy</strong> tab<br>
+                        <strong>Step 3:</strong> Configure your browser to use proxy 127.0.0.1:8080<br>
+                        <strong>Step 4:</strong> In Burp, turn <strong>Intercept On</strong><br>
+                        <strong>Step 5:</strong> Browse to a page - Burp will capture the request<br>
+                        <strong>Step 6:</strong> Modify the request and click <strong>Forward</strong>
+                    </div>
+                    
+                    <h3>Using Burp Repeater</h3>
+                    <p>Right-click any request → <strong>Send to Repeater</strong> → Modify and resend multiple times</p>
+                    
+                    <h3>Your Challenge</h3>
+                    <p>The API endpoint below only returns the flag when you modify a specific parameter in the request.</p>
+                    
+                    <div class="endpoint">
+                        <strong>API Endpoint:</strong><br>
+                        <code>GET http://localhost:3001/api/example/part3/intercept?access=user</code>
+                    </div>
+                    
+                    <h3>Instructions</h3>
+                    <div class="step">
+                        <strong>Option A - Using Burp Suite:</strong><br>
+                        1. Set up Burp proxy as described above<br>
+                        2. Visit the URL in your browser<br>
+                        3. Intercept the request in Burp<br>
+                        4. Change the parameter from <code>access=user</code> to <code>access=admin</code><br>
+                        5. Forward the modified request<br><br>
+                        
+                        <strong>Option B - Using cURL (simpler):</strong><br>
+                        <pre><code>curl "http://localhost:3001/api/example/part3/intercept?access=admin"</code></pre>
+                    </div>
+                    
+                    <div class="hint">
+                        💡 <strong>Hint:</strong> Change the access parameter from "user" to "admin" to get elevated privileges and retrieve the flag.
+                    </div>
+                    
+                    <div class="flag">
+                        🎯 <strong>Flag:</strong> <code>NSA{BURP_1NT3RC3PT0R}</code>
+                    </div>
+                </div>
+
+                <!-- PART 4: ID Enumeration -->
+                <div class="part">
+                    <h2>🔢 Part 4: ID Enumeration</h2>
+                    
+                    <h3>What You'll Learn</h3>
+                    <p>ID Enumeration is the systematic process of testing sequential IDs to discover hidden resources. Many APIs use predictable numeric IDs, allowing you to map out all resources.</p>
+                    
+                    <h3>Enumeration Techniques</h3>
+                    <pre><code># Test sequential IDs
+curl http://localhost:3001/api/resource/1
+curl http://localhost:3001/api/resource/2
+curl http://localhost:3001/api/resource/3
+
+# Or use a loop (bash)
+for i in {1..10}; do
+    curl http://localhost:3001/api/resource/$i
+done
+
+# With error handling
+for i in {1..10}; do
+    echo "Testing ID: $i"
+    curl -s http://localhost:3001/api/resource/$i | grep -q "error" || echo "Found: $i"
+done</code></pre>
+                    
+                    <h3>Your Challenge</h3>
+                    <p>The API has data for user IDs 1-5. Discover all 5 users to receive the flag.</p>
+                    
+                    <div class="endpoint">
+                        <strong>API Endpoint:</strong><br>
+                        <code>GET http://localhost:3001/api/example/part4/enumerate/:id</code>
+                    </div>
+                    
+                    <h3>Instructions</h3>
+                    <div class="step">
+                        <strong>Method 1 - Manual Testing:</strong><br>
+                        <pre><code>curl http://localhost:3001/api/example/part4/enumerate/1
+curl http://localhost:3001/api/example/part4/enumerate/2
+curl http://localhost:3001/api/example/part4/enumerate/3
+curl http://localhost:3001/api/example/part4/enumerate/4
+curl http://localhost:3001/api/example/part4/enumerate/5</code></pre>
+                        
+                        <strong>Method 2 - Using a Loop (Linux/Mac):</strong><br>
+                        <pre><code>for i in {1..10}; do curl http://localhost:3001/api/example/part4/enumerate/$i; done</code></pre>
+                        
+                        <strong>Method 3 - Browser DevTools:</strong><br>
+                        Open Console (F12) and run:<br>
+                        <pre><code>for(let i=1; i<=10; i++) {
+    fetch(\`http://localhost:3001/api/example/part4/enumerate/\${i}\`)
+        .then(r => r.json())
+        .then(data => console.log(\`ID \${i}:\`, data));
+}</code></pre>
+                    </div>
+                    
+                    <div class="hint">
+                        💡 <strong>Hint:</strong> Keep track of which IDs return valid data. When you've found all 5 valid users, request ID 5 again to get the flag.
+                    </div>
+                    
+                    <div class="flag">
+                        🎯 <strong>Flag:</strong> <code>NSA{3NUM3R4T10N_PR0}</code>
+                    </div>
+                </div>
+
+                <!-- Conclusion -->
+                <div class="intro" style="text-align: center; margin-top: 40px;">
+                    <h2>🎉 Tutorial Complete!</h2>
+                    <p>You've learned all the essential tools for the labs:</p>
+                    <ul style="text-align: left;">
+                        <li>✅ Browser DevTools for inspecting network traffic</li>
+                        <li>✅ cURL for command-line HTTP requests</li>
+                        <li>✅ Burp Suite for intercepting and modifying requests</li>
+                        <li>✅ ID Enumeration for systematic resource discovery</li>
                     </ul>
-                </div>
-
-                <div class="section">
-                    <h2>Prevention Best Practices</h2>
-                    <ol>
-                        <li><strong>Implement authorization checks:</strong> Verify the user has permission for EACH request</li>
-                        <li><strong>Use indirect references:</strong> Map user input to internal objects server-side</li>
-                        <li><strong>Session-based access:</strong> Retrieve resources based on session data, not user input</li>
-                        <li><strong>Access control lists:</strong> Maintain and verify permissions for each resource</li>
-                        <li><strong>Testing:</strong> Regularly test with different user roles and permissions</li>
-                    </ol>
-                </div>
-
-                <div class="section" style="text-align: center; margin-top: 40px;">
-                    <h2>Ready to Practice?</h2>
-                    <p>Now that you understand IDOR vulnerabilities, try the labs:</p>
-                    <p><a href="/">← Back to Labs</a></p>
+                    <p><strong>Ready to apply these skills?</strong></p>
+                    <p><a href="/">← Start the Labs</a></p>
                 </div>
             </div>
         </body>
         </html>
     `);
+});
+
+// Example API Endpoints
+
+// Part 1: Browser DevTools - User lookup by ID
+app.get('/api/example/part1/user/:id', (req, res) => {
+    const userId = parseInt(req.params.id);
+    
+    if (userId === 42) {
+        return res.json({
+            id: 42,
+            username: 'devtools_master',
+            message: 'Congratulations! You used Browser DevTools to inspect network requests.',
+            flag: 'NSA{D3VT00LS_M4ST3R}'
+        });
+    }
+    
+    // Generic response for other IDs
+    return res.json({
+        id: userId,
+        username: `user${userId}`,
+        message: 'This is a regular user. Try ID 42 to get the flag!'
+    });
+});
+
+// Part 2: cURL - Detects User-Agent
+app.get('/api/example/part2/test', (req, res) => {
+    const userAgent = req.headers['user-agent'] || '';
+    
+    // Check if request came from cURL
+    if (userAgent.toLowerCase().includes('curl')) {
+        return res.json({
+            message: 'Congratulations! You used cURL to make this request.',
+            userAgent: userAgent,
+            flag: 'NSA{CURL_C0MM4ND3R}',
+            tip: 'cURL is essential for testing APIs from the command line!'
+        });
+    }
+    
+    // Browser or other client
+    return res.json({
+        message: 'This endpoint requires cURL to access.',
+        userAgent: userAgent,
+        hint: 'Try accessing this endpoint using: curl http://localhost:3001/api/example/part2/test'
+    });
+});
+
+// Part 3: Burp Suite - Requires modified parameter
+app.get('/api/example/part3/intercept', (req, res) => {
+    const access = req.query.access;
+    
+    if (access === 'admin') {
+        return res.json({
+            message: 'Congratulations! You modified the request parameter.',
+            access: 'admin',
+            flag: 'NSA{BURP_1NT3RC3PT0R}',
+            tip: 'You successfully intercepted and modified the request. This is how attackers bypass client-side restrictions!'
+        });
+    }
+    
+    return res.json({
+        message: 'Access denied. Regular users cannot access this resource.',
+        access: access || 'none',
+        hint: 'Try changing the access parameter to "admin" in the URL or using Burp Suite to intercept and modify the request.'
+    });
+});
+
+// Part 4: ID Enumeration - Track discovered users
+const enumerationData = [
+    { id: 1, username: 'alice', department: 'Engineering' },
+    { id: 2, username: 'bob', department: 'Sales' },
+    { id: 3, username: 'charlie', department: 'Marketing' },
+    { id: 4, username: 'diana', department: 'HR' },
+    { id: 5, username: 'eve', department: 'Security' }
+];
+
+app.get('/api/example/part4/enumerate/:id', (req, res) => {
+    const userId = parseInt(req.params.id);
+    const user = enumerationData.find(u => u.id === userId);
+    
+    if (!user) {
+        return res.status(404).json({ 
+            error: 'User not found',
+            message: `No user exists with ID ${userId}`
+        });
+    }
+    
+    // Special response when accessing the last valid user (ID 5)
+    if (userId === 5) {
+        return res.json({
+            id: user.id,
+            username: user.username,
+            department: user.department,
+            message: 'Congratulations! You discovered all 5 users through enumeration.',
+            flag: 'NSA{3NUM3R4T10N_PR0}',
+            allUsers: enumerationData.map(u => u.username),
+            tip: 'Systematic enumeration helps you map out all resources in a system!'
+        });
+    }
+    
+    return res.json({
+        id: user.id,
+        username: user.username,
+        department: user.department,
+        message: `Found user ${userId}. Keep enumerating to find all users!`
+    });
 });
 
 // Lab 1 - User Enumeration (Easy)
