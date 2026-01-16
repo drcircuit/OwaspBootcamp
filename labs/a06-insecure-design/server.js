@@ -692,6 +692,10 @@ app.post('/api/lab1/verify-pin', (req, res) => {
     transferAttempts[clientIp] = [];
   }
   
+  // Clean up old attempts (older than 1 hour) to prevent memory leaks
+  const oneHourAgo = Date.now() - (60 * 60 * 1000);
+  transferAttempts[clientIp] = transferAttempts[clientIp].filter(timestamp => timestamp > oneHourAgo);
+  
   transferAttempts[clientIp].push(Date.now());
   const attemptCount = transferAttempts[clientIp].length;
   
