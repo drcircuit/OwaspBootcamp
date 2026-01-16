@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     email VARCHAR(100),
     role VARCHAR(20) DEFAULT 'user',
+    notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -27,18 +28,21 @@ CREATE TABLE IF NOT EXISTS sensitive_data (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Insert sample data
-INSERT INTO users (username, password, email, role) VALUES
-    ('admin', 'admin123', 'admin@citadel.local', 'admin'),
-    ('user1', 'password123', 'user1@citadel.local', 'user'),
-    ('user2', 'pass456', 'user2@citadel.local', 'user');
+-- Insert sample data with flags embedded realistically
+-- A01 flag hidden in admin notes, A04 flag in plaintext passwords
+INSERT INTO users (username, password, email, role, notes) VALUES
+    ('admin', 'admin123', 'admin@evilcorp.com', 'admin', 'Escalation successful: NSA{R00T_4CC3SS_4CH13V3D}'),
+    ('user1', 'password123', 'user1@evilcorp.com', 'user', 'Regular user account'),
+    ('user2', 'pass456', 'user2@evilcorp.com', 'user', 'Regular user account'),
+    ('backdoor', 'NSA{P3RS1ST3NC3_1S_K3Y}', 'backdoor@evilcorp.com', 'user', 'Persistence established');
 
 INSERT INTO products (name, description, price, stock) VALUES
     ('Laptop', 'High-performance laptop', 999.99, 10),
     ('Mouse', 'Wireless mouse', 29.99, 50),
     ('Keyboard', 'Mechanical keyboard', 79.99, 30);
 
+-- A05 flag in sensitive data that can be extracted via SQL injection
 INSERT INTO sensitive_data (user_id, data) VALUES
-    (1, 'Admin secret key: ABC123XYZ'),
-    (2, 'User1 SSN: 123-45-6789'),
-    (3, 'User2 Credit Card: 4111-1111-1111-1111');
+    (1, 'Admin access token: NSA{1NJ3CT_Y0UR_W4Y_1N}'),
+    (2, 'User1 API key: abc123def456'),
+    (3, 'User2 session token: xyz789uvw012');

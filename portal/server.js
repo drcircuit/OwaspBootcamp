@@ -196,6 +196,48 @@ app.get('/dashboard', requireAuth, async (req, res) => {
   }
 });
 
+// OWASP Topic view - show all challenges for an OWASP category
+app.get('/topic/:category', requireAuth, async (req, res) => {
+  try {
+    const category = req.params.category.toUpperCase();
+    
+    // Get challenges for this OWASP category with user progress
+    const challengesResult = await pool.query(`
+      SELECT c.*, 
+        cs.stage_name,
+        cs.icon as stage_icon,
+        up.completed,
+        up.completed_at,
+        up.attempts
+      FROM challenges c
+      LEFT JOIN challenge_stages cs ON c.stage_id = cs.id
+      LEFT JOIN user_progress up ON up.challenge_id = c.id AND up.user_id = $1
+      WHERE c.owasp_category = $2
+      ORDER BY 
+        CASE c.challenge_type 
+          WHEN 'example' THEN 1 
+          WHEN 'lab' THEN 2 
+          WHEN 'exam' THEN 3 
+        END,
+        c.lab_number NULLS FIRST,
+        c.id
+    `, [req.user.id, category]);
+    
+    if (challengesResult.rows.length === 0) {
+      return res.status(404).send('OWASP category not found');
+    }
+    
+    res.render('topic', {
+      user: req.user,
+      category: category,
+      challenges: challengesResult.rows
+    });
+  } catch (err) {
+    console.error('Topic error:', err);
+    res.status(500).send('Error loading topic');
+  }
+});
+
 // Stage details - show challenges for a stage
 app.get('/stage/:id', requireAuth, async (req, res) => {
   try {

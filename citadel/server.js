@@ -40,11 +40,7 @@ app.get('/user/:id', async (req, res) => {
     const result = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
     if (result.rows.length > 0) {
       const user = result.rows[0];
-      // Award flag when accessing admin account
-      if (user.role === 'admin') {
-        user.flag = 'NSA{R00T_4CC3SS_4CH13V3D}';
-        user.exploited = 'You escalated privileges to admin!';
-      }
+      // Flag hidden in admin account's notes field
       res.render('user', { user });
     } else {
       res.status(404).send('User not found');
@@ -57,13 +53,15 @@ app.get('/user/:id', async (req, res) => {
 // A02: Security Misconfiguration - Debug endpoint exposed
 app.get('/debug/config', (req, res) => {
   // Vulnerability: Exposes sensitive configuration
+  // Flag hidden in environment config
   res.json({
     database: {
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD
     },
-    environment: process.env.NODE_ENV
+    environment: process.env.NODE_ENV,
+    version: process.env.APP_VERSION || '1.0.0'
   });
 });
 
@@ -76,18 +74,14 @@ app.post('/register', async (req, res) => {
       'INSERT INTO users (username, password, email) VALUES ($1, $2, $3)',
       [username, password, email]
     );
-    // Award flag for creating a backdoor account
-    const flag = 'NSA{P3RS1ST3NC3_1S_K3Y}';
     
-    // Check if client prefers JSON over HTML using Express's accepts() method
+    // Success response without revealing vulnerability
     if (req.accepts(['json', 'html']) === 'json') {
       res.json({ 
         message: 'User registered successfully',
-        flag,
-        exploited: 'You created a persistent backdoor account!'
+        username: username
       });
     } else {
-      // For form submissions, just redirect - flag discovery is via API call
       res.redirect('/login');
     }
   } catch (err) {
