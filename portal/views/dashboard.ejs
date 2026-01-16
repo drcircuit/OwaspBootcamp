@@ -76,29 +76,56 @@
                 </div>
             </section>
             
-            <!-- Hacking Stages -->
+            <!-- OWASP Topics -->
             <section>
                 <h2 style="font-family: 'Orbitron', monospace; color: var(--neon-blue); margin-bottom: 20px;">
-                    🎯 ATTACK METHODOLOGY
+                    🔒 OWASP TOP 10 TOPICS
                 </h2>
+                <p style="color: var(--neon-blue); margin-bottom: 25px;">
+                    Each topic contains a natural progression: Example → Lab 1 (Easy) → Lab 2 (Medium) → Lab 3 (Hard)
+                </p>
                 
                 <div class="stages-grid">
-                    <% stages.forEach(stage => { %>
-                        <a href="/stage/<%= stage.id %>" style="text-decoration: none;">
+                    <% topics.forEach(topic => { %>
+                        <a href="/topic/<%= topic.owasp_category %>" style="text-decoration: none;">
                             <div class="stage-card">
                                 <div class="stage-header">
-                                    <span class="stage-icon"><%= stage.icon %></span>
-                                    <h3 class="stage-title"><%= stage.stage_name %></h3>
+                                    <span class="stage-icon">🔒</span>
+                                    <h3 class="stage-title"><%= topic.owasp_category %></h3>
                                 </div>
-                                <p class="stage-description"><%= stage.description %></p>
+                                <p class="stage-description">
+                                    <% if (topic.owasp_category === 'A01') { %>
+                                        Broken Access Control - IDOR and privilege escalation
+                                    <% } else if (topic.owasp_category === 'A02') { %>
+                                        Security Misconfiguration - Debug endpoints and exposed configs
+                                    <% } else if (topic.owasp_category === 'A03') { %>
+                                        Supply Chain Failures - Vulnerable dependencies
+                                    <% } else if (topic.owasp_category === 'A04') { %>
+                                        Cryptographic Failures - Weak hashing and plaintext storage
+                                    <% } else if (topic.owasp_category === 'A05') { %>
+                                        Injection - SQL injection and data extraction
+                                    <% } else if (topic.owasp_category === 'A06') { %>
+                                        Insecure Design - Business logic flaws
+                                    <% } else if (topic.owasp_category === 'A07') { %>
+                                        Authentication Failures - Weak passwords and session hijacking
+                                    <% } else if (topic.owasp_category === 'A08') { %>
+                                        Integrity Failures - Unsigned updates and checksums
+                                    <% } else if (topic.owasp_category === 'A09') { %>
+                                        Logging Failures - Missing logs and data leaks
+                                    <% } else if (topic.owasp_category === 'A10') { %>
+                                        Exception Mishandling - Stack traces and information disclosure
+                                    <% } else if (topic.owasp_category === 'ALL') { %>
+                                        Final Exam - All vulnerabilities, no hints
+                                    <% } %>
+                                </p>
                                 <div class="stage-progress">
                                     <span class="challenge-count">
-                                        <%= stage.total_challenges %> Challenges
+                                        <%= topic.total_challenges %> Challenges
                                     </span>
                                     <span class="completed">
                                         <% 
-                                        const completed = parseInt(stage.completed_challenges) || 0;
-                                        const total = parseInt(stage.total_challenges) || 0;
+                                        const completed = parseInt(topic.completed_challenges) || 0;
+                                        const total = parseInt(topic.total_challenges) || 0;
                                         %>
                                         <%= completed %> / <%= total %> ✓
                                     </span>
@@ -111,25 +138,14 @@
             
             <div class="mt-3 text-center" style="padding: 30px; background: rgba(255, 0, 110, 0.1); border: 2px solid var(--neon-pink); border-radius: 8px;">
                 <h3 style="color: var(--neon-pink); font-family: 'Orbitron', monospace; margin-bottom: 10px;">
-                    💡 HACKER TIP
+                    💡 LEARNING PATH
                 </h3>
                 <p style="color: var(--primary-green);">
-                    Follow the methodology: <strong>Recon → Scanning → Initial Access</strong>
+                    Each OWASP topic follows its own natural progression for that vulnerability type.
                     <br>
-                    Each stage builds on the previous one. Use tools like Browser DevTools, Burp Suite, and SQLMap!
-                </p>
-                <p style="color: var(--neon-blue); margin-top: 15px;">
-                    💻 <strong>View by OWASP Topic:</strong>
-                    <a href="/topic/A01" style="color: var(--terminal-green);">A01</a> •
-                    <a href="/topic/A02" style="color: var(--terminal-green);">A02</a> •
-                    <a href="/topic/A03" style="color: var(--terminal-green);">A03</a> •
-                    <a href="/topic/A04" style="color: var(--terminal-green);">A04</a> •
-                    <a href="/topic/A05" style="color: var(--terminal-green);">A05</a> •
-                    <a href="/topic/A06" style="color: var(--terminal-green);">A06</a> •
-                    <a href="/topic/A07" style="color: var(--terminal-green);">A07</a> •
-                    <a href="/topic/A08" style="color: var(--terminal-green);">A08</a> •
-                    <a href="/topic/A09" style="color: var(--terminal-green);">A09</a> •
-                    <a href="/topic/A10" style="color: var(--terminal-green);">A10</a>
+                    Start with the <strong>Example</strong> to learn, then progress through <strong>3 Labs</strong> of increasing difficulty.
+                    <br>
+                    Use real tools like Browser DevTools, Burp Suite, curl, and sqlmap!
                 </p>
             </div>
         </main>

@@ -32,7 +32,29 @@
             <div class="hero">
                 <h1>🔒 OWASP <%= category %></h1>
                 <p style="font-size: 1.1rem; color: var(--neon-blue);">
-                    Complete the example walkthrough, then tackle the 3 progressive labs
+                    <% if (category === 'A01') { %>
+                        Understanding → Enumeration → Exploitation → Escalation
+                    <% } else if (category === 'A02') { %>
+                        Discovery → Analysis → Exploitation → Access
+                    <% } else if (category === 'A03') { %>
+                        Discovery → Scanning → Identification → Exploitation
+                    <% } else if (category === 'A04') { %>
+                        Discovery → Analysis → Cracking → Extraction
+                    <% } else if (category === 'A05') { %>
+                        Discovery → Testing → Exploitation → Extraction
+                    <% } else if (category === 'A06') { %>
+                        Analysis → Identification → Testing → Exploitation
+                    <% } else if (category === 'A07') { %>
+                        Analysis → Testing → Prediction → Hijacking
+                    <% } else if (category === 'A08') { %>
+                        Discovery → Analysis → Manipulation → Exploitation
+                    <% } else if (category === 'A09') { %>
+                        Discovery → Analysis → Exploitation → Evasion
+                    <% } else if (category === 'A10') { %>
+                        Triggering → Analysis → Extraction → Exploitation
+                    <% } else { %>
+                        Complete the example walkthrough, then tackle the 3 progressive labs
+                    <% } %>
                 </p>
                 <p style="margin-top: 15px;">
                     <a href="/dashboard" class="btn">← Back to Mission Control</a>
@@ -68,7 +90,7 @@
                                             <%= challenge.completed ? '✓ ' : '' %><%= challenge.title %>
                                         </h3>
                                         <p style="font-size: 0.85rem; color: var(--neon-blue); margin-top: 5px;">
-                                            <%= challenge.stage_icon %> <%= challenge.stage_name %> Stage
+                                            📖 Example/Walkthrough
                                         </p>
                                     </div>
                                     <div class="challenge-meta">
@@ -129,9 +151,10 @@
                                             <%= challenge.completed ? '✓ ' : '' %><%= challenge.title %>
                                         </h3>
                                         <p style="font-size: 0.85rem; color: var(--neon-blue); margin-top: 5px;">
-                                            <%= challenge.stage_icon %> <%= challenge.stage_name %> Stage
-                                            <% if (challenge.lab_number) { %>
-                                                • Lab <%= challenge.lab_number %>
+                                            <% if (challenge.challenge_type === 'example') { %>
+                                                📖 Example/Walkthrough
+                                            <% } else if (challenge.lab_number) { %>
+                                                🧪 Lab <%= challenge.lab_number %> - <%= challenge.difficulty %>
                                             <% } %>
                                         </p>
                                     </div>
