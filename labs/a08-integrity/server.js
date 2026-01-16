@@ -5,7 +5,13 @@ const PORT = 3008;
 
 app.use(express.json());
 
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ 
+  dest: 'uploads/',
+  limits: { 
+    fileSize: 5 * 1024 * 1024,
+    files: 1
+  }
+});
 
 const cyberpunkStyles = `
   <style>
@@ -631,6 +637,10 @@ curl -X POST -F "file=@malicious.zip" http://localhost:3008/api/lab3/upload</pre
 app.post('/api/lab3/upload', upload.single('file'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
+  }
+
+  if (req.file.size > 5 * 1024 * 1024) {
+    return res.status(400).json({ error: 'File too large. Maximum size is 5MB.' });
   }
 
   res.json({
