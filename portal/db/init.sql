@@ -100,11 +100,24 @@ INSERT INTO challenges (owasp_category, title, description, difficulty, points, 
 -- A05: INJECTION
 -- Natural Progression: Discovery → Testing → Exploitation → Extraction
 -- ========================================
+-- Example consists of multiple sub-challenges demonstrating all tools
 INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order) VALUES
-    ('A05', 'A05 Example: SQL Injection Basics', 'Learn the fundamentals of SQL injection attacks.', 'Tutorial', 50, 'NSA{INJECTION_EXAMPLE_COMPLETE}', 'This is a guided walkthrough', 'http://localhost:3005/example', 'example', NULL, 1),
-    ('A05', 'A05 Lab 1: Find Input Points', 'Identify parameters that interact with the database.', 'Easy', 100, 'NSA{1NPUT_P01NTS_F0UND}', 'Forms and URLs accept input', 'http://localhost:3005/lab1', 'lab', 1, 2),
-    ('A05', 'A05 Lab 2: Test for SQLi', 'Test identified parameters for SQL injection vulnerabilities.', 'Medium', 150, 'NSA{SQL1_D3T3CT3D}', 'Single quotes cause errors', 'http://localhost:3005/lab2', 'lab', 2, 3),
-    ('A05', 'A05 Lab 3: Exploit SQL Injection', 'Exploit SQL injection to bypass authentication or extract data.', 'Hard', 200, 'NSA{1NJ3CT_Y0UR_W4Y_1N}', 'UNION SELECT is powerful', 'http://localhost:3005/lab3', 'lab', 3, 4);
+    ('A05', 'A05 Example Part 1: Finding Input Points', 'Learn to identify all user input points in web applications.', 'Tutorial', 10, 'NSA{1NPUT_HUNT3R}', 'Check forms, URL parameters, and headers', 'http://localhost:3005/example', 'example', NULL, 1),
+    ('A05', 'A05 Example Part 2: Manual SQLi Testing', 'Test for SQL injection using manual techniques.', 'Tutorial', 15, 'NSA{M4NU4L_T3ST3R}', 'Try single quotes and observe errors', 'http://localhost:3005/example', 'example', NULL, 2),
+    ('A05', 'A05 Example Part 3: Using sqlmap', 'Learn to use sqlmap for automated SQL injection testing.', 'Tutorial', 15, 'NSA{SQLM4P_US3R}', 'Use sqlmap with --dbs flag', 'http://localhost:3005/example', 'example', NULL, 3),
+    ('A05', 'A05 Example Part 4: Data Extraction', 'Extract data using UNION SELECT technique.', 'Tutorial', 10, 'NSA{UN10N_M4ST3R}', 'Use UNION SELECT to combine queries', 'http://localhost:3005/example', 'example', NULL, 4);
+
+-- Lab 1 (Discovery) - Easy
+INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order) VALUES
+    ('A05', 'A05 Lab 1: Find Input Points', 'Identify parameters that interact with the database.', 'Easy', 100, 'NSA{1NPUT_P01NTS_F0UND}', 'Forms and URLs accept input', 'http://localhost:3005/lab1', 'lab', 1, 5);
+
+-- Lab 2 (Testing) - Medium
+INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order) VALUES
+    ('A05', 'A05 Lab 2: Test for SQLi', 'Test identified parameters for SQL injection vulnerabilities.', 'Medium', 150, 'NSA{SQL1_D3T3CT3D}', 'Single quotes cause errors', 'http://localhost:3005/lab2', 'lab', 2, 6);
+
+-- Lab 3 (Exploitation) - Hard
+INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order) VALUES
+    ('A05', 'A05 Lab 3: Exploit SQL Injection', 'Exploit SQL injection to bypass authentication or extract data.', 'Hard', 200, 'NSA{1NJ3CT_Y0UR_W4Y_1N}', 'UNION SELECT is powerful', 'http://localhost:3005/lab3', 'lab', 3, 7);
 
 -- ========================================
 -- A06: INSECURE DESIGN
@@ -120,15 +133,28 @@ INSERT INTO challenges (owasp_category, title, description, difficulty, points, 
 -- A07: AUTHENTICATION FAILURES
 -- Natural Progression: Analysis → Testing → Prediction → Hijacking
 -- ========================================
+-- Example consists of multiple sub-challenges demonstrating all tools
 INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order) VALUES
-    ('A07', 'A07 Example: Auth Mechanisms', 'Learn about authentication weaknesses and session management.', 'Tutorial', 50, 'NSA{AUTH_EXAMPLE_COMPLETE}', 'This is a guided walkthrough', 'http://localhost:3007/example', 'example', NULL, 1),
-    ('A07', 'A07 Lab 1: Weak Password Policy', 'Test password requirements for weaknesses.', 'Easy', 100, 'NSA{W3AK_P4SS_P0L1CY}', 'Try simple passwords', 'http://localhost:3007/lab1', 'lab', 1, 2),
-    ('A07', 'A07 Lab 2: Session Analysis', 'Analyze session token generation for predictability.', 'Medium', 150, 'NSA{S3SS10N_PR3D1CT4BL3}', 'Sessions are sequential', 'http://localhost:3007/lab2', 'lab', 2, 3),
-    ('A07', 'A07 Lab 3: Session Hijacking', 'Hijack another user''s session to gain unauthorized access.', 'Hard', 200, 'NSA{S3SS10N_H1J4CK3D}', 'Predict or steal tokens', 'http://localhost:3007/lab3', 'lab', 3, 4);
+    ('A07', 'A07 Example Part 1: Password Testing', 'Learn to test password policies and requirements.', 'Tutorial', 10, 'NSA{P4SSW0RD_T3ST3R}', 'Try weak passwords to find limits', 'http://localhost:3007/example', 'example', NULL, 1),
+    ('A07', 'A07 Example Part 2: Session Token Analysis', 'Analyze session tokens for patterns and predictability.', 'Tutorial', 15, 'NSA{S3SS10N_4N4LYZ3R}', 'Compare multiple session tokens', 'http://localhost:3007/example', 'example', NULL, 2),
+    ('A07', 'A07 Example Part 3: Cookie Manipulation', 'Learn to manipulate cookies using browser DevTools.', 'Tutorial', 15, 'NSA{C00K13_H4CK3R}', 'Edit cookies in Application tab', 'http://localhost:3007/example', 'example', NULL, 3),
+    ('A07', 'A07 Example Part 4: Brute Force with Hydra', 'Use Hydra or similar tools for credential testing.', 'Tutorial', 10, 'NSA{BRU T3_F0RC3R}', 'Automated password guessing', 'http://localhost:3007/example', 'example', NULL, 4);
+
+-- Lab 1 (Analysis) - Easy
+INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order) VALUES
+    ('A07', 'A07 Lab 1: Weak Password Policy', 'Test password requirements for weaknesses.', 'Easy', 100, 'NSA{W3AK_P4SS_P0L1CY}', 'Try simple passwords', 'http://localhost:3007/lab1', 'lab', 1, 5);
+
+-- Lab 2 (Testing) - Medium
+INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order) VALUES
+    ('A07', 'A07 Lab 2: Session Analysis', 'Analyze session token generation for predictability.', 'Medium', 150, 'NSA{S3SS10N_PR3D1CT4BL3}', 'Sessions are sequential', 'http://localhost:3007/lab2', 'lab', 2, 6);
+
+-- Lab 3 (Hijacking) - Hard
+INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order) VALUES
+    ('A07', 'A07 Lab 3: Session Hijacking', 'Hijack another user''s session to gain unauthorized access.', 'Hard', 200, 'NSA{S3SS10N_H1J4CK3D}', 'Predict or steal tokens', 'http://localhost:3007/lab3', 'lab', 3, 7);
 
 -- Additional bonus lab for A07
 INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order) VALUES
-    ('A07', 'A07 Bonus: Backdoor Account', 'Create a persistent backdoor account in the system.', 'Expert', 250, 'NSA{P3RS1ST3NC3_1S_K3Y}', 'Register with weak validation', 'http://localhost:3007/bonus', 'lab', 4, 5);
+    ('A07', 'A07 Bonus: Backdoor Account', 'Create a persistent backdoor account in the system.', 'Expert', 250, 'NSA{P3RS1ST3NC3_1S_K3Y}', 'Register with weak validation', 'http://localhost:3007/bonus', 'lab', 4, 8);
 
 -- ========================================
 -- A08: SOFTWARE AND DATA INTEGRITY FAILURES

@@ -72,14 +72,16 @@
                 const exams = challenges.filter(c => c.challenge_type === 'exam');
                 %>
                 
-                <!-- Example Section -->
+                 <!-- Example Section -->
                 <% if (examples.length > 0) { %>
                 <div style="margin-bottom: 40px;">
                     <h2 style="font-family: 'Orbitron', monospace; color: var(--neon-blue); margin-bottom: 20px;">
-                        📖 EXAMPLE / WALKTHROUGH
+                        📖 EXAMPLE / WALKTHROUGH (<%= examples.length %> Parts)
                     </h2>
                     <p style="color: var(--terminal-green); margin-bottom: 20px;">
-                        Start here! This guided example explains the vulnerability with code comparisons and tool usage.
+                        Start here! Complete all <%= examples.length %> parts of the example to learn every tool and technique needed for the labs.
+                        <br>
+                        Each part teaches a specific tool: Browser DevTools, cURL, Burp Suite, and more.
                     </p>
                     <div class="challenges-list">
                         <% examples.forEach(challenge => { %>
