@@ -1,5 +1,21 @@
 # OWASP Bootcamp - Instructor Guide
 
+## 🎯 NEW CHALLENGE STRUCTURE
+
+**Important Change:** All labs have been restructured to follow professional CTF methodology:
+
+### Per OWASP Topic:
+- **1 Example/Walkthrough**: Educational content with vulnerable/secure code comparison
+- **3 Progressive Labs**: Easy → Medium → Hard, covering Recon → Scanning → Initial Access → Advanced stages
+- **NO Exploit Buttons**: Students must use real tools (curl, Burp Suite, Postman, DevTools)
+- **Subtle Hints Only**: Labs have collapsible hints that guide without giving away solutions
+- **Citadel (Final Exam)**: Realistic vulnerable application with NO hints
+
+### Portal Navigation:
+- **By Stage**: Recon → Scanning → Initial Access → Maintained Access → Cover Tracks
+- **By Topic**: View all challenges for a specific OWASP category (A01, A02, etc.)
+- Access via `http://localhost:3100/topic/A01` for topic-based view
+
 ## Workshop Overview
 
 **Duration**: 6-7 hours (including breaks)  
@@ -36,29 +52,53 @@ By the end of this workshop, students will be able to:
 
 ### Session 2: Instructional Labs (2.5-3 hours)
 
-Each lab follows the same structure:
-1. **Explain** the vulnerability (5 min)
-2. **Demonstrate** the exploit (5 min)
-3. **Show** the secure implementation (5 min)
-4. **Student practice** (5-10 min)
+**NEW STRUCTURE:** Each OWASP topic now has **1 Example + 3 Progressive Labs**
 
-#### A01: Broken Access Control (20 min)
+#### Teaching Approach per Topic (30-40 min each):
 
-**Key Concepts:**
-- Direct object references
-- Missing function level access control
-- IDOR (Insecure Direct Object Reference)
+1. **Example/Walkthrough** (10 min)
+   - Walk through the example page together
+   - Explain vulnerable vs. secure code side-by-side
+   - Demonstrate tool usage (curl, Burp Suite, browser DevTools)
+   - **Important:** No exploit buttons - show real tool commands
+   - Students follow along on their machines
 
-**Demo:**
-- Show how changing user IDs in URL exposes other users' data
-- Explain why client-side hiding isn't security
-- Show proper authorization checks
+2. **Lab 1 (Easy - Recon/Scanning)** (5-10 min)
+   - Students work independently or in pairs
+   - Provide subtle guidance if stuck
+   - Focus: Discovery and reconnaissance
 
-**Common Questions:**
-- Q: "Can't we just hide the links in the UI?"
-  - A: No, security must be enforced server-side
-- Q: "How do we implement proper access control?"
-  - A: Check user permissions on every request, use RBAC/ABAC
+3. **Lab 2 (Medium - Initial Access)** (10-15 min)
+   - Students exploit the vulnerability
+   - Minimal hints - let them figure it out
+   - Focus: Exploitation and gaining access
+
+4. **Lab 3 (Hard - Advanced)** (10-15 min)
+   - Advanced exploitation or persistence
+   - Students should struggle a bit - it's intentional
+   - Focus: Maintained access or covering tracks
+
+#### A01: Broken Access Control (30 min)
+
+**Example Walkthrough:**
+- Show IDOR vulnerability in code
+- Demonstrate using curl: `curl http://localhost:3001/api/example/user/1`
+- Explain authorization checks and how to implement them
+
+**Lab 1 (Easy):** User Enumeration
+- Students discover sequential user IDs
+- Tools: curl or browser
+- Hint if stuck: "Try different user IDs starting from 1"
+
+**Lab 2 (Medium):** Access Other Profiles  
+- Students exploit IDOR to view other users' data
+- Tools: curl, Burp Suite, or browser DevTools
+- Hint if stuck: "What happens if you change the ID parameter?"
+
+**Lab 3 (Hard):** Privilege Escalation
+- Students access admin account
+- Tools: Enumeration + exploitation
+- Hint if stuck: "Admin is just another user..."
 
 #### A02: Security Misconfiguration (20 min)
 

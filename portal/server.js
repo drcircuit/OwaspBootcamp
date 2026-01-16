@@ -153,16 +153,16 @@ app.get('/logout', (req, res) => {
 // Dashboard - main hub
 app.get('/dashboard', requireAuth, async (req, res) => {
   try {
-    // Get all stages with challenges
-    const stagesResult = await pool.query(`
-      SELECT cs.*, 
+    // Get all OWASP topics with challenges
+    const topicsResult = await pool.query(`
+      SELECT 
+        c.owasp_category,
         COUNT(c.id) as total_challenges,
         SUM(CASE WHEN up.completed = true THEN 1 ELSE 0 END) as completed_challenges
-      FROM challenge_stages cs
-      LEFT JOIN challenges c ON c.stage_id = cs.id
+      FROM challenges c
       LEFT JOIN user_progress up ON up.challenge_id = c.id AND up.user_id = $1
-      GROUP BY cs.id
-      ORDER BY cs.stage_order
+      GROUP BY c.owasp_category
+      ORDER BY c.owasp_category
     `, [req.user.id]);
     
     // Get total progress
@@ -182,7 +182,7 @@ app.get('/dashboard', requireAuth, async (req, res) => {
     
     res.render('dashboard', {
       user: req.user,
-      stages: stagesResult.rows,
+      topics: topicsResult.rows,
       progress: {
         completed: parseInt(progress.completed_challenges) || 0,
         total: parseInt(progress.total_challenges) || 0,
@@ -196,18 +196,12 @@ app.get('/dashboard', requireAuth, async (req, res) => {
   }
 });
 
-// Stage details - show challenges for a stage
-app.get('/stage/:id', requireAuth, async (req, res) => {
+// OWASP Topic view - show all challenges for an OWASP category
+app.get('/topic/:category', requireAuth, async (req, res) => {
   try {
-    const stageId = req.params.id;
+    const category = req.params.category.toUpperCase();
     
-    // Get stage info
-    const stageResult = await pool.query('SELECT * FROM challenge_stages WHERE id = $1', [stageId]);
-    if (stageResult.rows.length === 0) {
-      return res.status(404).send('Stage not found');
-    }
-    
-    // Get challenges for this stage with user progress
+    // Get challenges for this OWASP category with user progress
     const challengesResult = await pool.query(`
       SELECT c.*, 
         up.completed,
@@ -215,18 +209,22 @@ app.get('/stage/:id', requireAuth, async (req, res) => {
         up.attempts
       FROM challenges c
       LEFT JOIN user_progress up ON up.challenge_id = c.id AND up.user_id = $1
-      WHERE c.stage_id = $2
-      ORDER BY c.difficulty, c.id
-    `, [req.user.id, stageId]);
+      WHERE c.owasp_category = $2
+      ORDER BY c.challenge_order
+    `, [req.user.id, category]);
     
-    res.render('stage', {
+    if (challengesResult.rows.length === 0) {
+      return res.status(404).send('OWASP category not found');
+    }
+    
+    res.render('topic', {
       user: req.user,
-      stage: stageResult.rows[0],
+      category: category,
       challenges: challengesResult.rows
     });
   } catch (err) {
-    console.error('Stage error:', err);
-    res.status(500).send('Error loading stage');
+    console.error('Topic error:', err);
+    res.status(500).send('Error loading topic');
   }
 });
 

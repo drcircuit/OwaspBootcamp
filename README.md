@@ -39,34 +39,46 @@ Your mission control hub where you:
 - Experience epic hacker-themed design with animations
 
 ### 2. **Instructional Labs** (Individual Concepts)
-Each lab focuses on a single OWASP vulnerability with:
-- Clear explanation of the vulnerability
-- Side-by-side comparison of vulnerable vs. secure code
-- Interactive demonstrations
-- Hands-on exercises
-- Real-world context and tools
+Each OWASP Top 10 topic now follows a **structured learning path**:
 
-### 3. **Citadel Mode** (Full Application)
-A complete vulnerable web application containing all OWASP Top 10 2025 vulnerabilities where students:
+#### **Example/Walkthrough** (1 per topic)
+- Educational content explaining the vulnerability
+- Side-by-side comparison of vulnerable vs. secure code
+- Demonstrates proper tool usage (curl, Burp Suite, sqlmap)
+- **NO exploit buttons** - teaches methodology, not shortcuts
+
+#### **Progressive Labs** (3 per topic)
+- **Lab 1 (Easy)**: Recon/Scanning stage - discover the vulnerability
+- **Lab 2 (Medium)**: Initial Access stage - exploit the vulnerability
+- **Lab 3 (Hard)**: Maintained Access/Cover Tracks - advanced exploitation
+- Subtle hints only - students must use real pentesting tools
+- Each lab awards points and flags upon completion
+
+### 3. **Citadel Mode** (Full Application - Final Exam)
+A realistic vulnerable web application containing all OWASP Top 10 2025 vulnerabilities where students:
+- Face realistic vulnerabilities without overt hints
 - Break through multiple security layers
-- Practice penetration testing techniques
-- Apply knowledge from instructional labs
+- Practice complete penetration testing techniques
+- Apply knowledge from all instructional labs
+- Discover flags embedded naturally in the application
 
 ## 🔒 OWASP Top 10 2025 Coverage
 
-| # | Vulnerability | Port | Description |
-|---|---------------|------|-------------|
-| A01 | Broken Access Control | 3001 | Unauthorized access to resources |
-| A02 | Security Misconfiguration | 3002 | Exposed debug endpoints, verbose errors |
-| A03 | Software Supply Chain Failures | 3003 | Vulnerable dependencies, integrity issues |
-| A04 | Cryptographic Failures | 3004 | Weak encryption, plain text passwords |
-| A05 | Injection | 3005 | SQL, NoSQL, OS command injection |
-| A06 | Insecure Design | 3006 | Flawed business logic, no rate limiting |
-| A07 | Authentication Failures | 3007 | Weak passwords, predictable sessions |
-| A08 | Software/Data Integrity Failures | 3008 | Unsigned updates, no checksums |
-| A09 | Security Logging Failures | 3009 | Missing security event logging |
-| A10 | Mishandling Exceptional Conditions | 3010 | Information disclosure via errors |
-| **Citadel** | All Vulnerabilities | 3000 | Complete vulnerable web application |
+Each topic includes **1 example + 3 progressive labs**:
+
+| # | Vulnerability | Port | Structure |
+|---|---------------|------|-----------|
+| A01 | Broken Access Control | 3001 | Example + Lab 1 (Enumeration) + Lab 2 (IDOR) + Lab 3 (Privilege Escalation) |
+| A02 | Security Misconfiguration | 3002 | Example + Lab 1 (Debug) + Lab 2 (Config Leak) + Lab 3 (Admin Panel) |
+| A03 | Software Supply Chain | 3003 | Example + Lab 1 (Version Discovery) + Lab 2 (CVE Scanning) + Lab 3 (Path Traversal) |
+| A04 | Cryptographic Failures | 3004 | Example + Lab 1 (Weak Hash) + Lab 2 (Crack Hash) + Lab 3 (Plaintext) |
+| A05 | Injection | 3005 | Example + Lab 1 (Find Inputs) + Lab 2 (Detect SQLi) + Lab 3 (Auth Bypass) |
+| A06 | Insecure Design | 3006 | Example + Lab 1 (Rate Limiting) + Lab 2 (Logic Flaw) + Lab 3 (Race Condition) |
+| A07 | Authentication Failures | 3007 | Example + Lab 1 (Weak Password) + Lab 2 (Session Analysis) + Lab 3 (Session Hijacking) |
+| A08 | Integrity Failures | 3008 | Example + Lab 1 (Update Mechanism) + Lab 2 (Missing Checksum) + Lab 3 (Malicious Upload) |
+| A09 | Security Logging Failures | 3009 | Example + Lab 1 (Missing Logs) + Lab 2 (Log Leaks) + Lab 3 (Cover Tracks) |
+| A10 | Exception Mishandling | 3010 | Example + Lab 1 (Trigger Errors) + Lab 2 (Stack Traces) + Lab 3 (Suppress Evidence) |
+| **Citadel** | All Vulnerabilities (Exam) | 3000 | Realistic application with all vulnerabilities, no hints |
 
 ## 🚀 Quick Start
 

@@ -56,6 +56,13 @@
                                     </h3>
                                     <p style="font-size: 0.85rem; color: var(--neon-blue); margin-top: 5px;">
                                         OWASP <%= challenge.owasp_category %>
+                                        <% if (challenge.challenge_type === 'example') { %>
+                                            • 📖 Example/Walkthrough
+                                        <% } else if (challenge.challenge_type === 'lab' && challenge.lab_number) { %>
+                                            • 🧪 Lab <%= challenge.lab_number %>
+                                        <% } else if (challenge.challenge_type === 'exam') { %>
+                                            • 🎓 Final Exam
+                                        <% } %>
                                     </p>
                                 </div>
                                 <div class="challenge-meta">
