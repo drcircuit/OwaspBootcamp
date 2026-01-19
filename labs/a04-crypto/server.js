@@ -398,22 +398,32 @@ app.get('/lab1', (req, res) => {
     `);
 });
 
-// Lab 1 API - VULNERABLE debug endpoint
-app.get('/api/staff/system-info', (req, res) => {
-    // VULNERABLE: Debug info exposed in production
+// Lab 1 API - VULNERABLE: Base64 encoded data (not encrypted)
+app.get('/api/member/token', (req, res) => {
+    const memberId = req.query.id || '12345';
+    
+    // VULNERABLE: Using Base64 encoding, not encryption
+    // Base64 is encoding, NOT encryption - easily reversible
+    const memberData = {
+        id: memberId,
+        username: 'john_doe',
+        email: 'john@powerfit.gym',
+        membership: 'Premium',
+        creditCard: '4532-1234-5678-9012',
+        ssn: '123-45-6789',
+        flag: 'FLAG{B4S364_N0T_3NCRYPT10N}'
+    };
+    
+    // "Encrypting" with Base64 (WRONG!)
+    const token = Buffer.from(JSON.stringify(memberData)).toString('base64');
+    
     res.json({
-        flag: 'FLAG{D3BUG_1NF0_3XP0S3D}',
-        message: 'System information retrieved successfully!',
-        vulnerability: 'Debug endpoint exposed - reveals system details',
-        system_info: {
-            node_version: process.version,
-            platform: process.platform,
-            uptime_seconds: Math.floor(process.uptime()),
-            memory_mb: Math.floor(process.memoryUsage().heapUsed / 1024 / 1024),
-            environment: process.env.NODE_ENV || 'production'
-        },
-        database_host: configData.database.host,
-        warning: 'This endpoint should not be accessible in production!'
+        success: true,
+        token: token,
+        vulnerability: 'Base64 encoding used instead of proper encryption',
+        hint: 'This token can be easily decoded with: echo "token" | base64 -d',
+        warning: 'Base64 is encoding, not encryption! Anyone can decode it.',
+        message: 'Member token generated (insecurely)'
     });
 });
 
@@ -507,15 +517,48 @@ app.get('/lab2', (req, res) => {
     `);
 });
 
-// Lab 2 API - VULNERABLE config exposure
-app.get('/api/settings/config', (req, res) => {
-    // VULNERABLE: Configuration exposed without authentication
+// Lab 2 API - VULNERABLE: MD5 password hashes (weak hashing)
+app.get('/api/users/export', (req, res) => {
+    // VULNERABLE: Using MD5 for password hashing (deprecated, easily crackable)
+    const crypto = require('crypto');
+    
+    const users = [
+        { 
+            id: 1, 
+            username: 'trainer_mike',
+            email: 'mike@powerfit.gym',
+            password_hash: crypto.createHash('md5').update('fitness123').digest('hex'), // MD5 hash
+            role: 'trainer'
+        },
+        {
+            id: 2,
+            username: 'admin',
+            email: 'admin@powerfit.gym',
+            password_hash: crypto.createHash('md5').update('powerfit2024').digest('hex'), // MD5 hash
+            role: 'admin'
+        },
+        {
+            id: 3,
+            username: 'reception',
+            email: 'desk@powerfit.gym',
+            password_hash: crypto.createHash('md5').update('welcome').digest('hex'), // MD5 hash
+            role: 'staff'
+        }
+    ];
+    
     res.json({
-        flag: 'FLAG{C0NF1G_L34K3D}',
-        message: 'Configuration data retrieved!',
-        vulnerability: 'Configuration endpoint accessible without authentication',
-        configuration: configData,
-        warning: 'Sensitive credentials exposed - database password, API keys, secrets!'
+        success: true,
+        flag: 'FLAG{W34K_H4SH1NG_MD5_CR4CK3D}',
+        vulnerability: 'MD5 hashing algorithm used for passwords',
+        users: users,
+        warning: 'MD5 is cryptographically broken and unsuitable for password hashing!',
+        hint: 'These hashes can be cracked using online rainbow tables or hashcat',
+        examples: {
+            'fitness123': crypto.createHash('md5').update('fitness123').digest('hex'),
+            'powerfit2024': crypto.createHash('md5').update('powerfit2024').digest('hex'),
+            'welcome': crypto.createHash('md5').update('welcome').digest('hex')
+        },
+        tools: ['hashcat', 'john', 'crackstation.net', 'md5decrypt.net']
     });
 });
 
@@ -615,30 +658,48 @@ app.get('/lab3', (req, res) => {
     `);
 });
 
-// Lab 3 API - VULNERABLE default credentials
-app.post('/api/manager/login', (req, res) => {
-    const { username, password } = req.body;
+// Lab 3 API - VULNERABLE: Hardcoded encryption keys in source
+app.get('/api/secure/config', (req, res) => {
+    // VULNERABLE: Hardcoded encryption keys in source code
+    const crypto = require('crypto');
     
-    if (!username || !password) {
-        return res.status(400).json({ error: 'Username and password required' });
-    }
+    // CRITICAL VULNERABILITY: Encryption keys hardcoded in source
+    const HARDCODED_KEYS = {
+        encryption_key: 'powerfit_secret_key_2024',  // Hardcoded!
+        iv: '1234567890123456',  // Hardcoded IV!
+        jwt_secret: 'gym_jwt_secret_key_hardcoded',
+        api_key: 'PF-API-KEY-12345678-HARDCODED'
+    };
     
-    // VULNERABLE: Using default credentials
-    if (username === adminCredentials.username && password === adminCredentials.password) {
-        return res.json({
-            success: true,
-            flag: 'FLAG{D3F4ULT_CR3DS_US3D}',
-            message: 'Authentication successful with default credentials!',
-            vulnerability: 'Default admin credentials never changed',
-            credentials_used: { username, password },
-            token: 'manager_access_token_' + Date.now(),
-            warning: 'Default credentials should always be changed after setup!'
-        });
-    }
+    // Example of "encrypted" data (but key is in source!)
+    const sensitiveData = 'admin:SuperSecret123!';
+    const cipher = crypto.createCipheriv('aes-256-cbc', 
+        Buffer.from(HARDCODED_KEYS.encryption_key).slice(0, 32), 
+        Buffer.from(HARDCODED_KEYS.iv));
+    let encrypted = cipher.update(sensitiveData, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
     
-    res.status(401).json({
-        error: 'Invalid credentials',
-        hint: 'Try common default credentials'
+    res.json({
+        success: true,
+        flag: 'FLAG{H4RDC0D3D_3NCRYPT10N_K3YS}',
+        vulnerability: 'Encryption keys hardcoded in source code',
+        warning: 'Anyone with access to source code can decrypt all data!',
+        encryption_keys: HARDCODED_KEYS,
+        encrypted_sample: encrypted,
+        decryption_hint: 'Use the exposed keys to decrypt data',
+        message: 'Keys in source code = no security!',
+        real_world_examples: [
+            'GitHub secrets exposed in commits',
+            'API keys in mobile app source',
+            'Hardcoded passwords in configuration files'
+        ],
+        better_approach: [
+            'Use environment variables',
+            'Use secret management (AWS Secrets Manager, HashiCorp Vault)',
+            'Never commit keys to version control',
+            'Rotate keys regularly',
+            'Use proper key derivation functions (PBKDF2, Argon2)'
+        ]
     });
 });
 
