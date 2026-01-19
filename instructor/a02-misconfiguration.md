@@ -150,218 +150,207 @@ app.get('/api/staff/system-info', (req, res) => {
 ## LAB 2: Store Settings (MEDIUM - Scanning)
 
 **URL:** http://localhost:3002/lab2  
-**Challenge:** Discover exposed configuration file with credentials  
+**Challenge:** Discover exposed .env file through misconfiguration  
 **Stage:** Scanning  
 
 ### Vulnerability
-Configuration endpoint accessible without authentication, exposing all production secrets and credentials.
+.env file and backup files accessible via web due to misconfigured static file serving. This is a classic misconfiguration where sensitive environment files are not properly restricted.
 
 ### Exploitation Steps
 
-1. **Reconnaissance:** Visit store settings page
-2. **API Discovery:** Test for common config endpoints
-3. **Access Configuration:**
+1. **Test Common Files:**
    ```bash
-   curl http://localhost:3002/api/settings/config
+   # Try accessing common configuration files
+   curl http://localhost:3002/.env
+   curl http://localhost:3002/.env.backup
+   curl http://localhost:3002/.git/config
+   ```
+
+2. **Read .env Contents:**
+   ```bash
+   curl http://localhost:3002/.env
    ```
 
 ### Flag
-`FLAG{C0NF1G_L34K3D}`
+`FLAG{3NV_F1L3_3XP0S3D}` (in .env file)  
+Bonus: `FLAG{B4CKUP_F1L3_L34K3D}` (in .env.backup)
 
-### Critical Data Exposed
-```json
-{
-  "success": true,
-  "flag": "FLAG{C0NF1G_L34K3D}",
-  "config": {
-    "database": {
-      "host": "db.beanscene.local",
-      "username": "coffee_admin",
-      "password": "Bean$cene2024!",
-      "port": 5432
-    },
-    "paymentGateway": {
-      "provider": "Square",
-      "apiKey": "sq0atp-BeanScene_Live_Token_xyz789",
-      "secretKey": "MLHV6GRVNB4XQ"
-    },
-    "jwtSecret": "beanscene_jwt_secret_key",
-    "sessionSecret": "coffee-shop-session-2024",
-    "adminEmail": "admin@beanscene.coffee"
-  }
-}
+### Sensitive Data Exposed
+```
+# BeanScene Coffee - Environment Configuration
+NODE_ENV=production
+DB_PASSWORD=Bean$cene2024!
+JWT_SECRET=beanscene_jwt_secret_key_12345
+SESSION_SECRET=coffee-shop-session-2024
+SQUARE_API_KEY=sq0atp-BeanScene_Live_Token_xyz789
+SMTP_PASS=BeanMail!2024
+DEBUG_MODE=true
 ```
 
 ### Impact
-- **Database Compromise:** Full database credentials exposed
-- **Payment System:** Live payment gateway credentials leaked
-- **Session Security:** JWT and session secrets compromised
-- **Administrative Access:** Admin email discovered
+- **Complete Credential Exposure:** All environment secrets in plaintext
+- **Backup Files:** Old credentials also exposed (.env.backup)
+- **Different from API Leak:** This is a web server misconfiguration
 
 ### Vulnerable Code Pattern
 ```javascript
-app.get('/api/settings/config', (req, res) => {
-    // CRITICAL VULNERABILITY: No authentication, exposes all secrets
-    res.json({
-        database: {
-            host: process.env.DB_HOST,
-            username: process.env.DB_USER,
-            password: process.env.DB_PASS  // NEVER expose passwords!
-        },
-        paymentGateway: {
-            apiKey: process.env.PAYMENT_API_KEY,  // NEVER expose API keys!
-            secretKey: process.env.PAYMENT_SECRET
-        },
-        jwtSecret: process.env.JWT_SECRET,
-        sessionSecret: process.env.SESSION_SECRET
-    });
-});
+// Express serves all files without restrictions
+app.use(express.static('public'));
+
+// Missing configuration to block sensitive files
+// .env file is accessible at /.env
 ```
 
 ### Secure Implementation
 ```javascript
-// Configuration should NEVER be exposed via API
-// If config management is needed:
-
-app.get('/api/settings/view', async (req, res) => {
-    // 1. Require authentication and admin role
-    if (!req.session || req.session.role !== 'admin') {
-        return res.status(403).json({ error: 'Access denied' });
+// Explicitly block sensitive files
+app.use((req, res, next) => {
+    const blockedFiles = ['.env', '.env.backup', '.git', '.htaccess', 
+                          'wp-config.php', 'config.php'];
+    if (blockedFiles.some(file => req.path.includes(file))) {
+        return res.status(404).send('Not Found');
     }
-    
-    // 2. Only return non-sensitive configuration
-    res.json({
-        storeName: process.env.STORE_NAME,
-        timezone: process.env.TIMEZONE,
-        // NEVER include passwords, API keys, or secrets
-    });
+    next();
 });
 
-// 3. Use secret management services (AWS Secrets Manager, HashiCorp Vault)
-// 4. Rotate secrets regularly
-// 5. Log all configuration access attempts
+// Use proper static file serving with restrictions
+app.use(express.static('public', {
+    dotfiles: 'deny',  // Block .env, .git, etc.
+    index: false
+}));
+```
+
+### Web Server Configuration (nginx)
+```nginx
+location ~ /\. {
+    deny all;
+    return 404;
+}
+
+location ~* \.(env|git|htaccess|htpasswd|backup|old)$ {
+    deny all;
+    return 404;
+}
 ```
 
 ### Teaching Points
-- Secrets should never be in source code or exposed via APIs
-- Use environment variables with secret management services
-- Configuration endpoints should not exist in production
-- Implement proper access controls on administrative functions
+- .env files must NEVER be web-accessible
+- Configure web servers to deny access to sensitive files
+- Use .gitignore to prevent committing .env files
+- Backup files (.backup, .old, ~) are often forgotten
+- Static file serving needs proper security configuration
+- Different attack vector than debug endpoints - this is file exposure
 
 ---
 
 ## LAB 3: Manager Portal (HARD - Initial Access)
 
 **URL:** http://localhost:3002/lab3  
-**Challenge:** Gain access using default credentials  
+**Challenge:** Discover directory listing vulnerability exposing sensitive files  
 **Stage:** Initial Access  
 
 ### Vulnerability
-Default administrator credentials not changed in production deployment.
+Directory listing enabled for /admin directory, exposing configuration files and credentials. This is a common misconfiguration in web servers where automatic directory indexing is not disabled.
 
 ### Exploitation Steps
 
-1. **Reconnaissance:** Find the manager login page
-2. **Test Common Defaults:** Try common username/password combinations
-3. **Successful Login:**
+1. **Discover Admin Directory:**
    ```bash
-   curl -X POST http://localhost:3002/api/manager/login \
-     -H "Content-Type: application/json" \
-     -d '{"username": "admin", "password": "beanscene"}'
+   # Try common admin paths
+   curl http://localhost:3002/admin
+   curl http://localhost:3002/admin/
+   ```
+
+2. **Browse Directory Listing:**
+   The server returns an HTML directory index showing:
+   - config.json
+   - backup/ directory
+   - logs/ directory
+   - credentials.txt
+
+3. **Access Sensitive Files:**
+   ```bash
+   curl http://localhost:3002/admin/credentials.txt
+   curl http://localhost:3002/admin/config.json
    ```
 
 ### Flag
-`FLAG{D3F4ULT_CR3DS_US3D}`
+`FLAG{D1R3CT0RY_L1ST1NG_3N4BL3D}`
 
-### Common Default Credentials to Test
-- `admin:admin`
-- `admin:password`
-- `admin:beanscene` ✓ (successful)
-- `manager:manager`
-- `root:root`
-
-### Response on Successful Login
-```json
-{
-  "success": true,
-  "message": "Login successful!",
-  "flag": "FLAG{D3F4ULT_CR3DS_US3D}",
-  "user": {
-    "username": "admin",
-    "role": "manager",
-    "access": "full"
-  }
-}
+### Sensitive Data Exposed
 ```
+BeanScene Admin Credentials
+=================================
+Username: manager
+Password: Coffee2024!
+API Key: BSC-2024-ADMIN-xyz789
+
+FLAG{D1R3CT0RY_L1ST1NG_3N4BL3D}
+
+WARNING: This file should not be web-accessible!
+```
+
+### Impact
+- **Complete Admin Access:** Username, password, and API keys exposed
+- **Directory Enumeration:** Attackers can see all files in admin directory
+- **Further Exploration:** Backup and log directories may contain more secrets
 
 ### Vulnerable Code Pattern
 ```javascript
-const DEFAULT_ADMIN = {
-    username: 'admin',
-    password: 'beanscene'  // VULNERABILITY: Hardcoded default credentials
-};
+// Express default behavior or misconfigured static serving
+app.use('/admin', express.static('admin'));
 
-app.post('/api/manager/login', (req, res) => {
-    const { username, password } = req.body;
-    
-    // VULNERABILITY: Accepts default credentials
-    if (username === DEFAULT_ADMIN.username && 
-        password === DEFAULT_ADMIN.password) {
-        res.json({
-            success: true,
-            flag: 'FLAG{D3F4ULT_CR3DS_US3D}',
-            user: { username, role: 'manager', access: 'full' }
-        });
-    }
-});
+// Missing configuration to prevent directory listing
+// No index.html file, so Express shows directory contents
 ```
 
 ### Secure Implementation
 ```javascript
-// 1. Force password change on first login
-app.post('/api/manager/login', async (req, res) => {
-    const { username, password } = req.body;
-    
-    // 2. Check against database (with hashed passwords)
-    const user = await db.query(
-        'SELECT * FROM users WHERE username = $1',
-        [username]
-    );
-    
-    if (!user || !await bcrypt.compare(password, user.password_hash)) {
-        // 3. Log failed attempts
-        await logFailedLogin(username, req.ip);
-        return res.status(401).json({ error: 'Invalid credentials' });
+// 1. Disable directory listing in Express
+app.use('/admin', express.static('admin', {
+    index: false,  // Don't serve directory listings
+    dotfiles: 'deny'
+}));
+
+// 2. Add middleware to block directory access
+app.use('/admin', (req, res, next) => {
+    if (req.path.endsWith('/')) {
+        return res.status(404).send('Not Found');
     }
-    
-    // 4. Check if default password still in use
-    if (user.is_default_password) {
-        return res.status(403).json({
-            error: 'Password change required',
-            redirect: '/change-password'
-        });
-    }
-    
-    // 5. Implement account lockout after failed attempts
-    if (user.failed_attempts >= 5) {
-        return res.status(423).json({ error: 'Account locked' });
-    }
-    
-    // 6. Create secure session
-    req.session.userId = user.id;
-    req.session.role = user.role;
-    
-    res.json({ success: true, user: { username, role: user.role } });
+    next();
 });
+
+// 3. Better: Don't expose admin files via web at all
+// Admin files should not be in web-accessible directories
+
+// 4. Use authentication for admin areas
+app.use('/admin', requireAuth, requireAdmin);
+```
+
+### Web Server Configuration (nginx)
+```nginx
+location /admin {
+    autoindex off;  # Disable directory listing
+    auth_basic "Admin Area";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+}
+```
+
+### Apache Configuration (.htaccess)
+```apache
+Options -Indexes
+<Files "credentials.txt">
+    Require all denied
+</Files>
 ```
 
 ### Teaching Points
-- Never use default credentials in production
-- Force password changes on initial setup
-- Implement strong password policies
-- Use password hashing (bcrypt, Argon2)
-- Implement account lockout after failed attempts
-- Log all authentication attempts
+- Directory listing reveals file structure to attackers
+- Admin directories should never be web-accessible
+- Different from previous labs: file system level misconfiguration
+- Always disable autoindex/directory browsing in production
+- Sensitive files like credentials.txt should not exist in web root
+- Use authentication for admin areas, not just obscurity
 
 ---
 
