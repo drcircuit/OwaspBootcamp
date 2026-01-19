@@ -76,32 +76,42 @@ async function runMigrations() {
       if (challengeCount < EXPECTED_MIN_CHALLENGES) {
         console.log(`Found only ${challengeCount} challenges, populating missing challenges...`);
         
-        // Use DELETE instead of TRUNCATE to preserve user progress relationships
-        // TRUNCATE CASCADE would delete all user_progress records
-        await pool.query('DELETE FROM challenges');
-        console.log('Cleared existing challenges (preserving user progress structure)');
-        
-        // Read init.sql asynchronously
-        const initSqlPath = path.join(__dirname, 'db', 'init.sql');
-        const initSql = await fs.promises.readFile(initSqlPath, 'utf8');
-        
-        // Extract INSERT statements specifically for challenges table
-        // This regex handles both single-row and multi-row INSERT statements
-        const challengeInserts = initSql.match(/INSERT INTO challenges\s+\([^)]+\)\s+VALUES\s+[\s\S]*?;/gi);
-        
-        if (challengeInserts) {
-          for (const insertStmt of challengeInserts) {
-            try {
-              await pool.query(insertStmt);
-            } catch (err) {
-              console.error('Error inserting challenge:', err.message);
-            }
-          }
-          console.log(`Successfully populated ${challengeInserts.length} challenge insert statements`);
+        try {
+          // Use DELETE instead of TRUNCATE to preserve user progress relationships
+          // TRUNCATE CASCADE would delete all user_progress records
+          await pool.query('DELETE FROM challenges');
+          console.log('Cleared existing challenges (preserving user progress structure)');
           
-          // Verify count
-          const newCount = await pool.query('SELECT COUNT(*)::int as count FROM challenges');
-          console.log(`Total challenges in database: ${newCount.rows[0].count}`);
+          // Read init.sql asynchronously with error handling
+          const initSqlPath = path.join(__dirname, 'db', 'init.sql');
+          const initSql = await fs.promises.readFile(initSqlPath, 'utf8');
+          
+          // Extract INSERT statements specifically for challenges table
+          // This regex handles both single-row and multi-row INSERT statements
+          const challengeInserts = initSql.match(/INSERT INTO challenges\s+\([^)]+\)\s+VALUES\s+[\s\S]*?;/gi);
+          
+          if (challengeInserts) {
+            let successCount = 0;
+            for (const insertStmt of challengeInserts) {
+              try {
+                await pool.query(insertStmt);
+                successCount++;
+              } catch (err) {
+                console.error('Error inserting challenge:', err.message);
+                console.error('Failed SQL (first 200 chars):', insertStmt.substring(0, 200));
+              }
+            }
+            console.log(`Successfully populated ${successCount}/${challengeInserts.length} challenge insert statements`);
+            
+            // Verify count
+            const newCount = await pool.query('SELECT COUNT(*)::int as count FROM challenges');
+            console.log(`Total challenges in database: ${newCount.rows[0].count}`);
+          } else {
+            console.error('No challenge INSERT statements found in init.sql');
+          }
+        } catch (err) {
+          console.error('Error during challenge population:', err.message);
+          console.error('Challenge migration failed - portal may not display all challenges');
         }
       } else {
         console.log(`Found ${challengeCount} challenges - no population needed`);
