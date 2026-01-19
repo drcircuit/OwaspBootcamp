@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OWASP Bootcamp - Instructor Writeups</title>
+    
+    <!-- Marked.js for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Highlight.js for code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --secondary-color: #66bb6a;
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-color: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --border-color: #404040;
+            --code-bg: #1e1e1e;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            max-width: 1800px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Navigation */
+        .sidebar {
+            background: var(--card-bg);
+            border-right: 2px solid var(--border-color);
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .sidebar-header h1 {
+            font-size: 1.5em;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-header p {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+        
+        .nav-section {
+            margin-bottom: 25px;
+        }
+        
+        .nav-section h3 {
+            font-size: 0.85em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .nav-item {
+            display: block;
+            padding: 10px 15px;
+            margin-bottom: 5px;
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.2s;
+            cursor: pointer;
+            font-size: 0.95em;
+        }
+        
+        .nav-item:hover {
+            background: var(--primary-color);
+            transform: translateX(5px);
+        }
+        
+        .nav-item.active {
+            background: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .nav-item .icon {
+            margin-right: 8px;
+        }
+        
+        /* Main Content */
+        .content {
+            padding: 40px 60px;
+            max-width: 1200px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        /* Markdown Content Styling */
+        .markdown-content {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .markdown-content h1 {
+            font-size: 2.5em;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        .markdown-content h2 {
+            font-size: 2em;
+            color: var(--secondary-color);
+            margin-top: 40px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .markdown-content h3 {
+            font-size: 1.5em;
+            color: var(--secondary-color);
+            margin-top: 30px;
+            margin-bottom: 12px;
+        }
+        
+        .markdown-content h4 {
+            font-size: 1.2em;
+            color: var(--text-color);
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+        
+        .markdown-content p {
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+        
+        .markdown-content ul, .markdown-content ol {
+            margin-bottom: 15px;
+            padding-left: 30px;
+        }
+        
+        .markdown-content li {
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+        
+        .markdown-content a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+        
+        .markdown-content a:hover {
+            border-bottom-color: var(--secondary-color);
+        }
+        
+        .markdown-content code {
+            background: var(--code-bg);
+            color: #e06c75;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .markdown-content pre {
+            background: var(--code-bg);
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .markdown-content pre code {
+            background: none;
+            padding: 0;
+            color: var(--text-color);
+            font-size: 0.9em;
+        }
+        
+        .markdown-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .markdown-content th, .markdown-content td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .markdown-content th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .markdown-content tr:hover {
+            background: rgba(102, 187, 106, 0.1);
+        }
+        
+        .markdown-content blockquote {
+            border-left: 4px solid var(--warning-color);
+            padding: 15px 20px;
+            margin: 20px 0;
+            background: rgba(255, 152, 0, 0.1);
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .markdown-content hr {
+            border: none;
+            border-top: 2px solid var(--border-color);
+            margin: 40px 0;
+        }
+        
+        /* Flag/Badge styling */
+        .markdown-content code:contains("FLAG"),
+        .markdown-content code:contains("NSA{"),
+        .markdown-content code:contains("TACO{"),
+        .markdown-content code:contains("PAWSPA{"),
+        .markdown-content code:contains("HARVEST{"),
+        .markdown-content code:contains("ARTSPACE{"),
+        .markdown-content code:contains("COMMUNITY{"),
+        .markdown-content code:contains("FRESHBLEND{") {
+            background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
+            color: white;
+            font-weight: 600;
+            padding: 4px 8px;
+        }
+        
+        /* Success/Info/Warning boxes */
+        .markdown-content .success {
+            background: rgba(76, 175, 80, 0.1);
+            border-left: 4px solid var(--success-color);
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .markdown-content .warning {
+            background: rgba(255, 152, 0, 0.1);
+            border-left: 4px solid var(--warning-color);
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .markdown-content .danger {
+            background: rgba(244, 67, 54, 0.1);
+            border-left: 4px solid var(--danger-color);
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: relative;
+                height: auto;
+                border-right: none;
+                border-bottom: 2px solid var(--border-color);
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .markdown-content pre {
+                border: 1px solid #ccc;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>🛡️ OWASP Bootcamp</h1>
+                <p>Instructor Writeups</p>
+            </div>
+            
+            <div class="nav-section">
+                <h3>📚 OWASP Top 10 Labs</h3>
+                <a class="nav-item" data-file="a01-broken-access.md">
+                    <span class="icon">🔓</span>A01: Broken Access Control
+                </a>
+                <a class="nav-item" data-file="a02-misconfiguration.md">
+                    <span class="icon">⚙️</span>A02: Misconfiguration
+                </a>
+                <a class="nav-item" data-file="a03-supply-chain.md">
+                    <span class="icon">📦</span>A03: Supply Chain
+                </a>
+                <a class="nav-item" data-file="a04-crypto.md">
+                    <span class="icon">🔐</span>A04: Cryptographic Failures
+                </a>
+                <a class="nav-item" data-file="a05-injection.md">
+                    <span class="icon">💉</span>A05: Injection
+                </a>
+                <a class="nav-item" data-file="a06-insecure-design.md">
+                    <span class="icon">🏗️</span>A06: Insecure Design
+                </a>
+                <a class="nav-item" data-file="a07-auth-failures.md">
+                    <span class="icon">🔑</span>A07: Auth Failures
+                </a>
+                <a class="nav-item" data-file="a08-integrity.md">
+                    <span class="icon">✅</span>A08: Integrity Failures
+                </a>
+                <a class="nav-item" data-file="a09-logging.md">
+                    <span class="icon">📝</span>A09: Logging Failures
+                </a>
+                <a class="nav-item" data-file="a10-exceptions.md">
+                    <span class="icon">⚠️</span>A10: Exception Handling
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <h3>🏰 Final Exam</h3>
+                <a class="nav-item" data-file="citadel.md">
+                    <span class="icon">🎯</span>Citadel Challenge
+                </a>
+            </div>
+        </nav>
+        
+        <!-- Main Content Area -->
+        <main class="content">
+            <div class="loading">Loading writeup</div>
+            <div class="markdown-content" style="display: none;"></div>
+        </main>
+    </div>
+    
+    <script>
+        // Configure marked with options
+        marked.setOptions({
+            highlight: function(code, lang) {
+                if (lang && hljs.getLanguage(lang)) {
+                    return hljs.highlight(code, { language: lang }).value;
+                }
+                return hljs.highlightAuto(code).value;
+            },
+            breaks: true,
+            gfm: true
+        });
+        
+        const contentDiv = document.querySelector('.markdown-content');
+        const loadingDiv = document.querySelector('.loading');
+        const navItems = document.querySelectorAll('.nav-item');
+        
+        // Load markdown file
+        async function loadMarkdown(filename) {
+            try {
+                loadingDiv.style.display = 'block';
+                contentDiv.style.display = 'none';
+                
+                const response = await fetch(filename);
+                if (!response.ok) {
+                    throw new Error(`Failed to load ${filename}`);
+                }
+                
+                const markdown = await response.text();
+                const html = marked.parse(markdown);
+                
+                contentDiv.innerHTML = html;
+                
+                // Highlight code blocks
+                contentDiv.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightElement(block);
+                });
+                
+                loadingDiv.style.display = 'none';
+                contentDiv.style.display = 'block';
+                
+                // Scroll to top
+                window.scrollTo(0, 0);
+                
+            } catch (error) {
+                console.error('Error loading markdown:', error);
+                contentDiv.innerHTML = `
+                    <div class="danger">
+                        <h2>⚠️ Error Loading Writeup</h2>
+                        <p>Could not load <code>${filename}</code></p>
+                        <p>Make sure the file exists in the instructor directory.</p>
+                    </div>
+                `;
+                loadingDiv.style.display = 'none';
+                contentDiv.style.display = 'block';
+            }
+        }
+        
+        // Navigation click handlers
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Update active state
+                navItems.forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+                
+                // Load the selected file
+                const filename = item.getAttribute('data-file');
+                loadMarkdown(filename);
+                
+                // Update URL hash
+                window.location.hash = filename.replace('.md', '');
+            });
+        });
+        
+        // Load from URL hash or default to first item
+        function loadFromHash() {
+            const hash = window.location.hash.slice(1);
+            if (hash) {
+                const filename = hash + '.md';
+                const navItem = document.querySelector(`[data-file="${filename}"]`);
+                if (navItem) {
+                    navItem.click();
+                    return;
+                }
+            }
+            // Default to first item
+            navItems[0].click();
+        }
+        
+        // Handle browser back/forward
+        window.addEventListener('hashchange', loadFromHash);
+        
+        // Initial load
+        loadFromHash();
+    </script>
+</body>
+</html>

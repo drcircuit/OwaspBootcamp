@@ -1,5 +1,17 @@
 # OWASP Bootcamp - Instructor Guide
 
+## 📚 Detailed Writeups Available!
+
+**NEW:** Comprehensive play-by-play writeups for all challenges are now available in the **`instructor/`** directory:
+
+- **📖 View in Browser:** Open `instructor/index.html` for an interactive, syntax-highlighted viewer
+- **📝 Individual Writeups:** One markdown file per OWASP topic (A01-A10) plus Citadel
+- **🎯 Complete Solutions:** Step-by-step exploitation, vulnerable code, secure implementations, and teaching tips
+
+**Quick Access:** `file:///path/to/OwaspBootcamp/instructor/index.html`
+
+---
+
 ## 🎯 NEW CHALLENGE STRUCTURE
 
 **Important Change:** All labs have been restructured to follow professional CTF methodology:
@@ -15,6 +27,11 @@
 - **By Stage**: Recon → Scanning → Initial Access → Maintained Access → Cover Tracks
 - **By Topic**: View all challenges for a specific OWASP category (A01, A02, etc.)
 - Access via `http://localhost:3100/topic/A01` for topic-based view
+
+### Instructor Resources:
+- **Detailed Writeups:** `instructor/` directory contains complete solutions for all labs
+- **Interactive Viewer:** `instructor/index.html` provides a beautiful browsing experience
+- **Teaching Guide:** Each writeup includes common questions, teaching points, and remediation advice
 
 ## Workshop Overview
 

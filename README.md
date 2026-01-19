@@ -192,6 +192,17 @@ For students using Azure VDI machines:
    - Discuss real-world applications
    - Q&A
 
+## 📚 For Instructors
+
+**NEW:** Comprehensive instructor writeups now available!
+
+The `instructor/` directory contains detailed play-by-play solutions for all challenges:
+- **📖 Interactive Viewer:** Open `instructor/index.html` in your browser
+- **📝 Individual Writeups:** Complete solutions for each OWASP topic (A01-A10) + Citadel
+- **🎯 Teaching Resources:** Vulnerable code examples, secure implementations, common questions, and remediation checklists
+
+See `instructor/README.md` for full details on using the writeups during workshops.
+
 ## ⚠️ Important Security Notice
 
 **WARNING**: This workshop contains deliberately vulnerable applications for educational purposes only.
