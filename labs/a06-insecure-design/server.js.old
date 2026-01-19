@@ -497,28 +497,28 @@ app.get('/lab2', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Lab 2 - Discount Codes</title>
+      <title>Lab 2 - Logic Flaw</title>
       ${styles}
     </head>
     <body>
       <div class="container">
-        <h1>🎯 LAB 2: DISCOUNT CODES <span class="difficulty medium">MEDIUM</span></h1>
+        <h1>🎯 LAB 2: LOGIC FLAW <span class="difficulty medium">MEDIUM</span></h1>
         <div class="nav-links">
           <a href="/">🏠 Home</a>
           <a href="/example">📚 Tutorial</a>
         </div>
 
         <div class="lab-info">
-          <h3>🎯 Your Mission</h3>
-          <p><strong>Scenario:</strong> Maximize your taco savings with promo codes!</p>
-          <p><strong>Your Goal:</strong> Get free tacos or even earn credit</p>
-          <p><strong>Reward:</strong> Free guacamole flag for savvy savers!</p>
+          <h3>📋 Mission Brief</h3>
+          <p><strong>Stage:</strong> Initial Access</p>
+          <p><strong>Objective:</strong> Exploit business logic flaw in discount code system</p>
+          <p><strong>Flag:</strong> Will be revealed when you get an item for free or negative price</p>
         </div>
 
         <div class="section">
-          <h2>🎟️ Challenge Description</h2>
-          <p>TacoTruck Express loves rewarding customers with discount codes! Our checkout system allows you to apply multiple promo codes to get the best deal.</p>
-          <p>Your task: Combine discount codes creatively to get tacos for free (or even better - make the price negative and earn credit!).</p>
+          <h2>🎯 Challenge Description</h2>
+          <p>The shopping cart API allows users to apply multiple discount codes. However, there's a flaw in the business logic that doesn't properly validate discount combinations.</p>
+          <p>Your task is to combine discount codes in a way that gets you an item for free or with a negative price (giving you money).</p>
         </div>
 
         <div class="endpoint">
@@ -526,26 +526,25 @@ app.get('/lab2', (req, res) => {
           <code>POST http://localhost:3006/api/lab2/checkout</code><br>
           <code>Content-Type: application/json</code><br><br>
           <strong>Body:</strong><br>
-          <code>{"price": 10, "discountCodes": ["FIRST5", "TACO10"]}</code>
+          <code>{"price": 100, "discountCodes": ["SAVE10", "SAVE20"]}</code>
         </div>
 
         <div class="section">
-          <h2>🎟️ Available Promo Codes</h2>
-          <ul style="font-size: 1.1em;">
-            <li><code>FIRST5</code> - $5 off your order (new customers)</li>
-            <li><code>TACO10</code> - 10% off (any customer)</li>
-            <li><code>LUNCH15</code> - 15% off (lunch special)</li>
-            <li><code>FREEGUAC</code> - $2.50 off (free guac promo)</li>
+          <h2>Available Discount Codes</h2>
+          <ul>
+            <li><code>SAVE10</code> - 10% off ($10 discount on $100 item)</li>
+            <li><code>SAVE20</code> - 20% off ($20 discount on $100 item)</li>
+            <li><code>SAVE50</code> - 50% off ($50 discount on $100 item)</li>
           </ul>
         </div>
 
         <div class="hint-box">
           <strong>💡 Hints:</strong>
           <ul>
-            <li>What if you use the same code multiple times?</li>
-            <li>Can you stack all the codes together?</li>
-            <li>Try different combinations and orders</li>
-            <li>What happens when the total goes below $0?</li>
+            <li>Can you apply the same discount code multiple times?</li>
+            <li>What happens if you apply all codes together?</li>
+            <li>Think about the order of operations</li>
+            <li>Can you make the final price negative?</li>
           </ul>
         </div>
 
@@ -554,7 +553,7 @@ app.get('/lab2', (req, res) => {
           <p><strong>Using curl:</strong></p>
           <pre><code>curl -X POST http://localhost:3006/api/lab2/checkout \\
   -H "Content-Type: application/json" \\
-  -d '{"price": 10, "discountCodes": ["FIRST5"]}'</code></pre>
+  -d '{"price": 100, "discountCodes": ["SAVE10"]}'</code></pre>
         </div>
 
         <div style="text-align: center; margin-top: 40px;">
@@ -572,82 +571,82 @@ app.get('/lab3', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Lab 3 - Account Balance</title>
+      <title>Lab 3 - Race Condition</title>
       ${styles}
     </head>
     <body>
       <div class="container">
-        <h1>🎯 LAB 3: ACCOUNT BALANCE <span class="difficulty hard">HARD</span></h1>
+        <h1>🎯 LAB 3: RACE CONDITION <span class="difficulty hard">HARD</span></h1>
         <div class="nav-links">
           <a href="/">🏠 Home</a>
           <a href="/example">📚 Tutorial</a>
         </div>
 
         <div class="lab-info">
-          <h3>🎯 Your Mission</h3>
-          <p><strong>Scenario:</strong> Use your $50 loyalty rewards wisely!</p>
-          <p><strong>Your Goal:</strong> Get more tacos than your balance allows</p>
-          <p><strong>Reward:</strong> Extra tacos flag for clever customers!</p>
+          <h3>📋 Mission Brief</h3>
+          <p><strong>Stage:</strong> Maintained Access</p>
+          <p><strong>Objective:</strong> Exploit race condition to withdraw more than available balance</p>
+          <p><strong>Flag:</strong> Will be revealed when total withdrawals exceed initial balance</p>
         </div>
 
         <div class="section">
-          <h2>💰 Challenge Description</h2>
-          <p>TacoTruck Express rewards loyal customers with account credits. Your account has a $50.00 balance that you can use for orders. The system processes payments in real-time!</p>
-          <p>Your task: Try to place multiple orders at the same time. Our fast system might process them all if you're quick enough!</p>
+          <h2>🎯 Challenge Description</h2>
+          <p>The banking API has a withdrawal endpoint that checks your balance before processing. However, there's a time gap between checking the balance and actually withdrawing the funds.</p>
+          <p>Your task is to send multiple concurrent withdrawal requests to exploit this race condition and withdraw more money than you actually have.</p>
         </div>
 
         <div class="endpoint">
           <strong>API Endpoints:</strong><br>
-          <code>GET http://localhost:3006/api/lab3/balance</code> - Check loyalty balance<br>
-          <code>POST http://localhost:3006/api/lab3/withdraw</code> - Use balance for order<br>
+          <code>GET http://localhost:3006/api/lab3/balance</code> - Check current balance<br>
+          <code>POST http://localhost:3006/api/lab3/withdraw</code> - Withdraw funds<br>
           <code>Content-Type: application/json</code><br><br>
-          <strong>Order Body:</strong><br>
-          <code>{"amount": 15}</code>
+          <strong>Withdraw Body:</strong><br>
+          <code>{"amount": 300}</code>
         </div>
 
         <div class="section">
-          <h2>💳 Your Loyalty Account</h2>
-          <ul style="font-size: 1.1em;">
-            <li><strong>Available Balance:</strong> $50.00</li>
-            <li><strong>Taco Order Size:</strong> Try $15 per order</li>
-            <li><strong>Challenge:</strong> Order more than $50 worth of tacos!</li>
+          <h2>Account Information</h2>
+          <ul>
+            <li><strong>Initial Balance:</strong> $1000</li>
+            <li><strong>Withdrawal Amount:</strong> Try withdrawing $300 per request</li>
+            <li><strong>Goal:</strong> Withdraw more than $1000 total</li>
           </ul>
         </div>
 
         <div class="hint-box">
           <strong>💡 Hints:</strong>
           <ul>
-            <li>Place multiple orders at the exact same moment</li>
-            <li>All orders should check the balance before any payment processes</li>
-            <li>Use concurrent requests (curl with &, or a script)</li>
-            <li>Try 4 orders of $15 simultaneously ($60 total from $50 balance!)</li>
+            <li>You need to send multiple requests at the exact same time</li>
+            <li>All requests should pass the balance check before any completes</li>
+            <li>Use tools that support concurrent requests (curl with &, xargs -P, or a script)</li>
+            <li>Try sending 4 withdrawal requests of $300 simultaneously</li>
           </ul>
         </div>
 
         <div class="section">
           <h2>🛠️ Testing Instructions</h2>
-          <p><strong>Using bash with concurrent orders:</strong></p>
-          <pre><code># Place 4 concurrent $15 orders
+          <p><strong>Using bash with concurrent curl:</strong></p>
+          <pre><code># Send 4 concurrent $300 withdrawals
 for i in {1..4}; do
   curl -X POST http://localhost:3006/api/lab3/withdraw \\
     -H "Content-Type: application/json" \\
-    -d '{"amount": 15}' &
+    -d '{"amount": 300}' &
 done
 wait
 
-# Check your balance
+# Check the result
 curl http://localhost:3006/api/lab3/balance</code></pre>
 
-          <p><strong>Or use Python for rapid-fire orders:</strong></p>
+          <p><strong>Or using a simple Python script:</strong></p>
           <pre><code>import requests
 import concurrent.futures
 
-def place_order():
+def withdraw():
     return requests.post('http://localhost:3006/api/lab3/withdraw',
-                        json={'amount': 15})
+                        json={'amount': 300})
 
 with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-    futures = [executor.submit(place_order) for _ in range(4)]
+    futures = [executor.submit(withdraw) for _ in range(4)]
     results = [f.result().json() for f in futures]
 
 for r in results:
@@ -664,39 +663,39 @@ for r in results:
 });
 
 // LAB 1: Rate Limiting vulnerability
-app.post('/api/lab1/verify-order', (req, res) => {
-  const { orderCode } = req.body;
+app.post('/api/lab1/verify-pin', (req, res) => {
+  const { pin } = req.body;
   const clientIp = req.ip || 'unknown';
   
   // Track attempts (but don't actually limit them - that's the vulnerability!)
-  if (!orderAttempts[clientIp]) {
-    orderAttempts[clientIp] = [];
+  if (!transferAttempts[clientIp]) {
+    transferAttempts[clientIp] = [];
   }
   
   // Clean up old attempts (older than 1 hour) to prevent memory leaks
   const oneHourAgo = Date.now() - (60 * 60 * 1000);
-  orderAttempts[clientIp] = orderAttempts[clientIp].filter(timestamp => timestamp > oneHourAgo);
+  transferAttempts[clientIp] = transferAttempts[clientIp].filter(timestamp => timestamp > oneHourAgo);
   
-  orderAttempts[clientIp].push(Date.now());
-  const attemptCount = orderAttempts[clientIp].length;
+  transferAttempts[clientIp].push(Date.now());
+  const attemptCount = transferAttempts[clientIp].length;
   
   // VULNERABLE: No rate limiting!
   if (attemptCount >= 10) {
     return res.json({
-      success: true,
-      message: 'Order verified! Wow, you can really order fast!',
+      success: false,
+      message: 'Invalid PIN',
       attempts: attemptCount,
-      flag: 'TACO{R4T3_L1M1T_M1SS1NG_3XTR4_GU4C}',
-      vulnerability: 'No rate limiting on order verification!',
-      explanation: 'You placed ' + attemptCount + ' rapid orders with no throttling. In a real system, this could overwhelm the kitchen!'
+      flag: 'NSA{R4T3_L1M1T_M1SS1NG}',
+      vulnerability: 'No rate limiting allows unlimited brute force attempts!',
+      explanation: 'You made ' + attemptCount + ' attempts with no throttling or account lockout'
     });
   }
   
   res.json({
-    success: true,
-    message: 'Order code verified',
+    success: false,
+    message: 'Invalid PIN',
     attempts: attemptCount,
-    hint: 'Keep ordering! No rate limiting in place. Make at least 10 rapid verification requests.'
+    hint: 'Keep trying! No rate limiting in place. Make at least 10 attempts.'
   });
 });
 
@@ -707,7 +706,7 @@ app.post('/api/lab2/checkout', (req, res) => {
   if (!price || !discountCodes || !Array.isArray(discountCodes)) {
     return res.json({
       error: 'Invalid request',
-      example: '{"price": 10, "discountCodes": ["FIRST5", "TACO10"]}'
+      example: '{"price": 100, "discountCodes": ["SAVE10", "SAVE20"]}'
     });
   }
   
@@ -716,37 +715,34 @@ app.post('/api/lab2/checkout', (req, res) => {
   
   // VULNERABLE: No validation that codes can't be reused!
   discountCodes.forEach(code => {
-    if (code === 'FIRST5') {
-      price -= 5;
-      discountsApplied.push('FIRST5 (-$5)');
-    } else if (code === 'TACO10') {
-      price -= price * 0.10;
-      discountsApplied.push('TACO10 (-10%)');
-    } else if (code === 'LUNCH15') {
-      price -= price * 0.15;
-      discountsApplied.push('LUNCH15 (-15%)');
-    } else if (code === 'FREEGUAC') {
-      price -= 2.50;
-      discountsApplied.push('FREEGUAC (-$2.50)');
+    if (code === 'SAVE10') {
+      price -= 10;
+      discountsApplied.push('SAVE10 (-$10)');
+    } else if (code === 'SAVE20') {
+      price -= 20;
+      discountsApplied.push('SAVE20 (-$20)');
+    } else if (code === 'SAVE50') {
+      price -= 50;
+      discountsApplied.push('SAVE50 (-$50)');
     }
   });
   
   const response = {
     originalPrice: originalPrice,
     discountsApplied: discountsApplied,
-    finalPrice: price.toFixed(2),
-    totalSaved: (originalPrice - price).toFixed(2)
+    finalPrice: price,
+    totalDiscount: originalPrice - price
   };
   
   // Award flag if price is 0 or negative
   if (price <= 0) {
-    response.flag = 'TACO{L0G1C_FL4W_FR33_GU4C4M0L3}';
+    response.flag = 'NSA{L0G1C_FL4W_3XPL01T3D}';
     response.vulnerability = 'Business logic flaw: Same discount code can be applied multiple times!';
-    response.explanation = 'You exploited the missing validation to stack codes and get free tacos (or even earn credit)!';
+    response.explanation = 'You exploited the missing validation to apply codes multiple times';
   } else if (discountsApplied.length > 1) {
-    response.hint = 'Good job stacking codes! Can you get it to $0 or negative?';
+    response.hint = 'You can apply multiple codes, but can you get it for free or negative price?';
   } else {
-    response.hint = 'Try applying multiple discount codes. Can you use the same code more than once?';
+    response.hint = 'Try applying multiple discount codes. Can you use the same code twice?';
   }
   
   res.json(response);
@@ -755,19 +751,19 @@ app.post('/api/lab2/checkout', (req, res) => {
 // LAB 3: Race Condition - Check Balance
 app.get('/api/lab3/balance', (req, res) => {
   res.json({
-    balance: accountBalances['customer123'],
-    orderHistory: orderHistory,
-    totalSpent: orderHistory.reduce((sum, order) => sum + order.amount, 0)
+    balance: accountBalance,
+    withdrawalHistory: withdrawalHistory,
+    totalWithdrawn: withdrawalHistory.reduce((sum, w) => sum + w.amount, 0)
   });
 });
 
 // LAB 3: Race Condition - Reset Balance
 app.post('/api/lab3/reset', (req, res) => {
-  accountBalances['customer123'] = 50.00;
-  orderHistory.length = 0;
+  accountBalance = 1000;
+  withdrawalHistory.length = 0;
   res.json({
-    message: 'Loyalty balance reset to $50.00',
-    balance: accountBalances['customer123']
+    message: 'Balance reset to $1000',
+    balance: accountBalance
   });
 });
 
@@ -778,56 +774,54 @@ app.post('/api/lab3/withdraw', async (req, res) => {
   if (!amount || amount <= 0) {
     return res.json({
       success: false,
-      error: 'Invalid order amount'
+      error: 'Invalid withdrawal amount'
     });
   }
   
-  const customerId = 'customer123';
-  
   // VULNERABLE: Check balance BEFORE modifying it
   // This creates a race condition window
-  if (accountBalances[customerId] >= amount) {
+  if (accountBalance >= amount) {
     // Simulate processing delay (makes race condition easier to exploit)
     await new Promise(resolve => setTimeout(resolve, 100));
     
     // VULNERABLE: Another request could have passed the check above
-    accountBalances[customerId] -= amount;
+    accountBalance -= amount;
     
-    const order = {
+    const withdrawal = {
       amount: amount,
       timestamp: new Date().toISOString(),
-      balanceAfter: accountBalances[customerId]
+      balanceAfter: accountBalance
     };
     
-    orderHistory.push(order);
+    withdrawalHistory.push(withdrawal);
     
-    const totalSpent = orderHistory.reduce((sum, o) => sum + o.amount, 0);
+    const totalWithdrawn = withdrawalHistory.reduce((sum, w) => sum + w.amount, 0);
     
     const response = {
       success: true,
-      message: 'Order placed! Payment processed from loyalty balance.',
-      orderAmount: amount,
-      balanceAfter: accountBalances[customerId].toFixed(2),
-      totalSpent: totalSpent.toFixed(2)
+      message: 'Withdrawal successful',
+      amount: amount,
+      balanceAfter: accountBalance,
+      totalWithdrawn: totalWithdrawn
     };
     
-    // Award flag if total spent exceeds initial balance
-    if (totalSpent > 50) {
-      response.flag = 'TACO{R4C3_C0ND1T10N_3XTR4_T4C0S}';
+    // Award flag if total withdrawn exceeds initial balance
+    if (totalWithdrawn > 1000) {
+      response.flag = 'NSA{R4C3_C0ND1T10N_W0N}';
       response.vulnerability = 'Race condition exploited!';
-      response.explanation = 'You ordered $' + totalSpent.toFixed(2) + ' worth of tacos from a $50.00 balance! The system processed simultaneous orders before updating the balance.';
-    } else if (accountBalances[customerId] < 0) {
-      response.hint = 'Balance is negative but not enough orders yet. Try more concurrent requests!';
+      response.explanation = 'You withdrew $' + totalWithdrawn + ' from an account with only $1000 initial balance';
+    } else if (accountBalance < 0) {
+      response.hint = 'Balance is negative but total not enough yet. Try more concurrent requests!';
     }
     
     res.json(response);
   } else {
     res.json({
       success: false,
-      error: 'Insufficient loyalty balance',
-      balance: accountBalances[customerId].toFixed(2),
+      error: 'Insufficient funds',
+      balance: accountBalance,
       requested: amount,
-      hint: 'Place multiple orders at the exact same time to exploit the race condition'
+      hint: 'Send multiple withdrawal requests at the exact same time to exploit the race condition'
     });
   }
 });
@@ -835,23 +829,23 @@ app.post('/api/lab3/withdraw', async (req, res) => {
 // Status endpoint
 app.get('/api/status', (req, res) => {
   res.json({
-    service: 'TacoTruck Express - Pre-Order System',
+    service: 'Insecure Design Lab',
     port: PORT,
     version: '1.0.0',
     labs: {
-      lab1: 'Order System (Rate Limiting)',
-      lab2: 'Discount Codes (Logic Flaw)',
-      lab3: 'Account Balance (Race Condition)'
+      lab1: 'Rate Limiting',
+      lab2: 'Logic Flaw',
+      lab3: 'Race Condition'
     }
   });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🌮 TacoTruck Express running on port ${PORT}`);
+  console.log(`A06: Insecure Design Lab running on port ${PORT}`);
   console.log('Available endpoints:');
   console.log('  http://localhost:3006/ - Home');
   console.log('  http://localhost:3006/example - Tutorial');
-  console.log('  http://localhost:3006/lab1 - Order System Lab');
-  console.log('  http://localhost:3006/lab2 - Discount Codes Lab');
-  console.log('  http://localhost:3006/lab3 - Account Balance Lab');
+  console.log('  http://localhost:3006/lab1 - Rate Limiting Lab');
+  console.log('  http://localhost:3006/lab2 - Logic Flaw Lab');
+  console.log('  http://localhost:3006/lab3 - Race Condition Lab');
 });
