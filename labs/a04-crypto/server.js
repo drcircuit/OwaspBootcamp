@@ -1,53 +1,15 @@
 const express = require('express');
+const crypto = require('crypto');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
 // PowerFit Gym data
-const gymMenu = [
-    { id: 1, name: 'Espresso', price: 2.99, category: 'hot', description: 'Bold gym shot' },
-    { id: 2, name: 'Cappuccino', price: 4.49, category: 'hot', description: 'Espresso with steamed milk' },
-    { id: 3, name: 'Cold Brew', price: 4.99, category: 'cold', description: 'Smooth cold gym' },
-    { id: 4, name: 'Caramel Macchiato', price: 5.99, category: 'hot', description: 'Layered espresso drink' }
-];
-
-const staff = [
-    { id: 1, name: 'Emma Rodriguez', role: 'manager', email: 'emma@beanscene.local', shift: 'morning' },
-    { id: 2, name: 'Marcus Chen', role: 'barista', email: 'marcus@beanscene.local', shift: 'morning' },
-    { id: 3, name: 'Sofia Martinez', role: 'barista', email: 'sofia@beanscene.local', shift: 'afternoon' }
-];
-
-// VULNERABLE configuration data
-const configData = {
-    database: {
-        host: 'db.beanscene.local',
-        username: 'gym_admin',
-        password: 'Bean\$cene2024!',
-        database: 'beanscene_prod'
-    },
-    payment_gateway: {
-        square_token: 'sq0atp-BeanScene_Live_Token_xyz789',
-        merchant_id: 'MLHV6GRVNB4XQ'
-    },
-    secrets: {
-        jwt_secret: 'beanscene_jwt_secret_key',
-        session_key: 'gym-shop-session-2024'
-    }
-};
-
-// VULNERABLE default credentials
-const adminCredentials = {
-    username: 'admin',
-    password: 'beanscene'
-};
-
-// Example store systems
-const storeSystemsExamples = [
-    { id: 100, system: 'POS Terminal 1', status: 'online', version: '2.4.1', ip: '192.168.1.10' },
-    { id: 101, system: 'POS Terminal 2', status: 'online', version: '2.4.1', ip: '192.168.1.11' },
-    { id: 102, system: 'Inventory Scanner', status: 'online', version: '1.8.3', ip: '192.168.1.20' },
-    { id: 103, system: 'Back Office', status: 'maintenance', version: '3.1.0', ip: '192.168.1.30' }
+const trainers = [
+    { id: 1, name: 'Mike Johnson', role: 'Head Trainer', email: 'mike@powerfit.gym', specialty: 'Strength Training' },
+    { id: 2, name: 'Sarah Chen', role: 'Yoga Instructor', email: 'sarah@powerfit.gym', specialty: 'Yoga & Pilates' },
+    { id: 3, name: 'Marcus Lee', role: 'Cardio Coach', email: 'marcus@powerfit.gym', specialty: 'HIIT & Cardio' }
 ];
 
 
@@ -135,38 +97,38 @@ app.get('/', (req, res) => {
                 </div>
 
                 <div class="welcome-section">
-                    <h2>Welcome to BeanScene Management Portal</h2>
-                    <p>Manage shop operations, track inventory, review sales data, and configure store settings.</p>
+                    <h2>Welcome to PowerFit Gym Portal</h2>
+                    <p>Manage member accounts, trainer schedules, and facility operations. Your fitness journey starts here.</p>
                 </div>
 
                 <div class="nav-cards">
                     <a href="/example" class="card">
-                        <h3>📚 Getting Started</h3>
-                        <p>Learn how to navigate the management system and access reports.</p>
+                        <h3>📚 Interactive Tutorial</h3>
+                        <p>Learn about cryptographic vulnerabilities through hands-on demos and exercises.</p>
                         <span class="card-badge badge-tutorial">Tutorial</span>
                     </a>
 
                     <a href="/lab1" class="card">
-                        <h3>👥 Staff Dashboard</h3>
-                        <p>View staff schedules, performance metrics, and team information.</p>
-                        <span class="card-badge badge-easy">Staff</span>
+                        <h3>👤 Member Portal</h3>
+                        <p>Access member data and session tokens. Understand encoding vs encryption.</p>
+                        <span class="card-badge badge-easy">Easy</span>
                     </a>
 
                     <a href="/lab2" class="card">
-                        <h3>⚙️ Store Settings</h3>
-                        <p>Configure operations, payment systems, and integration settings.</p>
-                        <span class="card-badge badge-medium">Settings</span>
+                        <h3>👥 User Export</h3>
+                        <p>Review user accounts and password security. Identify weak hashing algorithms.</p>
+                        <span class="card-badge badge-medium">Medium</span>
                     </a>
 
                     <a href="/lab3" class="card">
-                        <h3>🔐 Manager Portal</h3>
-                        <p>Access financial reports, system configuration, and admin controls.</p>
-                        <span class="card-badge badge-hard">Admin</span>
+                        <h3>🔐 Secure Config</h3>
+                        <p>Access system configuration and encryption keys. Find hardcoded secrets.</p>
+                        <span class="card-badge badge-hard">Hard</span>
                     </a>
                 </div>
 
                 <div class="footer">
-                    <p>🏋️ PowerFit Gym • 456 Brew Street • (555) 234-5678</p>
+                    <p>🏋️ PowerFit Gym • 789 Fitness Lane • (555) GYM-POWER</p>
                 </div>
             </div>
         </body>
@@ -175,13 +137,13 @@ app.get('/', (req, res) => {
 });
 
 
-// Example page - Help & Info
+// Example page - Interactive Tutorial
 app.get('/example', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Help Center - PowerFit Gym</title>
+            <title>Cryptography Tutorial - PowerFit Gym</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
@@ -189,8 +151,9 @@ app.get('/example', (req, res) => {
                     background: linear-gradient(135deg, #D32F2F 0%, #1976D2 100%);
                     padding: 20px;
                     min-height: 100vh;
+                    line-height: 1.6;
                 }
-                .container { max-width: 900px; margin: 0 auto; }
+                .container { max-width: 1000px; margin: 0 auto; }
                 .header {
                     background: #FFF3E0;
                     padding: 30px;
@@ -199,120 +162,391 @@ app.get('/example', (req, res) => {
                     text-align: center;
                     border: 2px solid #A1887F;
                 }
-                h1 { color: #1976D2; font-size: 2.2em; margin-bottom: 10px; }
-                .section {
+                h1 { color: #1976D2; font-size: 2.5em; margin-bottom: 10px; }
+                .subtitle { color: #5D4037; font-size: 1.1em; }
+                .tutorial-section {
                     background: #FFF3E0;
-                    padding: 25px;
+                    padding: 30px;
                     border-radius: 15px;
-                    margin-bottom: 20px;
+                    margin-bottom: 25px;
                     border: 2px solid #A1887F;
                 }
-                .section h2 { color: #1976D2; margin-bottom: 15px; }
-                .section p, .section li { color: #5D4037; line-height: 1.7; margin: 8px 0; }
-                .info-box {
+                .tutorial-section h2 {
+                    color: #1976D2;
+                    margin-bottom: 15px;
+                    font-size: 1.8em;
+                }
+                .tutorial-section p { color: #5D4037; margin-bottom: 15px; line-height: 1.7; }
+                .tutorial-box {
+                    background: #E8F5E9;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    border-left: 3px solid #4CAF50;
+                }
+                .interactive-demo {
+                    background: #FFF3E0;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    border-left: 3px solid #FF9800;
+                }
+                .demo-controls { margin: 15px 0; }
+                .demo-input {
+                    width: 100%;
+                    padding: 12px;
+                    border: 2px solid #1976D2;
+                    border-radius: 8px;
+                    font-size: 1em;
+                    margin: 10px 0;
+                }
+                .demo-button {
+                    background: linear-gradient(135deg, #1976D2 0%, #0D47A1 100%);
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-size: 1em;
+                    margin: 5px;
+                }
+                .demo-button:hover {
+                    background: linear-gradient(135deg, #0D47A1 0%, #01579B 100%);
+                }
+                .demo-button:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+                .output-box {
+                    background: #f5f5f5;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin: 15px 0;
+                    font-family: 'Courier New', monospace;
+                    font-size: 0.9em;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                    max-height: 300px;
+                    overflow-y: auto;
+                    border: 1px solid #ddd;
+                }
+                .flag-reveal {
+                    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 1.2em;
+                    display: none;
+                }
+                .hint-box {
+                    background: #E3F2FD;
+                    border-left: 4px solid #2196F3;
+                    padding: 15px;
+                    margin: 15px 0;
+                    border-radius: 5px;
+                }
+                .tip-box {
                     background: #FFF3E0;
                     border-left: 4px solid #FF9800;
                     padding: 15px;
                     margin: 15px 0;
                     border-radius: 5px;
                 }
-                a { color: #5D4037; font-weight: 600; text-decoration: none; }
-                a:hover { text-decoration: underline; }
+                code {
+                    background: #FFCDD2;
+                    padding: 2px 6px;
+                    border-radius: 3px;
+                    font-family: 'Courier New', monospace;
+                    color: #c62828;
+                }
                 .back-link { text-align: center; margin-top: 30px; }
+                .back-link a { color: #5D4037; text-decoration: none; font-weight: 600; }
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>🏋️ PowerFit Help Center</h1>
-                    <p style="color: #5D4037;">Your guide to the management portal</p>
+                    <h1>📚 Cryptography Tutorial</h1>
+                    <p class="subtitle">Learn about encoding, hashing, and encryption through interactive demos</p>
                 </div>
 
-                <div class="section">
-                    <h2>About the Portal</h2>
-                    <p>The PowerFit Gym Management Portal provides comprehensive tools for managing fitness center operations. Access staff information, review system settings, and monitor facility performance from one central location.</p>
+                <!-- Part 1: Base64 Encoding Demo -->
+                <div class="tutorial-section">
+                    <h2>Part 1: Base64 Encoding 🔍</h2>
+                    <p>Base64 is an encoding scheme, NOT encryption. It converts binary data to ASCII text but provides zero security.</p>
                     
-                    <div class="info-box">
-                        <strong>Getting Started:</strong> Use the navigation cards on the home page to access different areas of the portal. Each section provides specific management capabilities for different aspects of the business.
+                    <div class="tutorial-box">
+                        <h3>🎯 Your Mission</h3>
+                        <p>Encode some text to Base64, then decode it back. See how easy it is to reverse!</p>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>Interactive Base64 Demo</h3>
+                        <p>Enter text to encode, then decode it back. Open DevTools (F12) to watch the API calls!</p>
+                        <div class="demo-controls">
+                            <input type="text" id="part1-text" class="demo-input" placeholder="Enter text to encode" value="Secret Password 123">
+                            <button onclick="part1Encode()" class="demo-button">🔐 Encode to Base64</button>
+                            <button onclick="part1Decode()" class="demo-button">🔓 Decode from Base64</button>
+                        </div>
+                        <div id="part1-output" class="output-box"></div>
+                        <div id="part1-flag" class="flag-reveal"></div>
+                    </div>
+
+                    <div class="tip-box">
+                        <strong>💡 Tip:</strong> Press F12 to open DevTools, go to the Network tab, and watch the requests. Base64 is encoding, not encryption - anyone can decode it!
                     </div>
                 </div>
 
-                <div class="section">
-                    <h2>Portal Features</h2>
-                    <ul>
-                        <li><strong>Staff Dashboard:</strong> View team schedules, shift assignments, and contact information</li>
-                        <li><strong>Facility Settings:</strong> Configure operational parameters and integration settings</li>
-                        <li><strong>Manager Portal:</strong> Access administrative controls and financial reports</li>
-                    </ul>
+                <!-- Part 2: MD5 Hashing Demo -->
+                <div class="tutorial-section">
+                    <h2>Part 2: Weak Hashing (MD5) 💻</h2>
+                    <p>MD5 is a cryptographic hash function that's now considered broken. It's too fast and vulnerable to collisions.</p>
+                    
+                    <div class="tutorial-box">
+                        <h3>🎯 Your Mission</h3>
+                        <p>Hash a password with MD5 and see how weak it is. These hashes can be cracked instantly!</p>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>Try it yourself</h3>
+                        <p>Hash a password with MD5 (deprecated algorithm):</p>
+                        <input type="text" id="part2-text" class="demo-input" placeholder="Enter password to hash" value="password123">
+                        <button onclick="part2Hash()" class="demo-button">🔒 Hash with MD5</button>
+                        <div id="part2-output" class="output-box" style="display:none;"></div>
+                        <div id="part2-flag" class="flag-reveal"></div>
+                    </div>
+
+                    <div class="tip-box">
+                        <strong>💡 Tip:</strong> MD5 hashes can be cracked using rainbow tables at crackstation.net or md5decrypt.net. Never use MD5 for passwords!
+                    </div>
                 </div>
 
-                <div class="section">
-                    <h2>Need Help?</h2>
-                    <p>For technical support or questions about the management portal, contact the IT help desk or your facility manager.</p>
-                    <p><strong>Email:</strong> support@powerfit.gym</p>
-                    <p><strong>Phone:</strong> (555) 234-5678</p>
+                <!-- Part 3: Encryption Keys -->
+                <div class="tutorial-section">
+                    <h2>Part 3: Encryption Keys 🔐</h2>
+                    <p>Proper encryption requires secret keys. If keys are exposed, the encryption is worthless.</p>
+                    
+                    <div class="tutorial-box">
+                        <h3>🎯 Your Mission</h3>
+                        <p>See what happens when encryption keys are hardcoded or exposed in the application.</p>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>Interactive Demo</h3>
+                        <p>Check for exposed encryption configuration:</p>
+                        <button onclick="part3Test()" class="demo-button">🔑 Check Encryption Config</button>
+                        <div id="part3-output" class="output-box"></div>
+                        <div id="part3-flag" class="flag-reveal"></div>
+                    </div>
+
+                    <div class="hint-box">
+                        <strong>💡 Tip:</strong> Open DevTools Network tab to see the endpoint URL and response data. Hardcoded keys should never be in source code!
+                    </div>
                 </div>
 
                 <div class="back-link">
                     <a href="/">← Back to Portal</a>
                 </div>
             </div>
+
+            <script>
+                // Part 1: Base64 Encoding/Decoding
+                async function part1Encode() {
+                    const text = document.getElementById('part1-text').value;
+                    const output = document.getElementById('part1-output');
+                    const flagDiv = document.getElementById('part1-flag');
+                    
+                    output.textContent = 'Encoding...';
+                    flagDiv.style.display = 'none';
+                    
+                    try {
+                        const response = await fetch('/api/example/encode', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ text })
+                        });
+                        const data = await response.json();
+                        output.textContent = JSON.stringify(data, null, 2);
+                        
+                        if (data.flag) {
+                            flagDiv.textContent = '🎉 ' + data.flag;
+                            flagDiv.style.display = 'block';
+                        }
+                    } catch (error) {
+                        output.textContent = 'Error: ' + error.message;
+                    }
+                }
+
+                async function part1Decode() {
+                    const text = document.getElementById('part1-text').value;
+                    const output = document.getElementById('part1-output');
+                    
+                    output.textContent = 'Decoding...';
+                    
+                    try {
+                        const response = await fetch('/api/example/decode', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ encoded: text })
+                        });
+                        const data = await response.json();
+                        output.textContent = JSON.stringify(data, null, 2);
+                    } catch (error) {
+                        output.textContent = 'Error: ' + error.message;
+                    }
+                }
+
+                // Part 2: MD5 Hashing
+                async function part2Hash() {
+                    const text = document.getElementById('part2-text').value;
+                    const output = document.getElementById('part2-output');
+                    const flagDiv = document.getElementById('part2-flag');
+                    
+                    output.style.display = 'block';
+                    output.textContent = 'Hashing...';
+                    flagDiv.style.display = 'none';
+                    
+                    try {
+                        const response = await fetch('/api/example/hash', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ password: text })
+                        });
+                        const data = await response.json();
+                        output.textContent = JSON.stringify(data, null, 2);
+                        
+                        if (data.flag) {
+                            flagDiv.textContent = '🎉 ' + data.flag;
+                            flagDiv.style.display = 'block';
+                        }
+                    } catch (error) {
+                        output.textContent = 'Error: ' + error.message;
+                    }
+                }
+
+                // Part 3: Encryption Config Check
+                async function part3Test() {
+                    const output = document.getElementById('part3-output');
+                    const flagDiv = document.getElementById('part3-flag');
+                    
+                    output.textContent = 'Loading...';
+                    flagDiv.style.display = 'none';
+                    
+                    try {
+                        const response = await fetch('/api/example/crypto-info');
+                        const data = await response.json();
+                        output.textContent = JSON.stringify(data, null, 2);
+                        
+                        if (data.flag) {
+                            flagDiv.textContent = '🎉 ' + data.flag;
+                            flagDiv.style.display = 'block';
+                        }
+                    } catch (error) {
+                        output.textContent = 'Error: ' + error.message;
+                    }
+                }
+            </script>
         </body>
         </html>
     `);
 });
 
 // Example API endpoints
-app.get('/api/example/systems/:id', (req, res) => {
-    const systemId = parseInt(req.params.id);
-    const system = storeSystemsExamples.find(s => s.id === systemId);
-    
-    if (!system) {
-        return res.status(404).json({ error: 'System not found', hint: 'Try IDs 100-103' });
+app.post('/api/example/encode', (req, res) => {
+    const { text } = req.body;
+    if (!text) {
+        return res.status(400).json({ error: 'Text required' });
     }
     
-    if (systemId === 103) {
-        return res.json({
-            ...system,
-            flag: 'FLAG{ST0R3_SYST3M_3NUM3R4T3D}',
-            message: 'You found the maintenance system!',
-            admin_note: 'System in maintenance mode - full access available'
+    const encoded = Buffer.from(text).toString('base64');
+    
+    res.json({
+        success: true,
+        original: text,
+        encoded: encoded,
+        flag: 'FLAG{B4S364_1S_N0T_3NCRYPT10N}',
+        message: 'Base64 is encoding, not encryption!',
+        warning: 'Anyone can decode this - it provides NO security',
+        decoding_command: `echo "${encoded}" | base64 -d`
+    });
+});
+
+app.post('/api/example/decode', (req, res) => {
+    const { encoded } = req.body;
+    if (!encoded) {
+        return res.status(400).json({ error: 'Encoded text required' });
+    }
+    
+    try {
+        const decoded = Buffer.from(encoded, 'base64').toString('utf-8');
+        res.json({
+            success: true,
+            encoded: encoded,
+            decoded: decoded,
+            message: 'Decoded successfully - see how easy?',
+            security_note: 'Base64 provides zero security. Use proper encryption!'
         });
+    } catch (error) {
+        res.status(400).json({ error: 'Invalid base64 string' });
+    }
+});
+
+app.post('/api/example/hash', (req, res) => {
+    const { password } = req.body;
+    if (!password) {
+        return res.status(400).json({ error: 'Password required' });
     }
     
-    res.json(system);
-});
-
-app.get('/api/example/diagnostic', (req, res) => {
+    const md5Hash = crypto.createHash('md5').update(password).digest('hex');
+    const sha256Hash = crypto.createHash('sha256').update(password).digest('hex');
+    
     res.json({
-        status: 'operational',
-        flag: 'FLAG{D14GN0ST1C_4CC3SS3D}',
-        message: 'Diagnostic endpoint accessed successfully!',
-        store_health: {
-            pos_systems: 'online',
-            inventory: 'synced',
-            payment_gateway: 'connected'
-        }
+        success: true,
+        flag: 'FLAG{MD5_1S_BR0K3N}',
+        password: password,
+        md5_hash: md5Hash,
+        sha256_hash: sha256Hash,
+        warning: 'MD5 is cryptographically broken!',
+        vulnerability: 'MD5 can be cracked in seconds using rainbow tables',
+        crack_sites: ['crackstation.net', 'md5decrypt.net'],
+        better_options: ['bcrypt', 'Argon2', 'PBKDF2']
     });
 });
 
-app.get('/api/example/auth-check', (req, res) => {
+app.get('/api/example/crypto-info', (req, res) => {
     res.json({
-        authenticated: false,
-        flag: 'FLAG{4UTH_SYST3M_CH3CK3D}',
-        message: 'Auth check completed!',
-        hint: 'Authentication would normally validate credentials here'
+        success: true,
+        flag: 'FLAG{CRYPT0_1NF0_3XP0S3D}',
+        message: 'Cryptographic configuration retrieved',
+        algorithms: {
+            encoding: 'Base64 (NOT encryption)',
+            weak_hashing: 'MD5, SHA1 (deprecated)',
+            strong_hashing: 'SHA-256, SHA-512',
+            password_hashing: 'bcrypt, Argon2',
+            encryption: 'AES-256-GCM'
+        },
+        common_mistakes: [
+            'Using Base64 as encryption',
+            'Using MD5 for passwords',
+            'Hardcoding encryption keys',
+            'Not using salt for passwords',
+            'Using weak key sizes'
+        ]
     });
 });
 
 
-// Lab 1 - Staff Dashboard
+// Lab 1 - Member Portal (Base64 Encoding)
 app.get('/lab1', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Staff Dashboard - BeanScene</title>
+            <title>Member Portal - PowerFit Gym</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
@@ -320,6 +554,7 @@ app.get('/lab1', (req, res) => {
                     background: linear-gradient(135deg, #D32F2F 0%, #1976D2 100%);
                     padding: 20px;
                     min-height: 100vh;
+                    line-height: 1.6;
                 }
                 .container { max-width: 900px; margin: 0 auto; }
                 .header {
@@ -331,6 +566,7 @@ app.get('/lab1', (req, res) => {
                     border: 2px solid #A1887F;
                 }
                 h1 { color: #1976D2; font-size: 2em; margin-bottom: 8px; }
+                .subtitle { color: #5D4037; font-size: 1.1em; }
                 .section {
                     background: #FFF3E0;
                     padding: 25px;
@@ -339,60 +575,152 @@ app.get('/lab1', (req, res) => {
                     border: 2px solid #A1887F;
                 }
                 .section h2 { color: #1976D2; margin-bottom: 15px; }
-                .section p, .section li { color: #5D4037; line-height: 1.7; margin: 8px 0; }
-                .staff-card {
-                    background: #FFF8E7;
-                    padding: 15px;
-                    margin: 10px 0;
+                .section p { color: #5D4037; line-height: 1.7; margin: 8px 0; }
+                .search-box {
+                    background: #E8F5E9;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                    border-left: 3px solid #4CAF50;
+                }
+                .demo-input {
+                    width: 100%;
+                    padding: 12px;
+                    border: 2px solid #1976D2;
                     border-radius: 8px;
-                    border-left: 4px solid #8D6E63;
+                    font-size: 1em;
+                    margin: 10px 0;
+                }
+                .demo-button {
+                    background: linear-gradient(135deg, #1976D2 0%, #0D47A1 100%);
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-size: 1em;
+                    margin: 5px;
+                    width: 100%;
+                }
+                .demo-button:hover {
+                    background: linear-gradient(135deg, #0D47A1 0%, #01579B 100%);
+                }
+                .output-box {
+                    background: #f5f5f5;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin: 15px 0;
+                    font-family: 'Courier New', monospace;
+                    font-size: 0.9em;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                    max-height: 400px;
+                    overflow-y: auto;
+                    border: 1px solid #ddd;
+                }
+                .flag-reveal {
+                    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 1.2em;
+                }
+                .tip-box {
+                    background: #FFF3E0;
+                    border-left: 4px solid #FF9800;
+                    padding: 15px;
+                    margin: 20px 0;
+                    border-radius: 5px;
                 }
                 code {
                     background: #FFCDD2;
                     padding: 3px 8px;
                     border-radius: 4px;
                     font-family: monospace;
+                    color: #c62828;
                 }
-                .info-box {
-                    background: #E3F2FD;
-                    border-left: 4px solid #2196F3;
-                    padding: 15px;
-                    margin: 15px 0;
-                    border-radius: 5px;
-                }
-                a { color: #5D4037; font-weight: 600; text-decoration: none; }
                 .back-link { text-align: center; margin-top: 30px; }
+                .back-link a { color: #5D4037; text-decoration: none; font-weight: 600; }
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>👥 Staff Dashboard</h1>
-                    <p style="color: #5D4037;">View team schedules and information</p>
+                    <h1>👤 Member Portal</h1>
+                    <p class="subtitle">Access member data and session tokens</p>
                 </div>
 
                 <div class="section">
-                    <h2>Team Overview</h2>
-                    <p>Access staff information and shift schedules. Our team keeps BeanScene running smoothly.</p>
+                    <h2>Member Token System</h2>
+                    <p>Our member portal uses secure tokens to manage user sessions and access member information. Each member is assigned a unique token containing their profile data.</p>
                     
-                    ${staff.map(s => `
-                        <div class="staff-card">
-                            <strong>${s.name}</strong> - ${s.role}<br>
-                            Email: ${s.email}<br>
-                            Shift: ${s.shift}
-                        </div>
-                    `).join('')}
+                    <div class="search-box">
+                        <strong>🔍 Retrieve Member Token</strong>
+                        <p style="margin-top: 10px; font-size: 0.95em; color: #555;">
+                            Enter a member ID to retrieve their access token. The system will return an "encrypted" token containing member data.
+                        </p>
+                        <input type="text" id="memberId" class="demo-input" placeholder="Enter member ID (e.g., 12345)" value="12345">
+                        <button onclick="getMemberToken()" class="demo-button">Get Member Token</button>
+                    </div>
+
+                    <div class="tip-box">
+                        <strong>💡 Challenge Tip:</strong> Look at the token in the response. Does it look like proper encryption? Open DevTools (F12 → Network tab) to see the API response. Try decoding the token - is it actually encrypted or just encoded?
+                    </div>
                 </div>
 
-                <div class="section">
-                    <h2>📊 Team Resources</h2>
-                    <p>Access training materials, shift swap requests, and team announcements through the portal.</p>
-                </div>
+                <div id="resultsContainer"></div>
 
                 <div class="back-link">
                     <a href="/">← Back to Portal</a>
                 </div>
             </div>
+            
+            <script>
+                async function getMemberToken() {
+                    const memberId = document.getElementById('memberId').value.trim();
+                    const resultsContainer = document.getElementById('resultsContainer');
+                    
+                    if (!memberId) {
+                        resultsContainer.innerHTML = '<div class="section"><p style="color: #d32f2f;">Please enter a member ID</p></div>';
+                        return;
+                    }
+                    
+                    resultsContainer.innerHTML = '<div class="section"><p>🔍 Retrieving member token...</p></div>';
+                    
+                    try {
+                        const response = await fetch(\`/api/member/token?id=\${memberId}\`);
+                        const data = await response.json();
+                        
+                        let html = '<div class="section"><h2>Member Token Retrieved</h2>';
+                        
+                        if (data.flag) {
+                            html += '<div class="flag-reveal">🎉 ' + data.flag + '<br><br>' + data.message + '</div>';
+                        }
+                        
+                        html += '<div class="output-box">' + JSON.stringify(data, null, 2) + '</div>';
+                        
+                        if (data.token) {
+                            html += '<div class="tip-box">';
+                            html += '<strong>🔐 Token Analysis:</strong><br>';
+                            html += 'The token looks like Base64 encoding. Try decoding it:<br><br>';
+                            html += '<code>echo "' + data.token + '" | base64 -d</code><br><br>';
+                            html += 'Or use an online Base64 decoder!<br><br>';
+                            html += '<strong>⚠️ Security Issue:</strong> ' + (data.vulnerability || 'Base64 is encoding, not encryption!');
+                            html += '</div>';
+                        }
+                        
+                        html += '</div>';
+                        resultsContainer.innerHTML = html;
+                        
+                    } catch (error) {
+                        resultsContainer.innerHTML = '<div class="section"><p style="color: #d32f2f;">❌ Error: ' + error.message + '</p></div>';
+                    }
+                }
+            </script>
         </body>
         </html>
     `);
@@ -428,13 +756,13 @@ app.get('/api/member/token', (req, res) => {
 });
 
 
-// Lab 2 - Store Settings
+// Lab 2 - User Export (MD5 Hashing)
 app.get('/lab2', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Store Settings - BeanScene</title>
+            <title>User Export - PowerFit Gym</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
@@ -442,6 +770,7 @@ app.get('/lab2', (req, res) => {
                     background: linear-gradient(135deg, #D32F2F 0%, #1976D2 100%);
                     padding: 20px;
                     min-height: 100vh;
+                    line-height: 1.6;
                 }
                 .container { max-width: 900px; margin: 0 auto; }
                 .header {
@@ -453,6 +782,7 @@ app.get('/lab2', (req, res) => {
                     border: 2px solid #A1887F;
                 }
                 h1 { color: #1976D2; font-size: 2em; }
+                .subtitle { color: #5D4037; font-size: 1.1em; }
                 .section {
                     background: #FFF3E0;
                     padding: 25px;
@@ -461,57 +791,172 @@ app.get('/lab2', (req, res) => {
                     border: 2px solid #A1887F;
                 }
                 .section h2 { color: #1976D2; margin-bottom: 15px; }
-                .section p, .section li { color: #5D4037; line-height: 1.7; margin: 8px 0; }
+                .section p { color: #5D4037; line-height: 1.7; margin: 8px 0; }
+                .search-box {
+                    background: #E8F5E9;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                    border-left: 3px solid #4CAF50;
+                }
+                .demo-button {
+                    background: linear-gradient(135deg, #1976D2 0%, #0D47A1 100%);
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-size: 1em;
+                    margin: 5px;
+                    width: 100%;
+                }
+                .demo-button:hover {
+                    background: linear-gradient(135deg, #0D47A1 0%, #01579B 100%);
+                }
+                .output-box {
+                    background: #f5f5f5;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin: 15px 0;
+                    font-family: 'Courier New', monospace;
+                    font-size: 0.9em;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                    max-height: 400px;
+                    overflow-y: auto;
+                    border: 1px solid #ddd;
+                }
+                .flag-reveal {
+                    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 1.2em;
+                }
+                .tip-box {
+                    background: #FFF3E0;
+                    border-left: 4px solid #FF9800;
+                    padding: 15px;
+                    margin: 20px 0;
+                    border-radius: 5px;
+                }
                 code {
                     background: #FFCDD2;
                     padding: 3px 8px;
                     border-radius: 4px;
                     font-family: monospace;
+                    color: #c62828;
                 }
-                .warning-box {
-                    background: #FFF3E0;
-                    border-left: 4px solid #FF9800;
-                    padding: 15px;
+                .user-table {
+                    width: 100%;
+                    background: white;
+                    border-radius: 8px;
+                    overflow: hidden;
                     margin: 15px 0;
-                    border-radius: 5px;
                 }
-                a { color: #5D4037; font-weight: 600; text-decoration: none; }
+                .user-table th, .user-table td {
+                    padding: 12px;
+                    text-align: left;
+                    border-bottom: 1px solid #ddd;
+                }
+                .user-table th {
+                    background: #1976D2;
+                    color: white;
+                    font-weight: 600;
+                }
+                .user-table tr:hover {
+                    background: #f5f5f5;
+                }
                 .back-link { text-align: center; margin-top: 30px; }
+                .back-link a { color: #5D4037; text-decoration: none; font-weight: 600; }
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>⚙️ Store Settings</h1>
-                    <p style="color: #5D4037;">Configure store operations and integrations</p>
+                    <h1>👥 User Export</h1>
+                    <p class="subtitle">Review user accounts and password security</p>
                 </div>
 
                 <div class="section">
-                    <h2>Configuration Management</h2>
-                    <p>Manage store settings, payment integrations, and operational parameters.</p>
+                    <h2>User Database Export</h2>
+                    <p>Export user account data for backup and analysis purposes. This includes usernames, roles, and password hashes for security review.</p>
                     
-                    <div class="warning-box">
-                        <strong>⚠️ Manager Access:</strong> Configuration changes require manager approval.
+                    <div class="search-box">
+                        <strong>📊 Export User Data</strong>
+                        <p style="margin-top: 10px; font-size: 0.95em; color: #555;">
+                            Retrieve all user accounts with their password hashes. Review the hashing algorithm used for password storage.
+                        </p>
+                        <button onclick="exportUsers()" class="demo-button">Export User Database</button>
                     </div>
-                    
-                    <h3>Quick Settings:</h3>
-                    <ul>
-                        <li>Store hours configuration</li>
-                        <li>Payment gateway settings</li>
-                        <li>Inventory thresholds</li>
-                        <li>Email notification preferences</li>
-                    </ul>
+
+                    <div class="tip-box">
+                        <strong>💡 Challenge Tip:</strong> Look at the password hashes in the response. What algorithm is being used? Open DevTools (F12 → Network tab) to inspect the data. Can you identify the hashing algorithm? Try cracking the hashes using online tools like <code>crackstation.net</code> or <code>md5decrypt.net</code>
+                    </div>
                 </div>
 
-                <div class="section">
-                    <h2>🔧 Settings Overview</h2>
-                    <p>Facility configuration settings are managed through the administrative interface. Contact your manager for assistance with any configuration changes.</p>
-                </div>
+                <div id="resultsContainer"></div>
 
                 <div class="back-link">
                     <a href="/">← Back to Portal</a>
                 </div>
             </div>
+            
+            <script>
+                async function exportUsers() {
+                    const resultsContainer = document.getElementById('resultsContainer');
+                    
+                    resultsContainer.innerHTML = '<div class="section"><p>🔍 Exporting user data...</p></div>';
+                    
+                    try {
+                        const response = await fetch('/api/users/export');
+                        const data = await response.json();
+                        
+                        let html = '<div class="section"><h2>User Database Export</h2>';
+                        
+                        if (data.flag) {
+                            html += '<div class="flag-reveal">🎉 ' + data.flag + '<br><br>' + data.warning + '</div>';
+                        }
+                        
+                        // Display users in a table
+                        if (data.users && data.users.length > 0) {
+                            html += '<table class="user-table">';
+                            html += '<tr><th>ID</th><th>Username</th><th>Email</th><th>Password Hash</th><th>Role</th></tr>';
+                            data.users.forEach(user => {
+                                html += \`<tr>
+                                    <td>\${user.id}</td>
+                                    <td>\${user.username}</td>
+                                    <td>\${user.email}</td>
+                                    <td><code>\${user.password_hash}</code></td>
+                                    <td>\${user.role}</td>
+                                </tr>\`;
+                            });
+                            html += '</table>';
+                        }
+                        
+                        html += '<div class="output-box">' + JSON.stringify(data, null, 2) + '</div>';
+                        
+                        html += '<div class="tip-box">';
+                        html += '<strong>🔐 Hash Cracking Tips:</strong><br><br>';
+                        html += '1. Copy a password hash from above<br>';
+                        html += '2. Visit <a href="https://crackstation.net" target="_blank" style="color: #1976D2;">crackstation.net</a> or <a href="https://md5decrypt.net" target="_blank" style="color: #1976D2;">md5decrypt.net</a><br>';
+                        html += '3. Paste the hash and crack it!<br><br>';
+                        html += '<strong>⚠️ Security Issue:</strong> ' + (data.vulnerability || 'MD5 hashing is cryptographically broken!') + '<br><br>';
+                        html += '<strong>Better Options:</strong> ' + (data.tools ? data.tools.slice(0, 2).join(', ') : 'bcrypt, Argon2');
+                        html += '</div>';
+                        
+                        html += '</div>';
+                        resultsContainer.innerHTML = html;
+                        
+                    } catch (error) {
+                        resultsContainer.innerHTML = '<div class="section"><p style="color: #d32f2f;">❌ Error: ' + error.message + '</p></div>';
+                    }
+                }
+            </script>
         </body>
         </html>
     `);
@@ -562,13 +1007,13 @@ app.get('/api/users/export', (req, res) => {
     });
 });
 
-// Lab 3 - Manager Portal
+// Lab 3 - Secure Config (Hardcoded Keys)
 app.get('/lab3', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Manager Portal - BeanScene</title>
+            <title>Secure Config - PowerFit Gym</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
@@ -576,6 +1021,7 @@ app.get('/lab3', (req, res) => {
                     background: linear-gradient(135deg, #D32F2F 0%, #1976D2 100%);
                     padding: 20px;
                     min-height: 100vh;
+                    line-height: 1.6;
                 }
                 .container { max-width: 900px; margin: 0 auto; }
                 .header {
@@ -587,6 +1033,7 @@ app.get('/lab3', (req, res) => {
                     border: 2px solid #A1887F;
                 }
                 h1 { color: #1976D2; font-size: 2em; }
+                .subtitle { color: #5D4037; font-size: 1.1em; }
                 .section {
                     background: #FFF3E0;
                     padding: 25px;
@@ -595,20 +1042,7 @@ app.get('/lab3', (req, res) => {
                     border: 2px solid #A1887F;
                 }
                 .section h2 { color: #1976D2; margin-bottom: 15px; }
-                .section p, .section li { color: #5D4037; line-height: 1.7; margin: 8px 0; }
-                code {
-                    background: #FFCDD2;
-                    padding: 3px 8px;
-                    border-radius: 4px;
-                    font-family: monospace;
-                }
-                pre {
-                    background: #FFCDD2;
-                    padding: 15px;
-                    border-radius: 8px;
-                    overflow-x: auto;
-                    margin: 10px 0;
-                }
+                .section p { color: #5D4037; line-height: 1.7; margin: 8px 0; }
                 .restricted {
                     background: #FFEBEE;
                     border-left: 4px solid #D32F2F;
@@ -616,43 +1050,146 @@ app.get('/lab3', (req, res) => {
                     margin: 15px 0;
                     border-radius: 5px;
                 }
-                a { color: #5D4037; font-weight: 600; text-decoration: none; }
+                .search-box {
+                    background: #E8F5E9;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                    border-left: 3px solid #4CAF50;
+                }
+                .demo-button {
+                    background: linear-gradient(135deg, #1976D2 0%, #0D47A1 100%);
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-size: 1em;
+                    margin: 5px;
+                    width: 100%;
+                }
+                .demo-button:hover {
+                    background: linear-gradient(135deg, #0D47A1 0%, #01579B 100%);
+                }
+                .output-box {
+                    background: #f5f5f5;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin: 15px 0;
+                    font-family: 'Courier New', monospace;
+                    font-size: 0.9em;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                    max-height: 400px;
+                    overflow-y: auto;
+                    border: 1px solid #ddd;
+                }
+                .flag-reveal {
+                    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 1.2em;
+                }
+                .tip-box {
+                    background: #FFF3E0;
+                    border-left: 4px solid #FF9800;
+                    padding: 15px;
+                    margin: 20px 0;
+                    border-radius: 5px;
+                }
+                code {
+                    background: #FFCDD2;
+                    padding: 3px 8px;
+                    border-radius: 4px;
+                    font-family: monospace;
+                    color: #c62828;
+                }
                 .back-link { text-align: center; margin-top: 30px; }
+                .back-link a { color: #5D4037; text-decoration: none; font-weight: 600; }
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>🔐 Manager Portal</h1>
-                    <p style="color: #5D4037;">Administrative controls and reporting</p>
+                    <h1>🔐 Secure Config</h1>
+                    <p class="subtitle">System configuration and encryption keys</p>
                 </div>
 
                 <div class="restricted">
-                    <strong>🔒 Authentication Required</strong><br>
-                    This area requires manager credentials. Please contact your store manager for access.
+                    <strong>🔒 Administrative Area</strong><br>
+                    This section contains sensitive system configuration. Access requires proper authorization.
                 </div>
 
                 <div class="section">
-                    <h2>Manager Features</h2>
-                    <p>The manager portal provides access to:</p>
-                    <ul>
-                        <li>Financial reports and sales analytics</li>
-                        <li>Staff management and scheduling</li>
-                        <li>Inventory ordering and management</li>
-                        <li>System configuration and settings</li>
-                    </ul>
+                    <h2>Security Configuration</h2>
+                    <p>The PowerFit Gym system uses encryption to protect sensitive member data. Review the cryptographic configuration and key management practices.</p>
+                    
+                    <div class="search-box">
+                        <strong>🔑 Access Encryption Configuration</strong>
+                        <p style="margin-top: 10px; font-size: 0.95em; color: #555;">
+                            Retrieve the system's encryption configuration including algorithms, keys, and security settings. This information is used for security audits.
+                        </p>
+                        <button onclick="getSecureConfig()" class="demo-button">Load Security Config</button>
+                    </div>
+
+                    <div class="tip-box">
+                        <strong>💡 Challenge Tip:</strong> Open DevTools (F12 → Network tab) and watch the API response. Look for encryption keys in the configuration. Are the keys hardcoded in the response? What happens when encryption keys are exposed? Real-world impact: GitHub has seen billions in losses from exposed API keys!
+                    </div>
                 </div>
 
-                <div class="section">
-                    <h2>🔑 Administrative Access</h2>
-                    <p>Manager portal access is restricted to authorized personnel. Contact the facility owner for access credentials if you are a manager.</p>
-                    <p style="margin-top: 15px;">Authorized managers have access to financial reports, staff management, membership ordering, and system configuration tools.</p>
-                </div>
+                <div id="resultsContainer"></div>
 
                 <div class="back-link">
                     <a href="/">← Back to Portal</a>
                 </div>
             </div>
+            
+            <script>
+                async function getSecureConfig() {
+                    const resultsContainer = document.getElementById('resultsContainer');
+                    
+                    resultsContainer.innerHTML = '<div class="section"><p>🔍 Loading security configuration...</p></div>';
+                    
+                    try {
+                        const response = await fetch('/api/secure/config');
+                        const data = await response.json();
+                        
+                        let html = '<div class="section"><h2>Security Configuration Retrieved</h2>';
+                        
+                        if (data.flag) {
+                            html += '<div class="flag-reveal">🎉 ' + data.flag + '<br><br>' + data.message + '</div>';
+                        }
+                        
+                        html += '<div class="output-box">' + JSON.stringify(data, null, 2) + '</div>';
+                        
+                        html += '<div class="tip-box">';
+                        html += '<strong>🚨 CRITICAL SECURITY ISSUE:</strong><br><br>';
+                        html += '<strong>⚠️ Vulnerability:</strong> ' + (data.vulnerability || 'Encryption keys hardcoded in source code!') + '<br><br>';
+                        html += '<strong>Impact:</strong> Anyone with access to this endpoint (or source code) can decrypt ALL encrypted data. The encryption is completely worthless!<br><br>';
+                        html += '<strong>Real-World Examples:</strong><br>';
+                        html += '• GitHub secrets exposed in commits<br>';
+                        html += '• AWS keys in public repos → $50k+ bills<br>';
+                        html += '• Mobile apps decompiled to extract API keys<br><br>';
+                        html += '<strong>Better Approach:</strong><br>';
+                        html += '• Use environment variables (process.env)<br>';
+                        html += '• Use secret managers (AWS Secrets Manager, HashiCorp Vault)<br>';
+                        html += '• Never commit keys to Git<br>';
+                        html += '• Implement key rotation policies';
+                        html += '</div>';
+                        
+                        html += '</div>';
+                        resultsContainer.innerHTML = html;
+                        
+                    } catch (error) {
+                        resultsContainer.innerHTML = '<div class="section"><p style="color: #d32f2f;">❌ Error: ' + error.message + '</p></div>';
+                    }
+                }
+            </script>
         </body>
         </html>
     `);
@@ -661,7 +1198,6 @@ app.get('/lab3', (req, res) => {
 // Lab 3 API - VULNERABLE: Hardcoded encryption keys in source
 app.get('/api/secure/config', (req, res) => {
     // VULNERABLE: Hardcoded encryption keys in source code
-    const crypto = require('crypto');
     
     // CRITICAL VULNERABILITY: Encryption keys hardcoded in source
     const HARDCODED_KEYS = {
@@ -673,9 +1209,12 @@ app.get('/api/secure/config', (req, res) => {
     
     // Example of "encrypted" data (but key is in source!)
     const sensitiveData = 'admin:SuperSecret123!';
-    const cipher = crypto.createCipheriv('aes-256-cbc', 
-        Buffer.from(HARDCODED_KEYS.encryption_key).slice(0, 32), 
-        Buffer.from(HARDCODED_KEYS.iv));
+    
+    // Pad/truncate key to exactly 32 bytes for AES-256
+    const key = Buffer.alloc(32);
+    key.write(HARDCODED_KEYS.encryption_key);
+    
+    const cipher = crypto.createCipheriv('aes-256-cbc', key, Buffer.from(HARDCODED_KEYS.iv));
     let encrypted = cipher.update(sensitiveData, 'utf8', 'hex');
     encrypted += cipher.final('hex');
     
