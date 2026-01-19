@@ -507,16 +507,50 @@ app.get('/lab2', (req, res) => {
     `);
 });
 
-// Lab 2 API - VULNERABLE config exposure
-app.get('/api/settings/config', (req, res) => {
-    // VULNERABLE: Configuration exposed without authentication
-    res.json({
-        flag: 'FLAG{C0NF1G_L34K3D}',
-        message: 'Configuration data retrieved!',
-        vulnerability: 'Configuration endpoint accessible without authentication',
-        configuration: configData,
-        warning: 'Sensitive credentials exposed - database password, API keys, secrets!'
-    });
+// Lab 2 API - VULNERABLE: .env file exposed through misconfiguration
+app.get('/.env', (req, res) => {
+    // VULNERABLE: .env file accessible due to misconfigured static file serving
+    const envContent = `# BeanScene Coffee - Environment Configuration
+# WARNING: This file should NEVER be accessible via web!
+
+NODE_ENV=production
+PORT=3002
+
+# Database Configuration
+DB_HOST=db.beanscene.local
+DB_USER=coffee_admin
+DB_PASSWORD=Bean$cene2024!
+DB_NAME=beanscene_prod
+
+# API Keys & Secrets
+JWT_SECRET=beanscene_jwt_secret_key_12345
+SESSION_SECRET=coffee-shop-session-2024
+SQUARE_API_KEY=sq0atp-BeanScene_Live_Token_xyz789
+SQUARE_MERCHANT_ID=MLHV6GRVNB4XQ
+
+# Email Service
+SMTP_HOST=smtp.gmail.com
+SMTP_USER=notifications@beanscene.com
+SMTP_PASS=BeanMail!2024
+
+# Feature Flags
+DEBUG_MODE=true
+ENABLE_LOGGING=true
+SHOW_ERRORS=true
+
+FLAG{3NV_F1L3_3XP0S3D}
+`;
+    res.type('text/plain').send(envContent);
+});
+
+// Also expose .env.backup
+app.get('/.env.backup', (req, res) => {
+    const envBackup = `# Backup from 2024-01-15
+DB_PASSWORD=OldBean$2023!
+JWT_SECRET=old_jwt_secret_2023
+FLAG{B4CKUP_F1L3_L34K3D}
+`;
+    res.type('text/plain').send(envBackup);
 });
 
 // Lab 3 - Manager Portal
@@ -615,31 +649,68 @@ app.get('/lab3', (req, res) => {
     `);
 });
 
-// Lab 3 API - VULNERABLE default credentials
-app.post('/api/manager/login', (req, res) => {
-    const { username, password } = req.body;
-    
-    if (!username || !password) {
-        return res.status(400).json({ error: 'Username and password required' });
-    }
-    
-    // VULNERABLE: Using default credentials
-    if (username === adminCredentials.username && password === adminCredentials.password) {
-        return res.json({
-            success: true,
-            flag: 'FLAG{D3F4ULT_CR3DS_US3D}',
-            message: 'Authentication successful with default credentials!',
-            vulnerability: 'Default admin credentials never changed',
-            credentials_used: { username, password },
-            token: 'manager_access_token_' + Date.now(),
-            warning: 'Default credentials should always be changed after setup!'
-        });
-    }
-    
-    res.status(401).json({
-        error: 'Invalid credentials',
-        hint: 'Try common default credentials'
+// Lab 3 API - VULNERABLE: Directory listing enabled
+app.get('/admin', (req, res) => {
+    // VULNERABLE: Directory listing shows all admin files
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Index of /admin</title>
+            <style>
+                body { font-family: monospace; background: #f5f5f5; padding: 20px; }
+                h1 { color: #333; }
+                table { border-collapse: collapse; width: 100%; background: white; }
+                th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+                th { background: #333; color: white; }
+                a { color: #0066cc; text-decoration: none; }
+                a:hover { text-decoration: underline; }
+            </style>
+        </head>
+        <body>
+            <h1>Index of /admin</h1>
+            <table>
+                <tr><th>Name</th><th>Last Modified</th><th>Size</th></tr>
+                <tr><td><a href="/admin/">..</a></td><td>-</td><td>-</td></tr>
+                <tr><td><a href="/admin/config.json">config.json</a></td><td>2024-12-15 14:30</td><td>2.1 KB</td></tr>
+                <tr><td><a href="/admin/backup/">backup/</a></td><td>2024-12-10 09:15</td><td>-</td></tr>
+                <tr><td><a href="/admin/logs/">logs/</a></td><td>2025-01-19 10:00</td><td>-</td></tr>
+                <tr><td><a href="/admin/credentials.txt">credentials.txt</a></td><td>2024-11-20 16:45</td><td>156 bytes</td></tr>
+            </table>
+        </body>
+        </html>
+    `);
+});
+
+app.get('/admin/config.json', (req, res) => {
+    res.json({
+        application: "BeanScene Manager Portal",
+        version: "1.2.3",
+        database: {
+            host: "db.beanscene.local",
+            port: 5432,
+            name: "beanscene_prod"
+        },
+        features: {
+            debug: true,
+            errorReporting: "full"
+        }
     });
+});
+
+app.get('/admin/credentials.txt', (req, res) => {
+    // VULNERABLE: Credentials file accessible
+    const credentials = `BeanScene Admin Credentials
+=================================
+Username: manager
+Password: Coffee2024!
+API Key: BSC-2024-ADMIN-xyz789
+
+FLAG{D1R3CT0RY_L1ST1NG_3N4BL3D}
+
+WARNING: This file should not be web-accessible!
+`;
+    res.type('text/plain').send(credentials);
 });
 
 app.listen(PORT, () => {

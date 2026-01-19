@@ -398,22 +398,25 @@ app.get('/lab1', (req, res) => {
     `);
 });
 
-// Lab 1 API - VULNERABLE debug endpoint
-app.get('/api/staff/system-info', (req, res) => {
-    // VULNERABLE: Debug info exposed in production
+// Lab 1 API - VULNERABLE: Package version disclosure
+app.get('/api/staff/dependencies', (req, res) => {
+    // VULNERABLE: Exposes dependency versions - aids reconnaissance
     res.json({
-        flag: 'FLAG{D3BUG_1NF0_3XP0S3D}',
-        message: 'System information retrieved successfully!',
-        vulnerability: 'Debug endpoint exposed - reveals system details',
-        system_info: {
-            node_version: process.version,
-            platform: process.platform,
-            uptime_seconds: Math.floor(process.uptime()),
-            memory_mb: Math.floor(process.memoryUsage().heapUsed / 1024 / 1024),
-            environment: process.env.NODE_ENV || 'production'
+        flag: 'FLAG{V3RS10N_D1SCL0SUR3_D3P3ND3NC13S}',
+        message: 'Dependency information retrieved successfully!',
+        vulnerability: 'Exposes package versions - attackers can identify vulnerable dependencies',
+        dependencies: {
+            "express": "4.16.4",  // Known vulnerabilities
+            "lodash": "4.17.11",  // CVE-2019-10744
+            "request": "2.88.0",  // Deprecated package
+            "moment": "2.24.0",   // Known issues
+            "jsonwebtoken": "8.3.0",  // CVE-2022-23529
+            "mongoose": "5.7.5"   // Several CVEs
         },
-        database_host: configData.database.host,
-        warning: 'This endpoint should not be accessible in production!'
+        npm_version: "6.4.1",
+        node_version: process.version,
+        warning: 'Multiple outdated packages with known vulnerabilities detected!',
+        hint: 'Check CVE databases for these specific versions'
     });
 });
 
@@ -507,16 +510,37 @@ app.get('/lab2', (req, res) => {
     `);
 });
 
-// Lab 2 API - VULNERABLE config exposure
-app.get('/api/settings/config', (req, res) => {
-    // VULNERABLE: Configuration exposed without authentication
-    res.json({
-        flag: 'FLAG{C0NF1G_L34K3D}',
-        message: 'Configuration data retrieved!',
-        vulnerability: 'Configuration endpoint accessible without authentication',
-        configuration: configData,
-        warning: 'Sensitive credentials exposed - database password, API keys, secrets!'
-    });
+// Lab 2 API - VULNERABLE: package.json exposed
+app.get('/package.json', (req, res) => {
+    // VULNERABLE: package.json accessible reveals exact dependency versions
+    const packageJson = {
+        "name": "pageturner-bookstore",
+        "version": "1.0.0",
+        "description": "PageTurner Bookstore Management System",
+        "main": "server.js",
+        "scripts": {
+            "start": "node server.js",
+            "dev": "nodemon server.js"
+        },
+        "dependencies": {
+            "express": "4.16.4",
+            "body-parser": "1.18.3",
+            "lodash": "4.17.11",
+            "moment": "2.24.0",
+            "jsonwebtoken": "8.3.0",
+            "bcrypt": "3.0.6",
+            "mongoose": "5.7.5",
+            "request": "2.88.0",
+            "xml2js": "0.4.19",
+            "handlebars": "4.1.2"
+        },
+        "devDependencies": {
+            "nodemon": "1.19.1"
+        },
+        "flag": "FLAG{P4CK4G3_J50N_3XP0S3D}",
+        "note": "This file should not be web-accessible in production!"
+    };
+    res.json(packageJson);
 });
 
 // Lab 3 - Manager Portal
@@ -615,30 +639,43 @@ app.get('/lab3', (req, res) => {
     `);
 });
 
-// Lab 3 API - VULNERABLE default credentials
-app.post('/api/manager/login', (req, res) => {
-    const { username, password } = req.body;
+// Lab 3 API - VULNERABLE: Path traversal via vulnerable dependency
+// Simulating a vulnerability in a file upload/download library
+app.get('/api/files/download', (req, res) => {
+    const filename = req.query.file;
     
-    if (!username || !password) {
-        return res.status(400).json({ error: 'Username and password required' });
+    if (!filename) {
+        return res.status(400).json({ error: 'File parameter required' });
     }
     
-    // VULNERABLE: Using default credentials
-    if (username === adminCredentials.username && password === adminCredentials.password) {
+    // VULNERABLE: No path sanitization - allows directory traversal
+    // This simulates CVE-2017-16119 (fresh package) or similar
+    if (filename.includes('../')) {
+        // Path traversal detected
         return res.json({
             success: true,
-            flag: 'FLAG{D3F4ULT_CR3DS_US3D}',
-            message: 'Authentication successful with default credentials!',
-            vulnerability: 'Default admin credentials never changed',
-            credentials_used: { username, password },
-            token: 'manager_access_token_' + Date.now(),
-            warning: 'Default credentials should always be changed after setup!'
+            flag: 'FLAG{P4TH_TR4V3RS4L_VULN_D3P}',
+            vulnerability: 'Path traversal via vulnerable dependency',
+            message: 'File download processed with directory traversal',
+            warning: 'Vulnerable package allows accessing files outside intended directory!',
+            example_payloads: [
+                '../../../etc/passwd',
+                '..\\..\\..\\windows\\system32\\config\\sam',
+                '../.env',
+                '../package.json'
+            ],
+            cve_reference: 'Similar to CVE-2017-16119 (fresh), CVE-2020-28460 (path-parse)',
+            vulnerable_package: 'file-handler@1.2.3',
+            fix: 'Update to file-handler@2.0.0 or use path.resolve() to prevent traversal'
         });
     }
     
-    res.status(401).json({
-        error: 'Invalid credentials',
-        hint: 'Try common default credentials'
+    // Simulate normal file download
+    res.json({
+        success: true,
+        file: filename,
+        content: 'Sample file content...',
+        hint: 'Try using ../ in the filename parameter'
     });
 });
 
