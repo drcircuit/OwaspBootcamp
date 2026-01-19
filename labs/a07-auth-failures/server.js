@@ -18,10 +18,10 @@ let lab3Users = {
   'charlie': { password: 'charliepass789', profile: 'Charlie is a guest user with limited access.' }
 };
 
-const cyberpunkStyles = `
+const pawspaStyles = `
   body {
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a0033 100%);
-    color: #00ff9f;
+    background: linear-gradient(135deg, #E0F2FE 0%, #DBEAFE 50%, #C7D2FE 100%);
+    color: #1E40AF;
     font-family: 'Courier New', monospace;
     margin: 0;
     padding: 20px;
@@ -30,67 +30,67 @@ const cyberpunkStyles = `
   .container {
     max-width: 1200px;
     margin: 0 auto;
-    background: rgba(0, 0, 0, 0.8);
-    border: 2px solid #00ff9f;
+    background: #FFFFFF;
+    border: 2px solid #60A5FA;
     border-radius: 10px;
     padding: 30px;
     box-shadow: 0 0 30px rgba(0, 255, 159, 0.3);
   }
   h1 {
-    color: #ff0080;
-    text-shadow: 0 0 10px #ff0080;
-    border-bottom: 2px solid #00ff9f;
+    color: #2563EB;
+    text-shadow: 0 0 10px #3B82F6;
+    border-bottom: 2px solid #10B981;
     padding-bottom: 10px;
   }
   h2 {
-    color: #00d4ff;
-    text-shadow: 0 0 5px #00d4ff;
+    color: #4F46E5;
+    text-shadow: 0 0 5px #6366F1;
   }
   h3 {
-    color: #ffd700;
+    color: #7C3AED;
   }
   .section {
     background: rgba(0, 20, 40, 0.6);
-    border-left: 4px solid #00ff9f;
+    border-left: 4px solid #10B981;
     padding: 20px;
     margin: 20px 0;
     border-radius: 5px;
   }
   .vulnerable {
-    border-left-color: #ff0080;
+    border-left-color: #2563EB;
     background: rgba(40, 0, 20, 0.6);
   }
   .secure {
-    border-left-color: #00ff9f;
+    border-left-color: #1E40AF;
     background: rgba(0, 40, 20, 0.6);
   }
   .code {
     background: #000;
-    border: 1px solid #00ff9f;
+    border: 1px solid #10B981;
     padding: 15px;
     border-radius: 5px;
     overflow-x: auto;
-    color: #00ff9f;
+    color: #1E40AF;
     margin: 10px 0;
     font-size: 14px;
   }
   .endpoint {
-    color: #ffd700;
+    color: #7C3AED;
     font-weight: bold;
   }
   .flag {
-    color: #ff0080;
+    color: #2563EB;
     font-weight: bold;
-    text-shadow: 0 0 5px #ff0080;
+    text-shadow: 0 0 5px #3B82F6;
   }
   a {
-    color: #00d4ff;
+    color: #4F46E5;
     text-decoration: none;
-    text-shadow: 0 0 5px #00d4ff;
+    text-shadow: 0 0 5px #6366F1;
   }
   a:hover {
-    color: #00ff9f;
-    text-shadow: 0 0 10px #00ff9f;
+    color: #1E40AF;
+    text-shadow: 0 0 10px #10B981;
   }
   .nav-links {
     display: flex;
@@ -100,25 +100,25 @@ const cyberpunkStyles = `
   }
   .nav-link {
     background: rgba(0, 212, 255, 0.1);
-    border: 2px solid #00d4ff;
+    border: 2px solid #6366F1;
     padding: 15px 25px;
     border-radius: 5px;
     transition: all 0.3s;
   }
   .nav-link:hover {
     background: rgba(0, 255, 159, 0.2);
-    border-color: #00ff9f;
+    border-color: #1E40AF;
     transform: translateY(-2px);
   }
   .warning {
-    color: #ff0080;
+    color: #2563EB;
     background: rgba(255, 0, 128, 0.1);
     padding: 10px;
     border-radius: 5px;
     margin: 10px 0;
   }
   .info {
-    color: #ffd700;
+    color: #7C3AED;
   }
   ul {
     line-height: 1.8;
@@ -128,9 +128,9 @@ const cyberpunkStyles = `
     word-wrap: break-word;
   }
   input, textarea {
-    background: rgba(0, 0, 0, 0.8);
-    border: 2px solid #00ff9f;
-    color: #00ff9f;
+    background: #FFFFFF;
+    border: 2px solid #60A5FA;
+    color: #1E40AF;
     padding: 10px;
     margin: 5px 0;
     border-radius: 5px;
@@ -140,12 +140,12 @@ const cyberpunkStyles = `
   }
   input:focus, textarea:focus {
     outline: none;
-    border-color: #00d4ff;
+    border-color: #4F46E5;
     box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
   }
   .result {
     background: rgba(0, 0, 0, 0.9);
-    border: 2px solid #00ff9f;
+    border: 2px solid #60A5FA;
     padding: 15px;
     margin: 15px 0;
     border-radius: 5px;
@@ -181,51 +181,51 @@ app.get('/', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>A07: Authentication Failures - Navigation</title>
-      <style>${cyberpunkStyles}</style>
+      <title>PawSpa Grooming �� - Appointment System - Navigation</title>
+      <style>${pawspaStyles}</style>
     </head>
     <body>
       <div class="container">
-        <h1>🔑 A07: AUTHENTICATION FAILURES</h1>
-        <p>Authentication failures occur when applications don't properly verify users' identities, allowing attackers to compromise passwords, keys, or session tokens.</p>
+        <h1>🐾 PAWSPA GROOMING</h1>
+        <p style="text-align: center; font-size: 1.2em; margin-bottom: 30px;">
+          <strong>Premium Pet Grooming & Spa Services</strong><br>
+          Book appointments for your furry friends - Dogs, Cats, and exotic pets welcome!
+        </p>
         
         <div class="nav-links">
-          <a href="/example" class="nav-link">📚 Example - Educational Walkthrough</a>
-          <a href="/lab1" class="nav-link">🎯 Lab 1 - Recon (Easy)</a>
-          <a href="/lab2" class="nav-link">🔍 Lab 2 - Scanning (Medium)</a>
-          <a href="/lab3" class="nav-link">💀 Lab 3 - Initial Access (Hard)</a>
+          <a href="/example" class="nav-link">📚 Tutorial - How Our System Works</a>
+          <a href="/lab1" class="nav-link">🎯 Lab 1 - Login Portal (Easy)</a>
+          <a href="/lab2" class="nav-link">🔍 Lab 2 - My Appointments (Medium)</a>
+          <a href="/lab3" class="nav-link">💀 Lab 3 - Account Recovery (Hard)</a>
         </div>
 
         <div class="section">
-          <h2>What are Authentication Failures?</h2>
-          <p>Authentication is the process of verifying a user's identity. Failures in this critical security function include:</p>
-          <ul>
-            <li><strong>Weak Password Policies:</strong> Allowing simple passwords like "123" or "password"</li>
-            <li><strong>Credential Stuffing:</strong> Using stolen username/password pairs from breaches</li>
-            <li><strong>Predictable Session IDs:</strong> Sequential or guessable session tokens</li>
-            <li><strong>Session Fixation:</strong> Attacker forces a known session ID on a victim</li>
-            <li><strong>No Multi-Factor Authentication (MFA):</strong> Single factor authentication is easier to compromise</li>
-            <li><strong>Poor Session Management:</strong> Sessions that don't expire or can be hijacked</li>
+          <h2>🐾 Our Services</h2>
+          <ul style="font-size: 1.1em;">
+            <li><strong>Basic Bath</strong> - Wash, dry, and brush - $35</li>
+            <li><strong>Full Groom</strong> - Bath, haircut, nail trim, ear cleaning - $65</li>
+            <li><strong>Deluxe Spa</strong> - Full groom plus massage and aromatherapy - $95</li>
+            <li><strong>Nail Trim Only</strong> - Quick paw maintenance - $15</li>
           </ul>
         </div>
 
         <div class="section">
-          <h2>Attack Stages</h2>
+          <h2>📅 About Our System</h2>
+          <p>PawSpa Grooming uses an online appointment system for pet owners to book grooming services. Our system manages:</p>
           <ul>
-            <li><span class="info">Lab 1 (Recon):</span> Discover weak password policies by testing registration</li>
-            <li><span class="info">Lab 2 (Scanning):</span> Analyze session token patterns to find predictability</li>
-            <li><span class="info">Lab 3 (Initial Access):</span> Exploit session management to hijack another user's account</li>
+            <li><strong>User Accounts:</strong> Pet owners create accounts to manage their appointments</li>
+            <li><strong>Appointment Booking:</strong> Schedule services for your pets</li>
+            <li><strong>Session Management:</strong> Stay logged in across visits</li>
+            <li><strong>Pet Profiles:</strong> Save information about your furry friends</li>
           </ul>
         </div>
 
-        <div class="section vulnerable">
-          <h2>⚠️ Real-World Impact</h2>
-          <p>Authentication failures have led to massive breaches:</p>
+        <div class="section">
+          <h2>🎯 Lab Challenges</h2>
           <ul>
-            <li><strong>LinkedIn (2012):</strong> 165M passwords stolen due to weak hashing</li>
-            <li><strong>Yahoo (2013):</strong> 3B accounts compromised through auth bypass</li>
-            <li><strong>Equifax (2017):</strong> 147M records exposed, partially due to default credentials</li>
-            <li><strong>SolarWinds (2020):</strong> Supply chain attack using weak password "solarwinds123"</li>
+            <li><span class="info">Lab 1:</span> Test the account creation system for password security</li>
+            <li><span class="info">Lab 2:</span> Analyze how the system manages user sessions</li>
+            <li><span class="info">Lab 3:</span> Explore session recovery and account access</li>
           </ul>
         </div>
       </div>
@@ -240,8 +240,8 @@ app.get('/example', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>A07: Authentication Failures - Example</title>
-      <style>${cyberpunkStyles}</style>
+      <title>PawSpa Grooming �� - Appointment System - Example</title>
+      <style>${pawspaStyles}</style>
     </head>
     <body>
       <div class="container">
@@ -249,7 +249,7 @@ app.get('/example', (req, res) => {
         <p><a href="/">← Back to Navigation</a></p>
 
         <div class="section">
-          <h2>Understanding Authentication Failures</h2>
+          <h2>Understanding PawSpa Grooming</h2>
           <p>Authentication and session management are critical for application security. When implemented incorrectly, they become prime targets for attackers.</p>
         </div>
 
@@ -487,9 +487,9 @@ app.post('/login', async (req, res) => {
           <h2>📖 Ready to Practice?</h2>
           <p>Now that you understand authentication failures, try the labs:</p>
           <div class="nav-links">
-            <a href="/lab1" class="nav-link">Lab 1 - Weak Password Policy</a>
+            <a href="/lab1" class="nav-link">Lab 1 - Login Portal</a>
             <a href="/lab2" class="nav-link">Lab 2 - Predictable Sessions</a>
-            <a href="/lab3" class="nav-link">Lab 3 - Session Hijacking</a>
+            <a href="/lab3" class="nav-link">Lab 3 - Account Recovery</a>
           </div>
         </div>
       </div>
@@ -498,14 +498,14 @@ app.post('/login', async (req, res) => {
   `);
 });
 
-// Lab 1: Weak Password Policy
+// Lab 1: Login Portal
 app.get('/lab1', (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html>
     <head>
-      <title>A07: Lab 1 - Weak Password Policy</title>
-      <style>${cyberpunkStyles}</style>
+      <title>A07: Lab 1 - Login Portal</title>
+      <style>${pawspaStyles}</style>
     </head>
     <body>
       <div class="container">
@@ -519,7 +519,7 @@ app.get('/lab1', (req, res) => {
 
         <div class="section vulnerable">
           <h2>Scenario</h2>
-          <p>You've discovered a user registration endpoint. The application claims to have "secure authentication," but you suspect the password policy might be weak.</p>
+          <p>You've discovered a appointment booking endpoint. The application claims to have "secure authentication," but you suspect the password policy might be weak.</p>
           <p>Test if the system accepts weak passwords that don't meet basic security standards.</p>
         </div>
 
@@ -528,7 +528,7 @@ app.get('/lab1', (req, res) => {
           <p class="endpoint">POST /api/lab1/register</p>
           <p><strong>Request Body:</strong></p>
           <div class="code"><pre>{
-  "username": "testuser",
+  "username": "fluffy_owner",
   "password": "your_password_here"
 }</pre></div>
 
@@ -545,7 +545,7 @@ app.get('/lab1', (req, res) => {
           <h2>Test Registration</h2>
           <form id="registerForm">
             <label>Username:</label><br>
-            <input type="text" id="username" value="testuser" required><br><br>
+            <input type="text" id="username" value="fluffy_owner" required><br><br>
             
             <label>Password:</label><br>
             <input type="text" id="password" placeholder="Try weak passwords..." required><br><br>
@@ -589,10 +589,10 @@ app.get('/lab1', (req, res) => {
                 resultDiv.innerHTML += '<p class="flag">🚩 FLAG CAPTURED: ' + data.flag + '</p>';
               }
             } else {
-              resultDiv.innerHTML = '<p style="color: #ff0080;">Error: ' + (data.error || 'Registration failed') + '</p>';
+              resultDiv.innerHTML = '<p style="color: #2563EB;">Error: ' + (data.error || 'Registration failed') + '</p>';
             }
           } catch (error) {
-            resultDiv.innerHTML = '<p style="color: #ff0080;">Request failed: ' + error.message + '</p>';
+            resultDiv.innerHTML = '<p style="color: #2563EB;">Request failed: ' + error.message + '</p>';
           }
         });
 
@@ -626,7 +626,7 @@ app.post('/api/lab1/register', (req, res) => {
         success: true,
         message: 'Registration successful',
         username: username,
-        flag: 'NSA{W3AK_P4SS_P0L1CY}',
+        flag: 'PAWSPA{W3AK_PAWSW0RD_P0L1CY}',
         vulnerability: 'No password strength requirements',
         explanation: 'This system accepts passwords like "123" which can be cracked instantly. Strong password policies should require minimum length (12+ chars), complexity (uppercase, lowercase, numbers, symbols), and check against common password lists.'
       });
@@ -643,14 +643,14 @@ app.post('/api/lab1/register', (req, res) => {
   return res.status(400).json({ error: 'Password cannot be empty' });
 });
 
-// Lab 2: Predictable Session Tokens
+// Lab 2: My Appointments
 app.get('/lab2', (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html>
     <head>
-      <title>A07: Lab 2 - Predictable Session Tokens</title>
-      <style>${cyberpunkStyles}</style>
+      <title>A07: Lab 2 - My Appointments</title>
+      <style>${pawspaStyles}</style>
     </head>
     <body>
       <div class="container">
@@ -746,10 +746,10 @@ app.get('/lab2', (req, res) => {
                 resultDiv.innerHTML += '<p class="flag">🚩 FLAG CAPTURED: ' + data.flag + '</p>';
               }
             } else {
-              resultDiv.innerHTML = '<p style="color: #ff0080;">Error: ' + (data.error || 'Login failed') + '</p>';
+              resultDiv.innerHTML = '<p style="color: #2563EB;">Error: ' + (data.error || 'Login failed') + '</p>';
             }
           } catch (error) {
-            resultDiv.innerHTML = '<p style="color: #ff0080;">Request failed: ' + error.message + '</p>';
+            resultDiv.innerHTML = '<p style="color: #2563EB;">Request failed: ' + error.message + '</p>';
           }
 
           // Clear username for next test
@@ -804,7 +804,7 @@ app.post('/api/lab2/login', (req, res) => {
       success: true,
       sessionId: sessionId,
       username: username,
-      flag: 'NSA{S3SS10N_PR3D1CT4BL3}',
+      flag: 'PAWSPA{S3SS10N_PR3D1CT4BL3_P3TS}',
       vulnerability: 'Sequential session IDs',
       explanation: 'Session IDs increment predictably (1000, 1001, 1002...). An attacker can enumerate valid sessions by trying sequential IDs. Secure implementations use cryptographically random tokens with high entropy (e.g., 256-bit random values).',
       previousSessions: [lab2SessionCounter - 4, lab2SessionCounter - 3, lab2SessionCounter - 2, lab2SessionCounter - 1],
@@ -821,14 +821,14 @@ app.post('/api/lab2/login', (req, res) => {
   });
 });
 
-// Lab 3: Session Hijacking
+// Lab 3: Account Recovery
 app.get('/lab3', (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html>
     <head>
-      <title>A07: Lab 3 - Session Hijacking</title>
-      <style>${cyberpunkStyles}</style>
+      <title>A07: Lab 3 - Account Recovery</title>
+      <style>${pawspaStyles}</style>
     </head>
     <body>
       <div class="container">
@@ -942,11 +942,11 @@ app.get('/lab3', (req, res) => {
             loginResult.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
             
             if (data.sessionId) {
-              loginResult.innerHTML += '<p style="color: #ffd700;">Your session ID: ' + data.sessionId + '</p>';
+              loginResult.innerHTML += '<p style="color: #7C3AED;">Your session ID: ' + data.sessionId + '</p>';
               loginResult.innerHTML += '<p>Now try accessing profiles with different session IDs below...</p>';
             }
           } catch (error) {
-            loginResult.innerHTML = '<p style="color: #ff0080;">Request failed: ' + error.message + '</p>';
+            loginResult.innerHTML = '<p style="color: #2563EB;">Request failed: ' + error.message + '</p>';
           }
         });
 
@@ -970,7 +970,7 @@ app.get('/lab3', (req, res) => {
               profileResult.innerHTML += '<p class="flag">🚩 FLAG CAPTURED: ' + data.flag + '</p>';
             }
           } catch (error) {
-            profileResult.innerHTML = '<p style="color: #ff0080;">Request failed: ' + error.message + '</p>';
+            profileResult.innerHTML = '<p style="color: #2563EB;">Request failed: ' + error.message + '</p>';
           }
         });
       </script>
@@ -1028,7 +1028,7 @@ app.get('/api/lab3/profile', (req, res) => {
       username: username,
       profile: userProfile.profile,
       sessionId: sessionId,
-      flag: 'NSA{S3SS10N_H1J4CK3D}',
+      flag: 'PAWSPA{S3SS10N_H1J4CK3D_SP4}',
       vulnerability: 'Session hijacking via predictable session IDs',
       explanation: 'You successfully accessed another user\'s profile by guessing their sequential session ID. In a secure system, session tokens should be cryptographically random (256-bit entropy), stored as HttpOnly cookies, and regenerated on login to prevent fixation and hijacking attacks.'
     });
@@ -1050,6 +1050,6 @@ lab3Sessions[5002] = { username: 'bob', createdAt: Date.now() };
 lab3Sessions[5003] = { username: 'charlie', createdAt: Date.now() };
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`A07: Authentication Failures Lab running on port ${PORT}`);
+  console.log(`PawSpa Grooming �� - Appointment System Lab running on port ${PORT}`);
   console.log(`Navigate to http://localhost:${PORT} to begin`);
 });

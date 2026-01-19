@@ -5,63 +5,61 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 // State for Lab 1: Rate Limiting vulnerability
-const transferAttempts = {};
+const orderAttempts = {};
 
 // State for Lab 2: Logic Flaw vulnerability
-const discountCodes = {
-  'SAVE10': { discount: 10, used: false },
-  'SAVE20': { discount: 20, used: false },
-  'SAVE50': { discount: 50, used: false }
-};
+const promoCodeUsage = {};
 
 // State for Lab 3: Race Condition vulnerability
-let accountBalance = 1000;
-const withdrawalHistory = [];
+let accountBalances = {
+  'customer123': 50.00
+};
+const orderHistory = [];
 
-// Cyberpunk theme styles
+// TacoTruck Express theme styles
 const styles = `
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Courier New', monospace;
-      background: linear-gradient(135deg, #0a0a0a 0%, #0a1a0a 100%);
-      color: #00ff00;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #C1121F 100%);
+      color: #2B2D42;
       min-height: 100vh;
       padding: 20px;
     }
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      background: rgba(0, 0, 0, 0.8);
-      border: 2px solid #00ff00;
-      border-radius: 10px;
-      padding: 30px;
-      box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+      background: #FFF8F0;
+      border-radius: 15px;
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     }
     h1 {
-      color: #ff0055;
-      text-shadow: 0 0 10px #ff0055;
-      margin-bottom: 20px;
-      font-size: 2.5em;
+      color: #C1121F;
+      margin-bottom: 10px;
+      font-size: 2.8em;
       text-align: center;
+      font-weight: 800;
     }
     h2 {
-      color: #00ffff;
-      text-shadow: 0 0 10px #00ffff;
+      color: #FF6B35;
       margin-top: 30px;
       margin-bottom: 15px;
-      border-bottom: 2px solid #00ffff;
+      border-bottom: 3px solid #F7931E;
       padding-bottom: 10px;
+      font-weight: 700;
     }
     h3 {
-      color: #ffaa00;
+      color: #2B2D42;
       margin-top: 20px;
       margin-bottom: 10px;
+      font-weight: 600;
     }
     p, li {
       line-height: 1.8;
       margin-bottom: 10px;
-      color: #cccccc;
+      color: #2B2D42;
     }
     .nav-links {
       display: flex;
@@ -70,110 +68,121 @@ const styles = `
       flex-wrap: wrap;
     }
     .nav-links a {
-      color: #00ff00;
+      color: #FFF;
       text-decoration: none;
-      padding: 10px 20px;
-      border: 2px solid #00ff00;
-      border-radius: 5px;
+      padding: 12px 24px;
+      border: 2px solid #FF6B35;
+      border-radius: 8px;
       transition: all 0.3s;
-      background: rgba(0, 255, 0, 0.1);
+      background: #FF6B35;
+      font-weight: 600;
     }
     .nav-links a:hover {
-      background: rgba(0, 255, 0, 0.3);
-      box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+      background: #C1121F;
+      border-color: #C1121F;
       transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(193, 18, 31, 0.3);
     }
     .challenge {
-      background-color: #0a0a0a;
-      border: 2px solid #00ff00;
+      background: linear-gradient(135deg, #FFF8F0 0%, #FFE5D0 100%);
+      border: 2px solid #FF6B35;
       padding: 20px;
       margin: 20px 0;
-      border-radius: 5px;
-      box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(255, 107, 53, 0.2);
     }
     .challenge h3 {
       margin-top: 0;
-      color: #00ff00;
+      color: #C1121F;
       font-size: 1.5em;
     }
     .difficulty {
       display: inline-block;
       padding: 5px 15px;
-      border-radius: 3px;
+      border-radius: 20px;
       font-weight: bold;
       margin-left: 10px;
+      font-size: 0.9em;
     }
-    .easy { background-color: #00ff00; color: #000; }
-    .medium { background-color: #ffaa00; color: #000; }
-    .hard { background-color: #ff0000; color: #fff; }
-    .example { background-color: #0088ff; color: #fff; }
+    .easy { background: #10B981; color: #FFF; }
+    .medium { background: #F7931E; color: #FFF; }
+    .hard { background: #C1121F; color: #FFF; }
+    .example { background: #3B82F6; color: #FFF; }
     .section {
-      background-color: #0a0a0a;
-      border: 2px solid #00ff00;
+      background: #FFF;
+      border: 2px solid #F7931E;
       padding: 20px;
       margin: 20px 0;
-      border-radius: 5px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     .good {
-      background-color: #001a00;
-      border-left: 4px solid #00ff00;
+      background: #D1FAE5;
+      border-left: 4px solid #10B981;
       padding: 15px;
       margin: 15px 0;
+      border-radius: 5px;
     }
     .bad {
-      background-color: #1a0000;
-      border-left: 4px solid #ff0000;
+      background: #FEE2E2;
+      border-left: 4px solid #EF4444;
       padding: 15px;
       margin: 15px 0;
+      border-radius: 5px;
     }
     .lab-info {
-      background: rgba(0, 255, 255, 0.1);
-      border-left: 4px solid #00ffff;
+      background: #FEF3C7;
+      border-left: 4px solid #F59E0B;
       padding: 15px;
       margin: 20px 0;
+      border-radius: 5px;
     }
     .hint-box {
-      background-color: #0a0a0a;
-      border-left: 4px solid #ffaa00;
+      background: #DBEAFE;
+      border-left: 4px solid #3B82F6;
       padding: 15px;
       margin: 20px 0;
+      border-radius: 5px;
     }
     .endpoint {
-      background: rgba(0, 100, 255, 0.2);
-      border: 1px solid #0066ff;
-      padding: 10px;
-      border-radius: 5px;
+      background: #F3F4F6;
+      border: 2px solid #6B7280;
+      padding: 15px;
+      border-radius: 8px;
       margin: 10px 0;
-      color: #66ccff;
+      color: #1F2937;
+      font-family: 'Courier New', monospace;
     }
     pre {
-      background: #000;
-      color: #00ff00;
+      background: #1F2937;
+      color: #10B981;
       padding: 15px;
-      border-radius: 5px;
-      border: 1px solid #00ff00;
+      border-radius: 8px;
+      border: 1px solid #374151;
       overflow-x: auto;
       margin: 10px 0;
     }
     code {
-      background: rgba(0, 255, 0, 0.1);
-      color: #00ff00;
-      padding: 2px 6px;
-      border-radius: 3px;
+      background: #FEE2E2;
+      color: #B91C1C;
+      padding: 2px 8px;
+      border-radius: 4px;
       font-family: 'Courier New', monospace;
+      font-size: 0.9em;
     }
     ul {
       margin-left: 20px;
       margin-top: 10px;
     }
     a {
-      color: #00ffff;
+      color: #FF6B35;
       text-decoration: none;
-      border-bottom: 1px dotted #00ffff;
+      font-weight: 600;
+      border-bottom: 2px solid transparent;
+      transition: border-bottom 0.2s;
     }
     a:hover {
-      color: #00ff00;
-      border-bottom: 1px solid #00ff00;
+      border-bottom: 2px solid #FF6B35;
     }
   </style>
 `;
@@ -184,49 +193,59 @@ app.get('/', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>A06: Insecure Design</title>
+      <title>TacoTruck Express 🌮 - Order System</title>
       ${styles}
     </head>
     <body>
       <div class="container">
-        <h1>🎨 A06: INSECURE DESIGN</h1>
-        <p>Welcome to the Insecure Design training lab. Navigate through the stages to learn about design flaws and business logic vulnerabilities.</p>
+        <h1>🌮 TACOTRUCK EXPRESS</h1>
+        <p style="text-align: center; font-size: 1.2em; color: #F7931E; margin-bottom: 30px;">
+          <strong>Pre-Order Your Favorite Tacos!</strong><br>
+          Fast, fresh, and always delicious Mexican street food
+        </p>
         
         <div class="challenge">
-          <h3>📚 Example - Insecure Design <span class="difficulty example">TUTORIAL</span></h3>
-          <p>Learn about insecure design patterns, business logic flaws, and how proper threat modeling prevents vulnerabilities.</p>
-          <p><a href="/example">→ Start Tutorial</a></p>
+          <h3>📚 Tutorial - How Our System Works <span class="difficulty example">START HERE</span></h3>
+          <p>Learn how TacoTruck Express handles orders, discounts, and loyalty rewards. See examples of our security measures in action.</p>
+          <p><a href="/example">→ View Tutorial</a></p>
         </div>
 
         <div class="challenge">
-          <h3>🎯 Lab 1 - Rate Limiting <span class="difficulty easy">EASY</span></h3>
-          <p><strong>Stage:</strong> Recon</p>
-          <p><strong>Description:</strong> Exploit missing rate limits on sensitive operations</p>
-          <p><strong>Hint:</strong> No rate limiting means unlimited attempts</p>
-          <p><strong>Flag:</strong> Capture the flag by bypassing rate limits</p>
+          <h3>🌮 Lab 1 - Order System <span class="difficulty easy">EASY</span></h3>
+          <p><strong>Mission:</strong> Test our high-speed ordering system</p>
+          <p><strong>Description:</strong> During lunch rush, customers can rapid-fire orders. See if our system handles the volume!</p>
+          <p><strong>Your Task:</strong> Place multiple orders quickly</p>
           <p><a href="/lab1">→ Start Lab 1</a></p>
         </div>
 
         <div class="challenge">
-          <h3>🎯 Lab 2 - Logic Flaw <span class="difficulty medium">MEDIUM</span></h3>
-          <p><strong>Stage:</strong> Initial Access</p>
-          <p><strong>Description:</strong> Exploit business logic flaws to gain unauthorized benefits</p>
-          <p><strong>Hint:</strong> Business rules can be chained in unexpected ways</p>
-          <p><strong>Flag:</strong> Capture the flag by exploiting the logic flaw</p>
+          <h3>🎟️ Lab 2 - Discount Codes <span class="difficulty medium">MEDIUM</span></h3>
+          <p><strong>Mission:</strong> Maximize your savings with promo codes</p>
+          <p><strong>Description:</strong> We offer various discount codes. Stack them wisely to get the best deal!</p>
+          <p><strong>Your Task:</strong> Find the best combination of discount codes</p>
           <p><a href="/lab2">→ Start Lab 2</a></p>
         </div>
 
         <div class="challenge">
-          <h3>🎯 Lab 3 - Race Condition <span class="difficulty hard">HARD</span></h3>
-          <p><strong>Stage:</strong> Maintained Access</p>
-          <p><strong>Description:</strong> Exploit race conditions to duplicate funds</p>
-          <p><strong>Hint:</strong> Concurrent requests can bypass balance checks</p>
-          <p><strong>Flag:</strong> Capture the flag by winning the race</p>
+          <h3>💰 Lab 3 - Account Balance <span class="difficulty hard">HARD</span></h3>
+          <p><strong>Mission:</strong> Test our loyalty rewards system</p>
+          <p><strong>Description:</strong> Use your $50 account balance to place orders. Our system processes payments in real-time.</p>
+          <p><strong>Your Task:</strong> Make the most of your loyalty balance</p>
           <p><a href="/lab3">→ Start Lab 3</a></p>
         </div>
 
+        <div class="section">
+          <h2>🌮 Our Menu</h2>
+          <ul style="font-size: 1.1em;">
+            <li><strong>Carne Asada</strong> - Grilled steak with cilantro & onions - $3.50</li>
+            <li><strong>Al Pastor</strong> - Marinated pork with pineapple - $3.75</li>
+            <li><strong>Pollo Asado</strong> - Grilled chicken with lime - $3.25</li>
+            <li><strong>Vegetarian</strong> - Black beans, peppers & guacamole - $3.00</li>
+          </ul>
+        </div>
+
         <p style="text-align: center; margin-top: 40px;">
-          <a href="/">← Back to Portal</a>
+          <a href="/">← Back to Main Portal</a>
         </p>
       </div>
     </body>
@@ -240,130 +259,122 @@ app.get('/example', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Example - Insecure Design</title>
+      <title>TacoTruck Express - How It Works</title>
       ${styles}
     </head>
     <body>
       <div class="container">
-        <h1>🎨 INSECURE DESIGN PATTERNS</h1>
+        <h1>🌮 HOW TACOTRUCK EXPRESS WORKS</h1>
         <div class="nav-links">
           <a href="/">🏠 Home</a>
         </div>
 
         <div class="section">
-          <h2>What is Insecure Design?</h2>
-          <p>Insecure design represents missing or ineffective security controls in the design phase. Unlike implementation bugs, these are fundamental flaws in the architecture and business logic:</p>
+          <h2>About Our Pre-Order System</h2>
+          <p>TacoTruck Express is a mobile food truck serving authentic Mexican street tacos. Our pre-order system lets customers place orders ahead of time, skip the line, and enjoy fresh tacos faster!</p>
+          <p>Our system handles:</p>
           <ul>
-            <li><strong>Missing Security Controls:</strong> Features without required security mechanisms</li>
-            <li><strong>Business Logic Flaws:</strong> Workflows that can be abused in unexpected ways</li>
-            <li><strong>Race Conditions:</strong> Time-of-check to time-of-use vulnerabilities</li>
-            <li><strong>Improper Resource Limits:</strong> Missing rate limiting and throttling</li>
-            <li><strong>Insufficient Validation:</strong> Business rule validation bypassed</li>
+            <li><strong>Quick Orders:</strong> Place orders during lunch rush without waiting</li>
+            <li><strong>Promo Codes:</strong> Various discounts for new customers, regulars, and special promotions</li>
+            <li><strong>Loyalty Balance:</strong> Rewards program with account credits for frequent customers</li>
+            <li><strong>Real-Time Processing:</strong> Instant order confirmation and payment processing</li>
           </ul>
         </div>
 
         <div class="section">
-          <h2>❌ Common Insecure Design Mistakes</h2>
+          <h2>📋 Common Design Patterns</h2>
           
-          <h3>1. Missing Rate Limiting</h3>
+          <h3>1. Order Rate Limiting</h3>
           <div class="bad">
-            <strong>Problem:</strong> No limits on sensitive operations
-            <pre><code>app.post('/api/transfer', (req, res) => {
-  const amount = req.body.amount;
-  // VULNERABLE: No rate limiting!
-  transferFunds(req.user.id, amount);
+            <strong>Vulnerable Approach:</strong> No order throttling
+            <pre><code>app.post('/api/order', (req, res) => {
+  const { items } = req.body;
+  // Process unlimited orders instantly!
+  placeOrder(items);
   res.json({ success: true });
 });</code></pre>
-            <p><strong>Impact:</strong> Attackers can spam requests, brute force passwords, or abuse functionality</p>
+            <p><strong>Risk:</strong> System can be overwhelmed during rush hours</p>
           </div>
           <div class="good">
-            <strong>Solution:</strong> Implement rate limiting
+            <strong>Secure Approach:</strong> Rate limiting for fair ordering
             <pre><code>const rateLimit = require('express-rate-limit');
 
-const transferLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Limit each user to 5 requests per window
-  message: 'Too many transfer attempts'
+const orderLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 3, // Max 3 orders per 5 minutes
+  message: 'Too many orders, please wait'
 });
 
-app.post('/api/transfer', transferLimiter, (req, res) => {
-  const amount = req.body.amount;
-  transferFunds(req.user.id, amount);
+app.post('/api/order', orderLimiter, (req, res) => {
+  const { items } = req.body;
+  placeOrder(items);
   res.json({ success: true });
 });</code></pre>
           </div>
 
-          <h3>2. Business Logic Flaws</h3>
+          <h3>2. Discount Code Logic</h3>
           <div class="bad">
-            <strong>Problem:</strong> Discount codes applied without validation
+            <strong>Vulnerable Approach:</strong> No validation on code usage
             <pre><code>app.post('/api/checkout', (req, res) => {
-  let price = 100;
-  const codes = req.body.discountCodes || [];
+  let total = 10.00;
+  const codes = req.body.promoCodes || [];
   
-  // VULNERABLE: No check if codes already used!
+  // Apply all codes without checking!
   codes.forEach(code => {
-    if (discounts[code]) {
-      price -= discounts[code];
-    }
+    if (code === 'FIRST5') total -= 5;
+    if (code === 'TACO10') total *= 0.9;
   });
   
-  res.json({ finalPrice: price });
+  res.json({ total: total });
 });</code></pre>
-            <p><strong>Impact:</strong> Users can apply the same discount multiple times or combine incompatible discounts</p>
+            <p><strong>Risk:</strong> Codes can be reused or stacked inappropriately</p>
           </div>
           <div class="good">
-            <strong>Solution:</strong> Proper business logic validation
+            <strong>Secure Approach:</strong> Validate code usage rules
             <pre><code>app.post('/api/checkout', (req, res) => {
-  let price = 100;
-  const codes = req.body.discountCodes || [];
-  const usedCodes = new Set();
+  let total = 10.00;
+  const codes = req.body.promoCodes || [];
+  const used = new Set();
   
   codes.forEach(code => {
-    // Check if code exists and not already used
-    if (discounts[code] && !usedCodes.has(code)) {
-      price -= discounts[code];
-      usedCodes.add(code);
-      // Mark as used in database
-      markCodeAsUsed(req.user.id, code);
+    if (!used.has(code)) {
+      if (code === 'FIRST5') total -= 5;
+      else if (code === 'TACO10') total *= 0.9;
+      used.add(code);
+      trackCodeUsage(code); // Prevent future reuse
     }
   });
   
-  // Ensure price doesn't go negative
-  price = Math.max(0, price);
-  
-  res.json({ finalPrice: price });
+  total = Math.max(0, total); // Never negative
+  res.json({ total: total });
 });</code></pre>
           </div>
 
-          <h3>3. Race Conditions</h3>
+          <h3>3. Balance Transactions</h3>
           <div class="bad">
-            <strong>Problem:</strong> Time-of-check to time-of-use gap
-            <pre><code>app.post('/api/withdraw', async (req, res) => {
+            <strong>Vulnerable Approach:</strong> Check-then-act pattern
+            <pre><code>app.post('/api/pay', async (req, res) => {
   const amount = req.body.amount;
-  const balance = await getBalance(req.user.id);
+  const balance = await getBalance(userId);
   
-  // VULNERABLE: Balance check is separate from withdrawal
+  // Gap between check and payment!
   if (balance >= amount) {
-    // Race condition window here!
-    await withdraw(req.user.id, amount);
+    await deductBalance(userId, amount);
     res.json({ success: true });
-  } else {
-    res.json({ error: 'Insufficient funds' });
   }
 });</code></pre>
-            <p><strong>Impact:</strong> Multiple concurrent requests can withdraw more than available balance</p>
+            <p><strong>Risk:</strong> Concurrent requests can overdraw balance</p>
           </div>
           <div class="good">
-            <strong>Solution:</strong> Atomic operations and locking
-            <pre><code>app.post('/api/withdraw', async (req, res) => {
+            <strong>Secure Approach:</strong> Atomic transactions
+            <pre><code>app.post('/api/pay', async (req, res) => {
   const amount = req.body.amount;
   
   try {
-    // Use atomic transaction with row locking
     await db.transaction(async (trx) => {
       const account = await trx('accounts')
-        .where('user_id', req.user.id)
-        .forUpdate() // Lock the row
+        .where('user_id', userId)
+        .forUpdate() // Lock during transaction
         .first();
       
       if (account.balance < amount) {
@@ -371,71 +382,40 @@ app.post('/api/transfer', transferLimiter, (req, res) => {
       }
       
       await trx('accounts')
-        .where('user_id', req.user.id)
+        .where('user_id', userId)
         .decrement('balance', amount);
     });
-    
     res.json({ success: true });
-  } catch (error) {
-    res.json({ error: error.message });
+  } catch (e) {
+    res.json({ error: e.message });
   }
 });</code></pre>
           </div>
         </div>
 
         <div class="section">
-          <h2>✅ Secure Design Principles</h2>
+          <h2>✅ Best Practices for Food Ordering Systems</h2>
           <ul>
-            <li><strong>Threat Modeling:</strong> Identify threats during design phase</li>
-            <li><strong>Defense in Depth:</strong> Multiple layers of security controls</li>
-            <li><strong>Secure by Default:</strong> Most secure configuration is the default</li>
-            <li><strong>Fail Securely:</strong> Failures should deny access, not grant it</li>
-            <li><strong>Complete Mediation:</strong> Check permissions on every access</li>
-            <li><strong>Economy of Mechanism:</strong> Keep designs simple</li>
-            <li><strong>Least Privilege:</strong> Minimal permissions required</li>
-            <li><strong>Separation of Duties:</strong> No single person can compromise system</li>
-          </ul>
-        </div>
-
-        <div class="section">
-          <h2>🛠️ Prevention Strategies</h2>
-          
-          <h3>Rate Limiting & Throttling</h3>
-          <ul>
-            <li>Limit requests per IP address, user, or session</li>
-            <li>Use exponential backoff for failed attempts</li>
-            <li>Implement CAPTCHA after threshold</li>
-            <li>Monitor for abuse patterns</li>
-          </ul>
-
-          <h3>Business Logic Security</h3>
-          <ul>
-            <li>Document all business rules and workflows</li>
-            <li>Validate business constraints server-side</li>
-            <li>Use state machines for complex workflows</li>
-            <li>Test for logic flaws (combine steps in unexpected ways)</li>
-            <li>Implement idempotency for critical operations</li>
-          </ul>
-
-          <h3>Concurrency Control</h3>
-          <ul>
-            <li>Use database transactions with proper isolation levels</li>
-            <li>Implement row-level locking for critical data</li>
-            <li>Use optimistic locking with version numbers</li>
-            <li>Design for idempotent operations</li>
-            <li>Test with concurrent requests</li>
+            <li><strong>Rate Limiting:</strong> Prevent order spam and ensure fair access</li>
+            <li><strong>Promo Code Management:</strong> Track usage and prevent abuse</li>
+            <li><strong>Transaction Safety:</strong> Use atomic operations for payments</li>
+            <li><strong>Input Validation:</strong> Verify all order data server-side</li>
+            <li><strong>Inventory Management:</strong> Real-time stock tracking</li>
           </ul>
         </div>
 
         <div class="lab-info">
-          <h3>📝 Key Takeaways</h3>
+          <h3>🎯 Ready to Test?</h3>
+          <p>Now that you understand how TacoTruck Express works, try the hands-on labs:</p>
           <ul>
-            <li>Security must be considered during the design phase</li>
-            <li>Business logic flaws are often harder to detect than technical bugs</li>
-            <li>Rate limiting is essential for all sensitive operations</li>
-            <li>Race conditions require atomic operations and proper locking</li>
-            <li>Test your application with unexpected input combinations</li>
+            <li><strong>Lab 1:</strong> Test the order system under high volume</li>
+            <li><strong>Lab 2:</strong> Experiment with discount code combinations</li>
+            <li><strong>Lab 3:</strong> Try the loyalty rewards balance system</li>
           </ul>
+        </div>
+
+        <div class="nav-links">
+          <a href="/lab1">Start Lab 1 →</a>
         </div>
       </div>
     </body>
@@ -449,55 +429,55 @@ app.get('/lab1', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Lab 1 - Rate Limiting</title>
+      <title>Lab 1 - Order System</title>
       ${styles}
     </head>
     <body>
       <div class="container">
-        <h1>🎯 LAB 1: RATE LIMITING <span class="difficulty easy">EASY</span></h1>
+        <h1>🌮 LAB 1: ORDER SYSTEM <span class="difficulty easy">EASY</span></h1>
         <div class="nav-links">
           <a href="/">🏠 Home</a>
           <a href="/example">📚 Tutorial</a>
         </div>
 
         <div class="lab-info">
-          <h3>📋 Mission Brief</h3>
-          <p><strong>Stage:</strong> Recon</p>
-          <p><strong>Objective:</strong> Exploit missing rate limits on password verification</p>
-          <p><strong>Flag:</strong> Will be revealed after multiple rapid attempts</p>
+          <h3>🎯 Your Mission</h3>
+          <p><strong>Scenario:</strong> It's lunch rush! Test our rapid order system</p>
+          <p><strong>Your Goal:</strong> Place multiple taco orders quickly</p>
+          <p><strong>Reward:</strong> Capture the flag for extra guacamole!</p>
         </div>
 
         <div class="section">
-          <h2>🎯 Challenge Description</h2>
-          <p>The API has a PIN verification endpoint with no rate limiting. This allows unlimited brute force attempts without any throttling or account lockout.</p>
-          <p>Your task is to make multiple rapid requests to the endpoint to capture the flag.</p>
+          <h2>🌮 Challenge Description</h2>
+          <p>TacoTruck Express prides itself on fast service. During lunch rush, customers can place multiple orders without waiting. Our system handles high-volume ordering!</p>
+          <p>Your task: Test the order verification system by placing orders rapidly. Try to make at least 10 order verification requests.</p>
         </div>
 
         <div class="endpoint">
           <strong>API Endpoint:</strong><br>
-          <code>POST http://localhost:3006/api/lab1/verify-pin</code><br>
+          <code>POST http://localhost:3006/api/lab1/verify-order</code><br>
           <code>Content-Type: application/json</code><br><br>
           <strong>Body:</strong><br>
-          <code>{"pin": "1234"}</code>
+          <code>{"orderCode": "TACO123"}</code>
         </div>
 
         <div class="hint-box">
           <strong>💡 Hints:</strong>
           <ul>
-            <li>The endpoint has no rate limiting at all</li>
-            <li>Make at least 10 requests rapidly to trigger the flag</li>
-            <li>You can use curl in a loop or write a simple script</li>
-            <li>The actual PIN doesn't matter - just the number of attempts</li>
+            <li>Our system prioritizes speed - no delays!</li>
+            <li>Try making at least 10 rapid order verifications</li>
+            <li>Use a loop or script to test the system under load</li>
+            <li>The actual order code doesn't matter for testing</li>
           </ul>
         </div>
 
         <div class="section">
           <h2>🛠️ Testing Instructions</h2>
-          <p><strong>Using a bash loop:</strong></p>
+          <p><strong>Using bash:</strong></p>
           <pre><code>for i in {1..15}; do
-  curl -X POST http://localhost:3006/api/lab1/verify-pin \\
+  curl -X POST http://localhost:3006/api/lab1/verify-order \\
     -H "Content-Type: application/json" \\
-    -d '{"pin":"1234"}'
+    -d '{"orderCode":"TACO123"}'
   echo ""
 done</code></pre>
         </div>
@@ -517,28 +497,28 @@ app.get('/lab2', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Lab 2 - Logic Flaw</title>
+      <title>Lab 2 - Discount Codes</title>
       ${styles}
     </head>
     <body>
       <div class="container">
-        <h1>🎯 LAB 2: LOGIC FLAW <span class="difficulty medium">MEDIUM</span></h1>
+        <h1>🎯 LAB 2: DISCOUNT CODES <span class="difficulty medium">MEDIUM</span></h1>
         <div class="nav-links">
           <a href="/">🏠 Home</a>
           <a href="/example">📚 Tutorial</a>
         </div>
 
         <div class="lab-info">
-          <h3>📋 Mission Brief</h3>
-          <p><strong>Stage:</strong> Initial Access</p>
-          <p><strong>Objective:</strong> Exploit business logic flaw in discount code system</p>
-          <p><strong>Flag:</strong> Will be revealed when you get an item for free or negative price</p>
+          <h3>🎯 Your Mission</h3>
+          <p><strong>Scenario:</strong> Maximize your taco savings with promo codes!</p>
+          <p><strong>Your Goal:</strong> Get free tacos or even earn credit</p>
+          <p><strong>Reward:</strong> Free guacamole flag for savvy savers!</p>
         </div>
 
         <div class="section">
-          <h2>🎯 Challenge Description</h2>
-          <p>The shopping cart API allows users to apply multiple discount codes. However, there's a flaw in the business logic that doesn't properly validate discount combinations.</p>
-          <p>Your task is to combine discount codes in a way that gets you an item for free or with a negative price (giving you money).</p>
+          <h2>🎟️ Challenge Description</h2>
+          <p>TacoTruck Express loves rewarding customers with discount codes! Our checkout system allows you to apply multiple promo codes to get the best deal.</p>
+          <p>Your task: Combine discount codes creatively to get tacos for free (or even better - make the price negative and earn credit!).</p>
         </div>
 
         <div class="endpoint">
@@ -546,25 +526,26 @@ app.get('/lab2', (req, res) => {
           <code>POST http://localhost:3006/api/lab2/checkout</code><br>
           <code>Content-Type: application/json</code><br><br>
           <strong>Body:</strong><br>
-          <code>{"price": 100, "discountCodes": ["SAVE10", "SAVE20"]}</code>
+          <code>{"price": 10, "discountCodes": ["FIRST5", "TACO10"]}</code>
         </div>
 
         <div class="section">
-          <h2>Available Discount Codes</h2>
-          <ul>
-            <li><code>SAVE10</code> - 10% off ($10 discount on $100 item)</li>
-            <li><code>SAVE20</code> - 20% off ($20 discount on $100 item)</li>
-            <li><code>SAVE50</code> - 50% off ($50 discount on $100 item)</li>
+          <h2>🎟️ Available Promo Codes</h2>
+          <ul style="font-size: 1.1em;">
+            <li><code>FIRST5</code> - $5 off your order (new customers)</li>
+            <li><code>TACO10</code> - 10% off (any customer)</li>
+            <li><code>LUNCH15</code> - 15% off (lunch special)</li>
+            <li><code>FREEGUAC</code> - $2.50 off (free guac promo)</li>
           </ul>
         </div>
 
         <div class="hint-box">
           <strong>💡 Hints:</strong>
           <ul>
-            <li>Can you apply the same discount code multiple times?</li>
-            <li>What happens if you apply all codes together?</li>
-            <li>Think about the order of operations</li>
-            <li>Can you make the final price negative?</li>
+            <li>What if you use the same code multiple times?</li>
+            <li>Can you stack all the codes together?</li>
+            <li>Try different combinations and orders</li>
+            <li>What happens when the total goes below $0?</li>
           </ul>
         </div>
 
@@ -573,7 +554,7 @@ app.get('/lab2', (req, res) => {
           <p><strong>Using curl:</strong></p>
           <pre><code>curl -X POST http://localhost:3006/api/lab2/checkout \\
   -H "Content-Type: application/json" \\
-  -d '{"price": 100, "discountCodes": ["SAVE10"]}'</code></pre>
+  -d '{"price": 10, "discountCodes": ["FIRST5"]}'</code></pre>
         </div>
 
         <div style="text-align: center; margin-top: 40px;">
@@ -591,82 +572,82 @@ app.get('/lab3', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Lab 3 - Race Condition</title>
+      <title>Lab 3 - Account Balance</title>
       ${styles}
     </head>
     <body>
       <div class="container">
-        <h1>🎯 LAB 3: RACE CONDITION <span class="difficulty hard">HARD</span></h1>
+        <h1>🎯 LAB 3: ACCOUNT BALANCE <span class="difficulty hard">HARD</span></h1>
         <div class="nav-links">
           <a href="/">🏠 Home</a>
           <a href="/example">📚 Tutorial</a>
         </div>
 
         <div class="lab-info">
-          <h3>📋 Mission Brief</h3>
-          <p><strong>Stage:</strong> Maintained Access</p>
-          <p><strong>Objective:</strong> Exploit race condition to withdraw more than available balance</p>
-          <p><strong>Flag:</strong> Will be revealed when total withdrawals exceed initial balance</p>
+          <h3>🎯 Your Mission</h3>
+          <p><strong>Scenario:</strong> Use your $50 loyalty rewards wisely!</p>
+          <p><strong>Your Goal:</strong> Get more tacos than your balance allows</p>
+          <p><strong>Reward:</strong> Extra tacos flag for clever customers!</p>
         </div>
 
         <div class="section">
-          <h2>🎯 Challenge Description</h2>
-          <p>The banking API has a withdrawal endpoint that checks your balance before processing. However, there's a time gap between checking the balance and actually withdrawing the funds.</p>
-          <p>Your task is to send multiple concurrent withdrawal requests to exploit this race condition and withdraw more money than you actually have.</p>
+          <h2>💰 Challenge Description</h2>
+          <p>TacoTruck Express rewards loyal customers with account credits. Your account has a $50.00 balance that you can use for orders. The system processes payments in real-time!</p>
+          <p>Your task: Try to place multiple orders at the same time. Our fast system might process them all if you're quick enough!</p>
         </div>
 
         <div class="endpoint">
           <strong>API Endpoints:</strong><br>
-          <code>GET http://localhost:3006/api/lab3/balance</code> - Check current balance<br>
-          <code>POST http://localhost:3006/api/lab3/withdraw</code> - Withdraw funds<br>
+          <code>GET http://localhost:3006/api/lab3/balance</code> - Check loyalty balance<br>
+          <code>POST http://localhost:3006/api/lab3/withdraw</code> - Use balance for order<br>
           <code>Content-Type: application/json</code><br><br>
-          <strong>Withdraw Body:</strong><br>
-          <code>{"amount": 300}</code>
+          <strong>Order Body:</strong><br>
+          <code>{"amount": 15}</code>
         </div>
 
         <div class="section">
-          <h2>Account Information</h2>
-          <ul>
-            <li><strong>Initial Balance:</strong> $1000</li>
-            <li><strong>Withdrawal Amount:</strong> Try withdrawing $300 per request</li>
-            <li><strong>Goal:</strong> Withdraw more than $1000 total</li>
+          <h2>💳 Your Loyalty Account</h2>
+          <ul style="font-size: 1.1em;">
+            <li><strong>Available Balance:</strong> $50.00</li>
+            <li><strong>Taco Order Size:</strong> Try $15 per order</li>
+            <li><strong>Challenge:</strong> Order more than $50 worth of tacos!</li>
           </ul>
         </div>
 
         <div class="hint-box">
           <strong>💡 Hints:</strong>
           <ul>
-            <li>You need to send multiple requests at the exact same time</li>
-            <li>All requests should pass the balance check before any completes</li>
-            <li>Use tools that support concurrent requests (curl with &, xargs -P, or a script)</li>
-            <li>Try sending 4 withdrawal requests of $300 simultaneously</li>
+            <li>Place multiple orders at the exact same moment</li>
+            <li>All orders should check the balance before any payment processes</li>
+            <li>Use concurrent requests (curl with &, or a script)</li>
+            <li>Try 4 orders of $15 simultaneously ($60 total from $50 balance!)</li>
           </ul>
         </div>
 
         <div class="section">
           <h2>🛠️ Testing Instructions</h2>
-          <p><strong>Using bash with concurrent curl:</strong></p>
-          <pre><code># Send 4 concurrent $300 withdrawals
+          <p><strong>Using bash with concurrent orders:</strong></p>
+          <pre><code># Place 4 concurrent $15 orders
 for i in {1..4}; do
   curl -X POST http://localhost:3006/api/lab3/withdraw \\
     -H "Content-Type: application/json" \\
-    -d '{"amount": 300}' &
+    -d '{"amount": 15}' &
 done
 wait
 
-# Check the result
+# Check your balance
 curl http://localhost:3006/api/lab3/balance</code></pre>
 
-          <p><strong>Or using a simple Python script:</strong></p>
+          <p><strong>Or use Python for rapid-fire orders:</strong></p>
           <pre><code>import requests
 import concurrent.futures
 
-def withdraw():
+def place_order():
     return requests.post('http://localhost:3006/api/lab3/withdraw',
-                        json={'amount': 300})
+                        json={'amount': 15})
 
 with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-    futures = [executor.submit(withdraw) for _ in range(4)]
+    futures = [executor.submit(place_order) for _ in range(4)]
     results = [f.result().json() for f in futures]
 
 for r in results:
@@ -683,39 +664,39 @@ for r in results:
 });
 
 // LAB 1: Rate Limiting vulnerability
-app.post('/api/lab1/verify-pin', (req, res) => {
-  const { pin } = req.body;
+app.post('/api/lab1/verify-order', (req, res) => {
+  const { orderCode } = req.body;
   const clientIp = req.ip || 'unknown';
   
   // Track attempts (but don't actually limit them - that's the vulnerability!)
-  if (!transferAttempts[clientIp]) {
-    transferAttempts[clientIp] = [];
+  if (!orderAttempts[clientIp]) {
+    orderAttempts[clientIp] = [];
   }
   
   // Clean up old attempts (older than 1 hour) to prevent memory leaks
   const oneHourAgo = Date.now() - (60 * 60 * 1000);
-  transferAttempts[clientIp] = transferAttempts[clientIp].filter(timestamp => timestamp > oneHourAgo);
+  orderAttempts[clientIp] = orderAttempts[clientIp].filter(timestamp => timestamp > oneHourAgo);
   
-  transferAttempts[clientIp].push(Date.now());
-  const attemptCount = transferAttempts[clientIp].length;
+  orderAttempts[clientIp].push(Date.now());
+  const attemptCount = orderAttempts[clientIp].length;
   
   // VULNERABLE: No rate limiting!
   if (attemptCount >= 10) {
     return res.json({
-      success: false,
-      message: 'Invalid PIN',
+      success: true,
+      message: 'Order verified! Wow, you can really order fast!',
       attempts: attemptCount,
-      flag: 'NSA{R4T3_L1M1T_M1SS1NG}',
-      vulnerability: 'No rate limiting allows unlimited brute force attempts!',
-      explanation: 'You made ' + attemptCount + ' attempts with no throttling or account lockout'
+      flag: 'TACO{R4T3_L1M1T_M1SS1NG_3XTR4_GU4C}',
+      vulnerability: 'No rate limiting on order verification!',
+      explanation: 'You placed ' + attemptCount + ' rapid orders with no throttling. In a real system, this could overwhelm the kitchen!'
     });
   }
   
   res.json({
-    success: false,
-    message: 'Invalid PIN',
+    success: true,
+    message: 'Order code verified',
     attempts: attemptCount,
-    hint: 'Keep trying! No rate limiting in place. Make at least 10 attempts.'
+    hint: 'Keep ordering! No rate limiting in place. Make at least 10 rapid verification requests.'
   });
 });
 
@@ -726,7 +707,7 @@ app.post('/api/lab2/checkout', (req, res) => {
   if (!price || !discountCodes || !Array.isArray(discountCodes)) {
     return res.json({
       error: 'Invalid request',
-      example: '{"price": 100, "discountCodes": ["SAVE10", "SAVE20"]}'
+      example: '{"price": 10, "discountCodes": ["FIRST5", "TACO10"]}'
     });
   }
   
@@ -735,34 +716,37 @@ app.post('/api/lab2/checkout', (req, res) => {
   
   // VULNERABLE: No validation that codes can't be reused!
   discountCodes.forEach(code => {
-    if (code === 'SAVE10') {
-      price -= 10;
-      discountsApplied.push('SAVE10 (-$10)');
-    } else if (code === 'SAVE20') {
-      price -= 20;
-      discountsApplied.push('SAVE20 (-$20)');
-    } else if (code === 'SAVE50') {
-      price -= 50;
-      discountsApplied.push('SAVE50 (-$50)');
+    if (code === 'FIRST5') {
+      price -= 5;
+      discountsApplied.push('FIRST5 (-$5)');
+    } else if (code === 'TACO10') {
+      price -= price * 0.10;
+      discountsApplied.push('TACO10 (-10%)');
+    } else if (code === 'LUNCH15') {
+      price -= price * 0.15;
+      discountsApplied.push('LUNCH15 (-15%)');
+    } else if (code === 'FREEGUAC') {
+      price -= 2.50;
+      discountsApplied.push('FREEGUAC (-$2.50)');
     }
   });
   
   const response = {
     originalPrice: originalPrice,
     discountsApplied: discountsApplied,
-    finalPrice: price,
-    totalDiscount: originalPrice - price
+    finalPrice: price.toFixed(2),
+    totalSaved: (originalPrice - price).toFixed(2)
   };
   
   // Award flag if price is 0 or negative
   if (price <= 0) {
-    response.flag = 'NSA{L0G1C_FL4W_3XPL01T3D}';
+    response.flag = 'TACO{L0G1C_FL4W_FR33_GU4C4M0L3}';
     response.vulnerability = 'Business logic flaw: Same discount code can be applied multiple times!';
-    response.explanation = 'You exploited the missing validation to apply codes multiple times';
+    response.explanation = 'You exploited the missing validation to stack codes and get free tacos (or even earn credit)!';
   } else if (discountsApplied.length > 1) {
-    response.hint = 'You can apply multiple codes, but can you get it for free or negative price?';
+    response.hint = 'Good job stacking codes! Can you get it to $0 or negative?';
   } else {
-    response.hint = 'Try applying multiple discount codes. Can you use the same code twice?';
+    response.hint = 'Try applying multiple discount codes. Can you use the same code more than once?';
   }
   
   res.json(response);
@@ -771,19 +755,19 @@ app.post('/api/lab2/checkout', (req, res) => {
 // LAB 3: Race Condition - Check Balance
 app.get('/api/lab3/balance', (req, res) => {
   res.json({
-    balance: accountBalance,
-    withdrawalHistory: withdrawalHistory,
-    totalWithdrawn: withdrawalHistory.reduce((sum, w) => sum + w.amount, 0)
+    balance: accountBalances['customer123'],
+    orderHistory: orderHistory,
+    totalSpent: orderHistory.reduce((sum, order) => sum + order.amount, 0)
   });
 });
 
 // LAB 3: Race Condition - Reset Balance
 app.post('/api/lab3/reset', (req, res) => {
-  accountBalance = 1000;
-  withdrawalHistory.length = 0;
+  accountBalances['customer123'] = 50.00;
+  orderHistory.length = 0;
   res.json({
-    message: 'Balance reset to $1000',
-    balance: accountBalance
+    message: 'Loyalty balance reset to $50.00',
+    balance: accountBalances['customer123']
   });
 });
 
@@ -794,54 +778,56 @@ app.post('/api/lab3/withdraw', async (req, res) => {
   if (!amount || amount <= 0) {
     return res.json({
       success: false,
-      error: 'Invalid withdrawal amount'
+      error: 'Invalid order amount'
     });
   }
   
+  const customerId = 'customer123';
+  
   // VULNERABLE: Check balance BEFORE modifying it
   // This creates a race condition window
-  if (accountBalance >= amount) {
+  if (accountBalances[customerId] >= amount) {
     // Simulate processing delay (makes race condition easier to exploit)
     await new Promise(resolve => setTimeout(resolve, 100));
     
     // VULNERABLE: Another request could have passed the check above
-    accountBalance -= amount;
+    accountBalances[customerId] -= amount;
     
-    const withdrawal = {
+    const order = {
       amount: amount,
       timestamp: new Date().toISOString(),
-      balanceAfter: accountBalance
+      balanceAfter: accountBalances[customerId]
     };
     
-    withdrawalHistory.push(withdrawal);
+    orderHistory.push(order);
     
-    const totalWithdrawn = withdrawalHistory.reduce((sum, w) => sum + w.amount, 0);
+    const totalSpent = orderHistory.reduce((sum, o) => sum + o.amount, 0);
     
     const response = {
       success: true,
-      message: 'Withdrawal successful',
-      amount: amount,
-      balanceAfter: accountBalance,
-      totalWithdrawn: totalWithdrawn
+      message: 'Order placed! Payment processed from loyalty balance.',
+      orderAmount: amount,
+      balanceAfter: accountBalances[customerId].toFixed(2),
+      totalSpent: totalSpent.toFixed(2)
     };
     
-    // Award flag if total withdrawn exceeds initial balance
-    if (totalWithdrawn > 1000) {
-      response.flag = 'NSA{R4C3_C0ND1T10N_W0N}';
+    // Award flag if total spent exceeds initial balance
+    if (totalSpent > 50) {
+      response.flag = 'TACO{R4C3_C0ND1T10N_3XTR4_T4C0S}';
       response.vulnerability = 'Race condition exploited!';
-      response.explanation = 'You withdrew $' + totalWithdrawn + ' from an account with only $1000 initial balance';
-    } else if (accountBalance < 0) {
-      response.hint = 'Balance is negative but total not enough yet. Try more concurrent requests!';
+      response.explanation = 'You ordered $' + totalSpent.toFixed(2) + ' worth of tacos from a $50.00 balance! The system processed simultaneous orders before updating the balance.';
+    } else if (accountBalances[customerId] < 0) {
+      response.hint = 'Balance is negative but not enough orders yet. Try more concurrent requests!';
     }
     
     res.json(response);
   } else {
     res.json({
       success: false,
-      error: 'Insufficient funds',
-      balance: accountBalance,
+      error: 'Insufficient loyalty balance',
+      balance: accountBalances[customerId].toFixed(2),
       requested: amount,
-      hint: 'Send multiple withdrawal requests at the exact same time to exploit the race condition'
+      hint: 'Place multiple orders at the exact same time to exploit the race condition'
     });
   }
 });
@@ -849,23 +835,23 @@ app.post('/api/lab3/withdraw', async (req, res) => {
 // Status endpoint
 app.get('/api/status', (req, res) => {
   res.json({
-    service: 'Insecure Design Lab',
+    service: 'TacoTruck Express - Pre-Order System',
     port: PORT,
     version: '1.0.0',
     labs: {
-      lab1: 'Rate Limiting',
-      lab2: 'Logic Flaw',
-      lab3: 'Race Condition'
+      lab1: 'Order System (Rate Limiting)',
+      lab2: 'Discount Codes (Logic Flaw)',
+      lab3: 'Account Balance (Race Condition)'
     }
   });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`A06: Insecure Design Lab running on port ${PORT}`);
+  console.log(`🌮 TacoTruck Express running on port ${PORT}`);
   console.log('Available endpoints:');
   console.log('  http://localhost:3006/ - Home');
   console.log('  http://localhost:3006/example - Tutorial');
-  console.log('  http://localhost:3006/lab1 - Rate Limiting Lab');
-  console.log('  http://localhost:3006/lab2 - Logic Flaw Lab');
-  console.log('  http://localhost:3006/lab3 - Race Condition Lab');
+  console.log('  http://localhost:3006/lab1 - Order System Lab');
+  console.log('  http://localhost:3006/lab2 - Discount Codes Lab');
+  console.log('  http://localhost:3006/lab3 - Account Balance Lab');
 });

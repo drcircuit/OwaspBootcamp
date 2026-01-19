@@ -4,9 +4,20 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// In-memory storage for sensitive operations (not logged!)
-const operations = [];
-const loginAttempts = [];
+// In-memory storage for gallery operations
+const auditLog = [];
+const visitorAccess = [];
+const artworkDatabase = [
+    { id: 1, title: 'Starry Night', artist: 'Vincent van Gogh', price: 100000000, exhibition: 'Post-Impressionism' },
+    { id: 2, title: 'The Scream', artist: 'Edvard Munch', price: 120000000, exhibition: 'Expressionism' },
+    { id: 3, title: 'Girl with a Pearl Earring', artist: 'Johannes Vermeer', price: 75000000, exhibition: 'Dutch Masters' },
+    { id: 4, title: 'The Persistence of Memory', artist: 'Salvador Dalí', price: 95000000, exhibition: 'Surrealism' }
+];
+const exhibitions = [
+    { id: 1, name: 'Post-Impressionism', curator: 'Dr. Sarah Mitchell', startDate: '2024-01-15', status: 'active' },
+    { id: 2, name: 'Expressionism', curator: 'Prof. James Chen', startDate: '2024-02-01', status: 'active' },
+    { id: 3, name: 'Dutch Masters', curator: 'Dr. Elena Rodriguez', startDate: '2024-03-10', status: 'upcoming' }
+];
 
 // Home page
 app.get('/', (req, res) => {
@@ -14,14 +25,15 @@ app.get('/', (req, res) => {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>A09: Logging Failures</title>
+            <title>ArtSpace Gallery - Exhibition Management</title>
             <style>
                 body {
-                    background-color: #1a1a1a;
-                    color: #00ff00;
-                    font-family: 'Courier New', monospace;
+                    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+                    color: #f5f5f5;
+                    font-family: 'Georgia', serif;
                     padding: 20px;
                     line-height: 1.6;
+                    margin: 0;
                 }
                 .container {
                     max-width: 1000px;
@@ -29,27 +41,38 @@ app.get('/', (req, res) => {
                 }
                 h1 {
                     text-align: center;
-                    font-size: 2.5em;
-                    text-shadow: 0 0 10px #00ff00;
-                    border-bottom: 2px solid #00ff00;
-                    padding-bottom: 10px;
+                    font-size: 2.8em;
+                    color: #d4af37;
+                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+                    border-bottom: 3px solid #d4af37;
+                    padding-bottom: 15px;
+                    letter-spacing: 2px;
                 }
-                h2 {
-                    color: #00ff00;
-                    margin-top: 30px;
+                .subtitle {
+                    text-align: center;
+                    color: #c0c0c0;
+                    font-size: 1.1em;
+                    margin-top: -10px;
+                    margin-bottom: 30px;
+                    font-style: italic;
                 }
                 .challenge {
-                    background-color: #0a0a0a;
-                    border: 2px solid #00ff00;
-                    padding: 20px;
-                    margin: 20px 0;
-                    border-radius: 5px;
-                    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+                    background: linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 100%);
+                    border: 2px solid #d4af37;
+                    padding: 25px;
+                    margin: 25px 0;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+                    transition: transform 0.2s;
+                }
+                .challenge:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
                 }
                 .challenge h3 {
                     margin-top: 0;
-                    color: #00ff00;
-                    font-size: 1.5em;
+                    color: #d4af37;
+                    font-size: 1.6em;
                 }
                 .difficulty {
                     display: inline-block;
@@ -57,70 +80,70 @@ app.get('/', (req, res) => {
                     border-radius: 3px;
                     font-weight: bold;
                     margin-left: 10px;
+                    font-family: Arial, sans-serif;
                 }
-                .easy { background-color: #00ff00; color: #000; }
-                .medium { background-color: #ffaa00; color: #000; }
-                .hard { background-color: #ff0000; color: #fff; }
-                .example { background-color: #0088ff; color: #fff; }
+                .easy { background-color: #4CAF50; color: #fff; }
+                .medium { background-color: #FF9800; color: #fff; }
+                .hard { background-color: #DC143C; color: #fff; }
+                .example { background-color: #2196F3; color: #fff; }
                 a {
-                    color: #00ffff;
+                    color: #d4af37;
                     text-decoration: none;
-                    border-bottom: 1px dotted #00ffff;
+                    border-bottom: 1px dotted #d4af37;
+                    transition: color 0.2s;
                 }
                 a:hover {
-                    color: #00ff00;
-                    border-bottom: 1px solid #00ff00;
+                    color: #ffd700;
+                    border-bottom: 1px solid #ffd700;
                 }
                 code {
                     background-color: #0a0a0a;
-                    padding: 2px 6px;
+                    padding: 3px 8px;
                     border-radius: 3px;
-                    color: #00ffff;
+                    color: #d4af37;
+                    font-family: 'Courier New', monospace;
                 }
-                .hint {
-                    background-color: #1a1a00;
-                    border-left: 4px solid #ffaa00;
-                    padding: 10px;
-                    margin: 10px 0;
-                    color: #ffaa00;
+                p {
+                    color: #e0e0e0;
                 }
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>🕵️ A09: LOGGING FAILURES 🕵️</h1>
+                <h1>🎨 ARTSPACE GALLERY</h1>
+                <div class="subtitle">Exhibition Management & Security Monitoring System</div>
                 
                 <div class="challenge">
-                    <h3>📚 Example - Logging Best Practices <span class="difficulty example">TUTORIAL</span></h3>
-                    <p>Learn about proper logging practices, what should and shouldn't be logged, and how logging failures enable attacks.</p>
+                    <h3>📚 Tutorial - Gallery Security & Audit Logs <span class="difficulty example">TUTORIAL</span></h3>
+                    <p>Learn about security logging best practices for art galleries, what operations should be audited, and how logging failures can expose valuable collections.</p>
                     <p><a href="/example">→ Start Tutorial</a></p>
                 </div>
 
                 <div class="challenge">
-                    <h3>🎯 Lab 1 - Ghost Operations <span class="difficulty easy">EASY</span></h3>
-                    <p><strong>Stage:</strong> Recon</p>
-                    <p><strong>Description:</strong> Find the critical operation that leaves no trace in the audit logs.</p>
-                    <p><strong>Hint:</strong> Critical operations like DELETE should always be logged</p>
-                    <p><strong>Flag:</strong> Capture the flag by performing an unlogged operation</p>
-                    <p><a href="/lab1">→ Start Lab 1</a></p>
+                    <h3>🖼️ Gallery Admin - Artwork Management <span class="difficulty easy">EASY</span></h3>
+                    <p><strong>System:</strong> Artwork Database</p>
+                    <p><strong>Description:</strong> Review the artwork management system and identify operations that lack proper audit logging.</p>
+                    <p><strong>Business Impact:</strong> Unaudited deletions can lead to missing inventory records</p>
+                    <p><strong>Task:</strong> Test the artwork deletion endpoint</p>
+                    <p><a href="/lab1">→ Start Exercise</a></p>
                 </div>
 
                 <div class="challenge">
-                    <h3>🎯 Lab 2 - Data Leakage in Logs <span class="difficulty medium">MEDIUM</span></h3>
-                    <p><strong>Stage:</strong> Scanning</p>
-                    <p><strong>Description:</strong> Extract sensitive data that should NEVER be logged.</p>
-                    <p><strong>Hint:</strong> Passwords, tokens, and PII should never appear in logs</p>
-                    <p><strong>Flag:</strong> Capture the flag from exposed log data</p>
-                    <p><a href="/lab2">→ Start Lab 2</a></p>
+                    <h3>👥 Visitor Tracking - Access Monitoring <span class="difficulty medium">MEDIUM</span></h3>
+                    <p><strong>System:</strong> Visitor Check-In System</p>
+                    <p><strong>Description:</strong> Examine the visitor tracking logs to identify sensitive data exposure risks.</p>
+                    <p><strong>Business Impact:</strong> PII leakage in logs violates privacy regulations</p>
+                    <p><strong>Task:</strong> Review visitor access logs for exposed data</p>
+                    <p><a href="/lab2">→ Start Exercise</a></p>
                 </div>
 
                 <div class="challenge">
-                    <h3>🎯 Lab 3 - Evidence Destruction <span class="difficulty hard">HARD</span></h3>
-                    <p><strong>Stage:</strong> Cover Tracks</p>
-                    <p><strong>Description:</strong> Exploit missing audit controls to cover your tracks.</p>
-                    <p><strong>Hint:</strong> Log management operations should be restricted and audited</p>
-                    <p><strong>Flag:</strong> Capture the flag by clearing logs without detection</p>
-                    <p><a href="/lab3">→ Start Lab 3</a></p>
+                    <h3>📋 Audit System - Log Management <span class="difficulty hard">HARD</span></h3>
+                    <p><strong>System:</strong> Security Audit Platform</p>
+                    <p><strong>Description:</strong> Test the audit log management system for proper access controls and audit trails.</p>
+                    <p><strong>Business Impact:</strong> Unauthorized log clearing destroys forensic evidence</p>
+                    <p><strong>Task:</strong> Evaluate log management security controls</p>
+                    <p><a href="/lab3">→ Start Exercise</a></p>
                 </div>
 
                 <p style="text-align: center; margin-top: 40px;">
@@ -138,12 +161,12 @@ app.get('/example', (req, res) => {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Example - Logging Best Practices</title>
+            <title>Gallery Security & Audit Logs - ArtSpace</title>
             <style>
                 body {
-                    background-color: #1a1a1a;
-                    color: #00ff00;
-                    font-family: 'Courier New', monospace;
+                    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+                    color: #f5f5f5;
+                    font-family: 'Georgia', serif;
                     padding: 20px;
                     line-height: 1.6;
                 }
@@ -154,32 +177,33 @@ app.get('/example', (req, res) => {
                 h1 {
                     text-align: center;
                     font-size: 2.5em;
-                    text-shadow: 0 0 10px #00ff00;
-                    border-bottom: 2px solid #00ff00;
+                    color: #d4af37;
+                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+                    border-bottom: 3px solid #d4af37;
                     padding-bottom: 10px;
                 }
                 h2 {
-                    color: #00ff00;
+                    color: #d4af37;
                     margin-top: 30px;
-                    border-bottom: 1px solid #00ff00;
+                    border-bottom: 2px solid #d4af37;
                     padding-bottom: 5px;
                 }
                 .section {
-                    background-color: #0a0a0a;
-                    border: 2px solid #00ff00;
-                    padding: 20px;
-                    margin: 20px 0;
-                    border-radius: 5px;
+                    background: linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 100%);
+                    border: 2px solid #d4af37;
+                    padding: 25px;
+                    margin: 25px 0;
+                    border-radius: 8px;
                 }
                 .good {
-                    background-color: #001a00;
-                    border-left: 4px solid #00ff00;
+                    background-color: rgba(76, 175, 80, 0.1);
+                    border-left: 4px solid #4CAF50;
                     padding: 15px;
                     margin: 15px 0;
                 }
                 .bad {
-                    background-color: #1a0000;
-                    border-left: 4px solid #ff0000;
+                    background-color: rgba(220, 20, 60, 0.1);
+                    border-left: 4px solid #DC143C;
                     padding: 15px;
                     margin: 15px 0;
                 }
@@ -188,123 +212,129 @@ app.get('/example', (req, res) => {
                     padding: 15px;
                     border-radius: 5px;
                     overflow-x: auto;
+                    border: 1px solid #444;
                 }
                 code {
-                    color: #00ffff;
+                    color: #d4af37;
+                    font-family: 'Courier New', monospace;
                 }
                 a {
-                    color: #00ffff;
+                    color: #d4af37;
                     text-decoration: none;
-                    border-bottom: 1px dotted #00ffff;
+                    border-bottom: 1px dotted #d4af37;
                 }
                 a:hover {
-                    color: #00ff00;
-                    border-bottom: 1px solid #00ff00;
+                    color: #ffd700;
+                    border-bottom: 1px solid #ffd700;
+                }
+                p, li {
+                    color: #e0e0e0;
                 }
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>🕵️ LOGGING BEST PRACTICES</h1>
+                <h1>🎨 GALLERY SECURITY & AUDIT LOGS</h1>
                 
                 <div class="section">
-                    <h2>What is Security Logging?</h2>
-                    <p>Security logging is the practice of recording security-relevant events in your application. Proper logging enables:</p>
+                    <h2>Why Security Logging Matters for Art Galleries</h2>
+                    <p>Art galleries manage valuable collections worth millions. Proper logging enables:</p>
                     <ul>
-                        <li><strong>Detection</strong> - Identify attacks as they happen</li>
-                        <li><strong>Investigation</strong> - Understand what happened after an incident</li>
-                        <li><strong>Compliance</strong> - Meet regulatory requirements</li>
-                        <li><strong>Forensics</strong> - Gather evidence for legal proceedings</li>
+                        <li><strong>Detection</strong> - Identify unauthorized access to artwork records</li>
+                        <li><strong>Investigation</strong> - Track who made changes to inventory or exhibitions</li>
+                        <li><strong>Compliance</strong> - Meet insurance and regulatory requirements</li>
+                        <li><strong>Forensics</strong> - Provide evidence for insurance claims or legal matters</li>
                     </ul>
                 </div>
 
                 <div class="section">
-                    <h2>❌ Common Logging Failures</h2>
+                    <h2>❌ Common Logging Failures in Gallery Systems</h2>
                     
                     <h3>1. Missing Logs for Critical Operations</h3>
                     <div class="bad">
-                        <strong>Problem:</strong> Critical operations aren't logged
-                        <pre><code>app.delete('/api/user/:id', (req, res) => {
-    // Delete user - NO LOGGING!
-    deleteUser(req.params.id);
+                        <strong>Problem:</strong> Artwork deletions aren't logged
+                        <pre><code>app.delete('/api/artwork/:id', (req, res) => {
+    // Delete artwork - NO LOGGING!
+    removeArtwork(req.params.id);
     res.json({ success: true });
 });</code></pre>
                     </div>
                     <div class="good">
-                        <strong>Solution:</strong> Log all security-relevant events
-                        <pre><code>app.delete('/api/user/:id', (req, res) => {
-    logger.warn('User deletion', {
-        userId: req.params.id,
-        deletedBy: req.user.id,
+                        <strong>Solution:</strong> Log all inventory changes
+                        <pre><code>app.delete('/api/artwork/:id', (req, res) => {
+    auditLog.warn('Artwork removal', {
+        artworkId: req.params.id,
+        removedBy: req.user.id,
         timestamp: new Date(),
-        ip: req.ip
-    });
-    deleteUser(req.params.id);
-    res.json({ success: true });
-});</code></pre>
-                    </div>
-
-                    <h3>2. Logging Sensitive Data</h3>
-                    <div class="bad">
-                        <strong>Problem:</strong> Passwords and secrets in logs
-                        <pre><code>logger.info('Login attempt', {
-    username: username,
-    password: password, // NEVER LOG THIS!
-    sessionToken: token  // OR THIS!
-});</code></pre>
-                    </div>
-                    <div class="good">
-                        <strong>Solution:</strong> Never log sensitive data
-                        <pre><code>logger.info('Login attempt', {
-    username: username,
-    success: false,
-    ip: req.ip,
-    // Password and token intentionally omitted
-});</code></pre>
-                    </div>
-
-                    <h3>3. Insufficient Log Protection</h3>
-                    <div class="bad">
-                        <strong>Problem:</strong> Logs can be deleted without audit trail
-                        <pre><code>app.post('/api/logs/clear', (req, res) => {
-    logs.clear(); // No audit, no authorization check
-    res.json({ success: true });
-});</code></pre>
-                    </div>
-                    <div class="good">
-                        <strong>Solution:</strong> Protect and audit log operations
-                        <pre><code>app.post('/api/logs/clear', requireAdmin, (req, res) => {
-    auditLog.critical('Log clearing initiated', {
-        by: req.user.id,
         reason: req.body.reason
     });
-    logs.clear();
+    removeArtwork(req.params.id);
+    res.json({ success: true });
+});</code></pre>
+                    </div>
+
+                    <h3>2. Logging Sensitive Visitor Data</h3>
+                    <div class="bad">
+                        <strong>Problem:</strong> PII exposed in access logs
+                        <pre><code>logger.info('Visitor check-in', {
+    name: visitor.name,
+    creditCard: visitor.payment, // NEVER LOG THIS!
+    address: visitor.address      // Privacy violation!
+});</code></pre>
+                    </div>
+                    <div class="good">
+                        <strong>Solution:</strong> Log only necessary data
+                        <pre><code>logger.info('Visitor check-in', {
+    visitorId: visitor.id,
+    timestamp: new Date(),
+    exhibition: exhibitionName,
+    // PII intentionally omitted
+});</code></pre>
+                    </div>
+
+                    <h3>3. Unprotected Log Management</h3>
+                    <div class="bad">
+                        <strong>Problem:</strong> Anyone can clear audit logs
+                        <pre><code>app.post('/api/logs/clear', (req, res) => {
+    auditLogs.clear(); // No authorization!
+    res.json({ success: true });
+});</code></pre>
+                    </div>
+                    <div class="good">
+                        <strong>Solution:</strong> Restrict and audit log operations
+                        <pre><code>app.post('/api/logs/clear', requireGalleryAdmin, (req, res) => {
+    securityLog.critical('Audit log clearing', {
+        by: req.user.id,
+        reason: req.body.reason,
+        requiresApproval: true
+    });
+    auditLogs.clear();
     res.json({ success: true });
 });</code></pre>
                     </div>
                 </div>
 
                 <div class="section">
-                    <h2>✅ What to Log</h2>
+                    <h2>✅ What Gallery Systems Should Log</h2>
                     <ul>
-                        <li>Authentication events (login, logout, failures)</li>
-                        <li>Authorization failures (access denied)</li>
-                        <li>Data access (who accessed what)</li>
-                        <li>Data modifications (create, update, delete)</li>
-                        <li>System configuration changes</li>
-                        <li>Security errors and exceptions</li>
-                        <li>Administrative actions</li>
+                        <li>Staff authentication events (login, logout, failures)</li>
+                        <li>Artwork access and modifications (view, update, delete)</li>
+                        <li>Exhibition changes (creation, updates, status changes)</li>
+                        <li>Visitor check-ins (anonymized)</li>
+                        <li>Sales transactions (artwork purchases)</li>
+                        <li>Security system events (alarm triggers, access control)</li>
+                        <li>Administrative actions (user management, permissions)</li>
                     </ul>
                 </div>
 
                 <div class="section">
-                    <h2>❌ What NOT to Log</h2>
+                    <h2>❌ What NOT to Log in Gallery Systems</h2>
                     <ul>
-                        <li>Passwords or password hashes</li>
-                        <li>Session tokens or API keys</li>
-                        <li>Credit card numbers or PII</li>
-                        <li>Encryption keys</li>
-                        <li>Source code or SQL queries (may contain secrets)</li>
+                        <li>Staff passwords or authentication tokens</li>
+                        <li>Visitor credit card numbers or payment details</li>
+                        <li>Personal addresses or contact information</li>
+                        <li>Buyer financial information</li>
+                        <li>Security system access codes</li>
                     </ul>
                 </div>
 
@@ -317,18 +347,18 @@ app.get('/example', (req, res) => {
     `);
 });
 
-// Lab 1 page - Ghost Operations
+// Lab 1 page - Artwork Management
 app.get('/lab1', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Lab 1 - Ghost Operations</title>
+            <title>Gallery Admin - Artwork Management</title>
             <style>
                 body {
-                    background-color: #1a1a1a;
-                    color: #00ff00;
-                    font-family: 'Courier New', monospace;
+                    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+                    color: #f5f5f5;
+                    font-family: 'Georgia', serif;
                     padding: 20px;
                     line-height: 1.6;
                 }
@@ -338,21 +368,22 @@ app.get('/lab1', (req, res) => {
                 }
                 h1 {
                     text-align: center;
-                    font-size: 2.5em;
-                    text-shadow: 0 0 10px #00ff00;
-                    border-bottom: 2px solid #00ff00;
+                    font-size: 2.3em;
+                    color: #d4af37;
+                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+                    border-bottom: 3px solid #d4af37;
                     padding-bottom: 10px;
                 }
                 .info-box {
-                    background-color: #0a0a0a;
-                    border: 2px solid #00ff00;
+                    background: linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 100%);
+                    border: 2px solid #d4af37;
                     padding: 20px;
                     margin: 20px 0;
-                    border-radius: 5px;
+                    border-radius: 8px;
                 }
                 .hint-box {
-                    background-color: #0a0a0a;
-                    border-left: 4px solid #ffaa00;
+                    background-color: rgba(255, 152, 0, 0.1);
+                    border-left: 4px solid #FF9800;
                     padding: 15px;
                     margin: 20px 0;
                 }
@@ -360,69 +391,78 @@ app.get('/lab1', (req, res) => {
                     background-color: #000;
                     padding: 15px;
                     border-radius: 5px;
-                    border-left: 4px solid #00ffff;
+                    border-left: 4px solid #d4af37;
                     margin: 15px 0;
-                    font-family: monospace;
+                    font-family: 'Courier New', monospace;
                 }
                 code {
-                    color: #00ffff;
+                    color: #d4af37;
+                    font-family: 'Courier New', monospace;
                 }
                 a {
-                    color: #00ffff;
+                    color: #d4af37;
                     text-decoration: none;
-                    border-bottom: 1px dotted #00ffff;
+                    border-bottom: 1px dotted #d4af37;
                 }
                 a:hover {
-                    color: #00ff00;
-                    border-bottom: 1px solid #00ff00;
+                    color: #ffd700;
+                    border-bottom: 1px solid #ffd700;
                 }
                 .difficulty {
                     display: inline-block;
                     padding: 5px 15px;
                     border-radius: 3px;
                     font-weight: bold;
-                    background-color: #00ff00;
-                    color: #000;
+                    background-color: #4CAF50;
+                    color: #fff;
+                    font-family: Arial, sans-serif;
+                }
+                p, li {
+                    color: #e0e0e0;
+                }
+                h2 {
+                    color: #d4af37;
                 }
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>🕵️ LAB 1: GHOST OPERATIONS <span class="difficulty">EASY</span></h1>
+                <h1>🖼️ GALLERY ADMIN: ARTWORK MANAGEMENT <span class="difficulty">EASY</span></h1>
                 
                 <div class="info-box">
-                    <h2>📋 Mission Brief</h2>
-                    <p><strong>Stage:</strong> Recon</p>
-                    <p><strong>Objective:</strong> Find the critical operation that leaves no trace</p>
-                    <p><strong>Flag:</strong> Will be revealed when you perform an unlogged operation</p>
+                    <h2>📋 Exercise Overview</h2>
+                    <p><strong>System:</strong> Artwork Database Management</p>
+                    <p><strong>Objective:</strong> Test artwork removal operations for proper audit logging</p>
+                    <p><strong>Flag Location:</strong> API response from deletion endpoint</p>
                 </div>
 
                 <div class="info-box">
-                    <h2>🎯 Challenge Description</h2>
-                    <p>The application has a user deletion endpoint. Critical operations like deleting users should always be logged for security auditing and forensics.</p>
-                    <p>Your task is to discover and exploit the unlogged deletion endpoint to capture the flag.</p>
+                    <h2>🎯 Scenario</h2>
+                    <p>The ArtSpace Gallery manages a valuable collection worth millions. Gallery administrators can add, modify, and remove artwork records from the system. Insurance policies and legal requirements mandate that all inventory changes must be logged for audit purposes.</p>
+                    <p><strong>Your task:</strong> Test the artwork deletion endpoint and verify whether it properly creates audit trail entries.</p>
                 </div>
 
                 <div class="endpoint">
-                    <strong>API Endpoint:</strong><br>
-                    <code>DELETE http://localhost:3009/api/user/delete/:id</code><br><br>
-                    <strong>Example:</strong><br>
-                    <code>DELETE http://localhost:3009/api/user/delete/1337</code>
+                    <strong style="color: #d4af37;">API Endpoint:</strong><br>
+                    <code>DELETE http://localhost:3009/api/gallery/artwork/:id</code><br><br>
+                    <strong style="color: #d4af37;">Example Request:</strong><br>
+                    <code>DELETE http://localhost:3009/api/gallery/artwork/1234</code>
                 </div>
 
                 <div class="hint-box">
-                    <strong>💡 Hints:</strong>
+                    <strong style="color: #FF9800;">💡 Testing Hints:</strong>
                     <ul>
-                        <li>Try deleting user ID 1337</li>
-                        <li>The response will indicate if the operation was logged</li>
-                        <li>Critical operations should have audit trails</li>
+                        <li>Try removing artwork with ID 1234 from the collection</li>
+                        <li>Observe the API response for audit trail information</li>
+                        <li>Critical operations should always be logged with who, what, when</li>
+                        <li>Unlogged deletions create insurance and compliance risks</li>
                     </ul>
                 </div>
 
                 <div class="info-box">
                     <h2>🛠️ Testing Instructions</h2>
                     <p><strong>Using curl:</strong></p>
-                    <pre><code>curl -X DELETE http://localhost:3009/api/user/delete/1337</code></pre>
+                    <pre style="background: #000; padding: 15px; border-radius: 5px; border: 1px solid #444;"><code>curl -X DELETE http://localhost:3009/api/gallery/artwork/1234</code></pre>
                 </div>
 
                 <div style="text-align: center; margin-top: 40px;">
@@ -434,18 +474,18 @@ app.get('/lab1', (req, res) => {
     `);
 });
 
-// Lab 2 page - Data Leakage in Logs
+// Lab 2 page - Visitor Tracking
 app.get('/lab2', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Lab 2 - Data Leakage in Logs</title>
+            <title>Visitor Tracking - Access Monitoring</title>
             <style>
                 body {
-                    background-color: #1a1a1a;
-                    color: #00ff00;
-                    font-family: 'Courier New', monospace;
+                    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+                    color: #f5f5f5;
+                    font-family: 'Georgia', serif;
                     padding: 20px;
                     line-height: 1.6;
                 }
@@ -455,21 +495,22 @@ app.get('/lab2', (req, res) => {
                 }
                 h1 {
                     text-align: center;
-                    font-size: 2.5em;
-                    text-shadow: 0 0 10px #00ff00;
-                    border-bottom: 2px solid #00ff00;
+                    font-size: 2.3em;
+                    color: #d4af37;
+                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+                    border-bottom: 3px solid #d4af37;
                     padding-bottom: 10px;
                 }
                 .info-box {
-                    background-color: #0a0a0a;
-                    border: 2px solid #00ff00;
+                    background: linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 100%);
+                    border: 2px solid #d4af37;
                     padding: 20px;
                     margin: 20px 0;
-                    border-radius: 5px;
+                    border-radius: 8px;
                 }
                 .hint-box {
-                    background-color: #0a0a0a;
-                    border-left: 4px solid #ffaa00;
+                    background-color: rgba(255, 152, 0, 0.1);
+                    border-left: 4px solid #FF9800;
                     padding: 15px;
                     margin: 20px 0;
                 }
@@ -477,76 +518,84 @@ app.get('/lab2', (req, res) => {
                     background-color: #000;
                     padding: 15px;
                     border-radius: 5px;
-                    border-left: 4px solid #00ffff;
+                    border-left: 4px solid #d4af37;
                     margin: 15px 0;
-                    font-family: monospace;
+                    font-family: 'Courier New', monospace;
                 }
                 code {
-                    color: #00ffff;
+                    color: #d4af37;
+                    font-family: 'Courier New', monospace;
                 }
                 a {
-                    color: #00ffff;
+                    color: #d4af37;
                     text-decoration: none;
-                    border-bottom: 1px dotted #00ffff;
+                    border-bottom: 1px dotted #d4af37;
                 }
                 a:hover {
-                    color: #00ff00;
-                    border-bottom: 1px solid #00ff00;
+                    color: #ffd700;
+                    border-bottom: 1px solid #ffd700;
                 }
                 .difficulty {
                     display: inline-block;
                     padding: 5px 15px;
                     border-radius: 3px;
                     font-weight: bold;
-                    background-color: #ffaa00;
-                    color: #000;
+                    background-color: #FF9800;
+                    color: #fff;
+                    font-family: Arial, sans-serif;
+                }
+                p, li {
+                    color: #e0e0e0;
+                }
+                h2 {
+                    color: #d4af37;
                 }
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>🕵️ LAB 2: DATA LEAKAGE IN LOGS <span class="difficulty">MEDIUM</span></h1>
+                <h1>👥 VISITOR TRACKING: ACCESS MONITORING <span class="difficulty">MEDIUM</span></h1>
                 
                 <div class="info-box">
-                    <h2>📋 Mission Brief</h2>
-                    <p><strong>Stage:</strong> Scanning</p>
-                    <p><strong>Objective:</strong> Extract sensitive data that should never be logged</p>
-                    <p><strong>Flag:</strong> Will be found in the exposed log data</p>
+                    <h2>📋 Exercise Overview</h2>
+                    <p><strong>System:</strong> Visitor Check-In System</p>
+                    <p><strong>Objective:</strong> Review visitor access logs for sensitive data exposure</p>
+                    <p><strong>Flag Location:</strong> Exposed in visitor access logs</p>
                 </div>
 
                 <div class="info-box">
-                    <h2>🎯 Challenge Description</h2>
-                    <p>The application logs login attempts, which is good security practice. However, it's logging data that should NEVER be stored in logs - passwords and authentication tokens.</p>
-                    <p>Your task is to trigger a login attempt and then view the logs to extract the flag from the exposed sensitive data.</p>
+                    <h2>🎯 Scenario</h2>
+                    <p>The gallery tracks visitor check-ins for security and attendance monitoring. While logging visitor access is good practice for security, the system must comply with privacy regulations and never log personal identifiable information (PII) unnecessarily.</p>
+                    <p><strong>Your task:</strong> Check in as a visitor, then review the access logs to identify any sensitive data that should not be logged.</p>
                 </div>
 
                 <div class="endpoint">
-                    <strong>Login Endpoint:</strong><br>
-                    <code>POST http://localhost:3009/api/login</code><br>
-                    <code>{"username": "test", "password": "test123"}</code><br><br>
-                    <strong>View Logs Endpoint:</strong><br>
-                    <code>GET http://localhost:3009/api/logs/login</code>
+                    <strong style="color: #d4af37;">Check-In Endpoint:</strong><br>
+                    <code>POST http://localhost:3009/api/visitor/checkin</code><br>
+                    <code>{"name": "John Doe", "email": "john@example.com"}</code><br><br>
+                    <strong style="color: #d4af37;">View Logs Endpoint:</strong><br>
+                    <code>GET http://localhost:3009/api/logs/visitors</code>
                 </div>
 
                 <div class="hint-box">
-                    <strong>💡 Hints:</strong>
+                    <strong style="color: #FF9800;">💡 Testing Hints:</strong>
                     <ul>
-                        <li>First, attempt a login with any credentials</li>
-                        <li>Then, view the login logs to see what was recorded</li>
-                        <li>Look for sensitive data that shouldn't be there</li>
-                        <li>Passwords should NEVER appear in logs</li>
+                        <li>First, perform a visitor check-in with test credentials</li>
+                        <li>Then retrieve the visitor access logs</li>
+                        <li>Look for PII or sensitive data that shouldn't be logged</li>
+                        <li>Privacy regulations prohibit logging full PII in audit trails</li>
                     </ul>
                 </div>
 
                 <div class="info-box">
                     <h2>🛠️ Testing Instructions</h2>
-                    <p><strong>Step 1 - Attempt login:</strong></p>
-                    <pre><code>curl -X POST http://localhost:3009/api/login \\
-  -H "Content-Type: application/json" \\
-  -d '{"username":"testuser","password":"testpass"}'</code></pre>
+                    <p><strong>Step 1 - Check in as visitor:</strong></p>
+                    <pre style="background: #000; padding: 15px; border-radius: 5px; border: 1px solid #444;"><code>curl -X POST http://localhost:3009/api/visitor/checkin \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test Visitor","email":"test@example.com"}'</code></pre>
                     
-                    <p><strong>Step 2 - View the logs:</strong></p>
-                    <pre><code>curl http://localhost:3009/api/logs/login</code></pre>
+                    <p><strong>Step 2 - View the access logs:</strong></p>
+                    <pre style="background: #000; padding: 15px; border-radius: 5px; border: 1px solid #444;"><code>curl http://localhost:3009/api/logs/visitors</code></pre>
                 </div>
 
                 <div style="text-align: center; margin-top: 40px;">
@@ -684,84 +733,106 @@ app.get('/lab3', (req, res) => {
     `);
 });
 
-// LAB 1: Missing logs on critical operation
-app.delete('/api/user/delete/:id', (req, res) => {
-    const userId = req.params.id;
-    // VULNERABLE: Critical operation with NO logging
-    operations.push({
-        action: 'delete_user',
-        userId: userId,
-        timestamp: new Date().toISOString()
-    });
+// LAB 1: Missing logs on critical operation (Artwork Deletion)
+app.delete('/api/gallery/artwork/:id', (req, res) => {
+    const artworkId = req.params.id;
+    // VULNERABLE: Critical operation with NO audit logging
+    const artwork = artworkDatabase.find(a => a.id == artworkId);
     
     res.json({ 
         success: true,
-        message: `User ${userId} deleted successfully`,
-        warning: 'This critical operation left no audit trail',
-        flag: 'NSA{N0TH1NG_L0GG3D}',
-        vulnerability: 'Critical operations must be logged for security monitoring'
+        message: `Artwork #${artworkId} removed from gallery collection`,
+        artwork: artwork ? artwork.title : 'Unknown',
+        warning: 'This inventory change left no audit trail',
+        flag: 'ARTSPACE{UN4UD1T3D_1NV3NT0RY}',
+        vulnerability: 'Critical inventory operations must be logged for insurance and compliance',
+        impact: 'Insurance claims require full audit trail of collection changes'
     });
 });
 
-// LAB 2: Sensitive data in logs
-app.post('/api/login', (req, res) => {
-    const { username, password } = req.body;
+// LAB 2: Sensitive visitor data in logs
+app.post('/api/visitor/checkin', (req, res) => {
+    const { name, email } = req.body;
     
-    // VULNERABLE: Logging sensitive data
+    // VULNERABLE: Logging full PII unnecessarily
     const logEntry = {
         timestamp: new Date().toISOString(),
-        action: 'login_attempt',
-        username: username,
-        password: password, // NEVER log passwords!
-        ip: req.ip,
-        flag: 'NSA{L0G_D4T4_L3AK}'
+        action: 'visitor_checkin',
+        visitorName: name, // PII should not be in logs
+        visitorEmail: email, // Privacy violation
+        creditCard: '4532-****-****-1234', // Never log this!
+        address: '123 Main St, City, State', // Not necessary
+        flag: 'ARTSPACE{P11_1N_L0G5}',
+        ip: req.ip
     };
     
-    loginAttempts.push(logEntry);
-    
-    res.json({
-        success: false,
-        message: 'Login failed',
-        hint: 'Check the logs endpoint to see what was recorded'
-    });
-});
-
-// View logs (exposes sensitive data)
-app.get('/api/logs/login', (req, res) => {
-    res.json({
-        message: 'Login attempt logs',
-        vulnerability: 'Passwords should NEVER be logged',
-        logs: loginAttempts
-    });
-});
-
-// LAB 3: Log manipulation without audit
-app.post('/api/logs/clear', (req, res) => {
-    const clearedCount = loginAttempts.length + operations.length;
-    
-    // VULNERABLE: No audit trail for log clearing
-    loginAttempts.length = 0;
-    operations.length = 0;
+    visitorAccess.push(logEntry);
     
     res.json({
         success: true,
-        message: `Cleared ${clearedCount} log entries`,
-        flag: 'NSA{N0_L0GS_N0_CR1M3}',
-        exploited: 'Evidence destroyed with no audit trail',
-        vulnerability: 'Log management operations must be logged and restricted'
+        message: 'Check-in successful',
+        visitor: name,
+        hint: 'Check the visitor access logs endpoint'
+    });
+});
+
+// View visitor logs (exposes PII)
+app.get('/api/logs/visitors', (req, res) => {
+    res.json({
+        message: 'Visitor access logs',
+        vulnerability: 'PII should never be logged - GDPR/privacy violation',
+        logs: visitorAccess,
+        compliance_note: 'Logs must be anonymized or use visitor IDs only'
+    });
+});
+
+// LAB 3: Log manipulation without audit trail
+app.post('/api/audit/clear', (req, res) => {
+    const clearedCount = visitorAccess.length + auditLog.length;
+    
+    // VULNERABLE: No authorization check, no audit trail for log clearing
+    visitorAccess.length = 0;
+    auditLog.length = 0;
+    
+    res.json({
+        success: true,
+        message: `Cleared ${clearedCount} audit log entries`,
+        flag: 'ARTSPACE{N0_4UD1T_TR41L}',
+        exploited: 'Forensic evidence destroyed with no trace',
+        vulnerability: 'Log management operations must be restricted to admins and audited',
+        impact: 'Attackers can erase evidence of theft or unauthorized access'
+    });
+});
+
+// Example endpoints for working demonstration
+app.get('/api/gallery/artworks', (req, res) => {
+    res.json({
+        artworks: artworkDatabase,
+        total: artworkDatabase.length
+    });
+});
+
+app.get('/api/exhibitions', (req, res) => {
+    res.json({
+        exhibitions: exhibitions,
+        active: exhibitions.filter(e => e.status === 'active').length
     });
 });
 
 // Status endpoint
 app.get('/api/status', (req, res) => {
     res.json({
-        service: 'Logging Failures Lab',
+        gallery: 'ArtSpace Gallery',
+        service: 'Exhibition Management & Security Monitoring',
         port: PORT,
-        operations_logged: operations.length,
-        login_attempts_logged: loginAttempts.length
+        audit_entries: auditLog.length,
+        visitor_logs: visitorAccess.length,
+        artworks: artworkDatabase.length,
+        exhibitions: exhibitions.length
     });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`A09: Logging Failures Lab running on port ${PORT}`);
+    console.log(`ArtSpace Gallery - Exhibition Management System running on port ${PORT}`);
 });
+

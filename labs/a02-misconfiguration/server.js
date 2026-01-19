@@ -4,31 +4,52 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// Simulated configuration data
+// BeanScene Coffee data
+const coffeeMenu = [
+    { id: 1, name: 'Espresso', price: 2.99, category: 'hot', description: 'Bold coffee shot' },
+    { id: 2, name: 'Cappuccino', price: 4.49, category: 'hot', description: 'Espresso with steamed milk' },
+    { id: 3, name: 'Cold Brew', price: 4.99, category: 'cold', description: 'Smooth cold coffee' },
+    { id: 4, name: 'Caramel Macchiato', price: 5.99, category: 'hot', description: 'Layered espresso drink' }
+];
+
+const staff = [
+    { id: 1, name: 'Emma Rodriguez', role: 'manager', email: 'emma@beanscene.local', shift: 'morning' },
+    { id: 2, name: 'Marcus Chen', role: 'barista', email: 'marcus@beanscene.local', shift: 'morning' },
+    { id: 3, name: 'Sofia Martinez', role: 'barista', email: 'sofia@beanscene.local', shift: 'afternoon' }
+];
+
+// VULNERABLE configuration data
 const configData = {
     database: {
-        host: 'db.internal.company.com',
-        port: 5432,
-        username: 'dbadmin',
-        password: 'P@ssw0rd123!',
-        database: 'production_db'
+        host: 'db.beanscene.local',
+        username: 'coffee_admin',
+        password: 'Bean\$cene2024!',
+        database: 'beanscene_prod'
     },
-    api_keys: {
-        stripe: 'sk_live_51Hxyz1234567890',
-        aws: 'AKIAIOSFODNN7EXAMPLE',
-        sendgrid: 'SG.1234567890.abcdefghijklmnop'
+    payment_gateway: {
+        square_token: 'sq0atp-BeanScene_Live_Token_xyz789',
+        merchant_id: 'MLHV6GRVNB4XQ'
     },
     secrets: {
-        jwt_secret: 'super_secret_jwt_key_do_not_share',
-        encryption_key: 'aes256-encryption-key-12345'
+        jwt_secret: 'beanscene_jwt_secret_key',
+        session_key: 'coffee-shop-session-2024'
     }
 };
 
-// Default admin credentials (commonly used, rarely changed)
+// VULNERABLE default credentials
 const adminCredentials = {
     username: 'admin',
-    password: 'admin123'
+    password: 'beanscene'
 };
+
+// Example store systems
+const storeSystemsExamples = [
+    { id: 100, system: 'POS Terminal 1', status: 'online', version: '2.4.1', ip: '192.168.1.10' },
+    { id: 101, system: 'POS Terminal 2', status: 'online', version: '2.4.1', ip: '192.168.1.11' },
+    { id: 102, system: 'Inventory Scanner', status: 'online', version: '1.8.3', ip: '192.168.1.20' },
+    { id: 103, system: 'Back Office', status: 'maintenance', version: '3.1.0', ip: '192.168.1.30' }
+];
+
 
 // Home page
 app.get('/', (req, res) => {
@@ -36,122 +57,116 @@ app.get('/', (req, res) => {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>A02: Security Misconfiguration</title>
+            <title>BeanScene Coffee - Management Portal</title>
             <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
-                    background-color: #1a1a1a;
-                    color: #00ff00;
-                    font-family: 'Courier New', monospace;
+                    font-family: 'Georgia', serif;
+                    background: linear-gradient(135deg, #6B4423 0%, #3E2723 100%);
+                    min-height: 100vh;
                     padding: 20px;
-                    line-height: 1.6;
                 }
-                .container {
-                    max-width: 1000px;
-                    margin: 0 auto;
-                }
-                h1 {
+                .container { max-width: 1200px; margin: 0 auto; }
+                .header {
+                    background: linear-gradient(135deg, #D7CCC8 0%, #BCAAA4 100%);
+                    padding: 30px;
+                    border-radius: 15px;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                    margin-bottom: 30px;
                     text-align: center;
+                    border: 3px solid #8D6E63;
+                }
+                .logo {
                     font-size: 2.5em;
-                    text-shadow: 0 0 10px #00ff00;
-                    border-bottom: 2px solid #00ff00;
-                    padding-bottom: 10px;
+                    font-weight: 700;
+                    color: #3E2723;
+                    text-shadow: 2px 2px 4px rgba(255,255,255,0.3);
                 }
-                h2 {
-                    color: #00ff00;
-                    margin-top: 30px;
+                .tagline { color: #5D4037; font-size: 1.1em; font-style: italic; margin-top: 10px; }
+                .welcome-section {
+                    background: #EFEBE9;
+                    padding: 30px;
+                    border-radius: 15px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                    margin-bottom: 25px;
+                    border: 2px solid #A1887F;
                 }
-                .challenge {
-                    background-color: #0a0a0a;
-                    border: 2px solid #00ff00;
-                    padding: 20px;
-                    margin: 20px 0;
-                    border-radius: 5px;
-                    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+                .welcome-section h2 { color: #3E2723; margin-bottom: 15px; }
+                .welcome-section p { color: #5D4037; line-height: 1.7; }
+                .nav-cards {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                    gap: 20px;
                 }
-                .challenge h3 {
-                    margin-top: 0;
-                    color: #00ff00;
-                    font-size: 1.5em;
-                }
-                .difficulty {
-                    display: inline-block;
-                    padding: 5px 15px;
-                    border-radius: 3px;
-                    font-weight: bold;
-                    margin-left: 10px;
-                }
-                .easy { background-color: #00ff00; color: #000; }
-                .medium { background-color: #ffaa00; color: #000; }
-                .hard { background-color: #ff0000; color: #fff; }
-                .example { background-color: #0088ff; color: #fff; }
-                a {
-                    color: #00ffff;
+                .card {
+                    background: linear-gradient(135deg, #EFEBE9 0%, #D7CCC8 100%);
+                    padding: 25px;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                    transition: transform 0.3s;
                     text-decoration: none;
-                    border-bottom: 1px dotted #00ffff;
+                    color: inherit;
+                    display: block;
+                    border: 2px solid #A1887F;
                 }
-                a:hover {
-                    color: #00ff00;
-                    border-bottom: 1px solid #00ff00;
+                .card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+                .card h3 { color: #3E2723; margin-bottom: 12px; font-size: 1.4em; }
+                .card p { color: #5D4037; line-height: 1.6; margin-bottom: 12px; }
+                .card-badge {
+                    display: inline-block;
+                    padding: 6px 14px;
+                    border-radius: 20px;
+                    font-size: 0.75em;
+                    font-weight: 600;
+                    text-transform: uppercase;
                 }
-                .info {
-                    background-color: #0a0a0a;
-                    border-left: 4px solid #00ff00;
-                    padding: 15px;
-                    margin: 20px 0;
-                }
-                code {
-                    background-color: #000;
-                    padding: 2px 6px;
-                    border-radius: 3px;
-                    color: #00ffff;
-                }
+                .badge-tutorial { background: #BBDEFB; color: #0D47A1; }
+                .badge-easy { background: #C8E6C9; color: #1B5E20; }
+                .badge-medium { background: #FFE0B2; color: #E65100; }
+                .badge-hard { background: #FFCDD2; color: #B71C1C; }
+                .footer { text-align: center; color: #D7CCC8; margin-top: 40px; padding: 20px; }
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>⚙️ A02: SECURITY MISCONFIGURATION ⚙️</h1>
-                
-                <div class="info">
-                    <strong>⚡ SYSTEM STATUS:</strong> Production environment detected<br>
-                    <strong>🎯 OBJECTIVE:</strong> Discover misconfigurations and capture the flags<br>
-                    <strong>🛠️ TOOLS:</strong> Use curl, Postman, Burp Suite, or Browser DevTools
+                <div class="header">
+                    <div class="logo">☕ BeanScene Coffee</div>
+                    <div class="tagline">Management Portal • Brew Excellence Daily</div>
                 </div>
 
-                <div class="challenge">
-                    <h3>📚 Example - Security Misconfiguration Explained <span class="difficulty example">TUTORIAL</span></h3>
-                    <p>Learn about security misconfigurations including debug endpoints, verbose errors, default credentials, and missing security headers. This walkthrough will teach you the concepts before attempting the labs.</p>
-                    <p><a href="/example">→ Start Tutorial</a></p>
+                <div class="welcome-section">
+                    <h2>Welcome to BeanScene Management Portal</h2>
+                    <p>Manage shop operations, track inventory, review sales data, and configure store settings.</p>
                 </div>
 
-                <div class="challenge">
-                    <h3>🔍 Lab 1 - Debug Exposure <span class="difficulty easy">EASY</span></h3>
-                    <p><strong>Stage:</strong> Recon</p>
-                    <p><strong>Description:</strong> Debug endpoints are often left enabled in production. Can you find exposed debug information?</p>
-                    <p><strong>Hint:</strong> Developers often use predictable endpoint names for debugging</p>
-                    <p><strong>Flag:</strong> Capture the flag when you access the debug endpoint</p>
-                    <p><a href="/lab1">→ Start Lab 1</a></p>
+                <div class="nav-cards">
+                    <a href="/example" class="card">
+                        <h3>📚 Getting Started</h3>
+                        <p>Learn how to navigate the management system and access reports.</p>
+                        <span class="card-badge badge-tutorial">Tutorial</span>
+                    </a>
+
+                    <a href="/lab1" class="card">
+                        <h3>👥 Staff Dashboard</h3>
+                        <p>View staff schedules, performance metrics, and team information.</p>
+                        <span class="card-badge badge-easy">Staff</span>
+                    </a>
+
+                    <a href="/lab2" class="card">
+                        <h3>⚙️ Store Settings</h3>
+                        <p>Configure operations, payment systems, and integration settings.</p>
+                        <span class="card-badge badge-medium">Settings</span>
+                    </a>
+
+                    <a href="/lab3" class="card">
+                        <h3>🔐 Manager Portal</h3>
+                        <p>Access financial reports, system configuration, and admin controls.</p>
+                        <span class="card-badge badge-hard">Admin</span>
+                    </a>
                 </div>
 
-                <div class="challenge">
-                    <h3>🎭 Lab 2 - Configuration Leak <span class="difficulty medium">MEDIUM</span></h3>
-                    <p><strong>Stage:</strong> Scanning</p>
-                    <p><strong>Description:</strong> Configuration files containing sensitive data are sometimes exposed. Can you retrieve the application's configuration?</p>
-                    <p><strong>Hint:</strong> Configuration endpoints might be accessible if not properly secured</p>
-                    <p><strong>Flag:</strong> Capture the flag when you retrieve sensitive configuration data</p>
-                    <p><a href="/lab2">→ Start Lab 2</a></p>
-                </div>
-
-                <div class="challenge">
-                    <h3>👑 Lab 3 - Default Credentials <span class="difficulty hard">HARD</span></h3>
-                    <p><strong>Stage:</strong> Initial Access</p>
-                    <p><strong>Description:</strong> Administrators sometimes forget to change default credentials. Can you find and access the admin panel?</p>
-                    <p><strong>Hint:</strong> Look for admin login endpoints and try common default credentials</p>
-                    <p><strong>Flag:</strong> Capture the flag when you successfully authenticate as admin</p>
-                    <p><a href="/lab3">→ Start Lab 3</a></p>
-                </div>
-
-                <div class="info">
-                    <strong>⚡ PRO TIP:</strong> Use your browser's DevTools (F12) to inspect network requests, or use command-line tools like curl for more control.
+                <div class="footer">
+                    <p>☕ BeanScene Coffee • 456 Brew Street • (555) 234-5678</p>
                 </div>
             </div>
         </body>
@@ -159,424 +174,111 @@ app.get('/', (req, res) => {
     `);
 });
 
-// Example page - Educational walkthrough
+
+// Example page - Tutorial
 app.get('/example', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Example - Security Misconfiguration Explained</title>
+            <title>Tutorial - BeanScene Coffee</title>
             <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
-                    background-color: #1a1a1a;
-                    color: #00ff00;
-                    font-family: 'Courier New', monospace;
+                    font-family: 'Georgia', serif;
+                    background: linear-gradient(135deg, #6B4423 0%, #3E2723 100%);
                     padding: 20px;
-                    line-height: 1.6;
+                    min-height: 100vh;
                 }
-                .container {
-                    max-width: 1000px;
-                    margin: 0 auto;
-                }
-                h1 {
+                .container { max-width: 900px; margin: 0 auto; }
+                .header {
+                    background: #EFEBE9;
+                    padding: 30px;
+                    border-radius: 15px;
+                    margin-bottom: 30px;
                     text-align: center;
-                    font-size: 2.5em;
-                    text-shadow: 0 0 10px #00ff00;
-                    border-bottom: 2px solid #00ff00;
-                    padding-bottom: 10px;
+                    border: 2px solid #A1887F;
                 }
-                h2 {
-                    color: #00ff00;
-                    margin-top: 30px;
-                    border-bottom: 1px solid #00ff00;
-                    padding-bottom: 5px;
-                }
-                h3 {
-                    color: #00ffff;
-                }
+                h1 { color: #3E2723; font-size: 2.2em; margin-bottom: 10px; }
                 .section {
-                    background-color: #0a0a0a;
-                    border: 2px solid #00ff00;
-                    padding: 20px;
-                    margin: 20px 0;
-                    border-radius: 5px;
+                    background: #EFEBE9;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 20px;
+                    border: 2px solid #A1887F;
                 }
-                .vulnerable {
-                    border-color: #ff0000;
-                }
-                .secure {
-                    border-color: #00ff00;
-                }
-                pre {
-                    background-color: #000;
+                .section h2 { color: #3E2723; margin-bottom: 15px; }
+                .section h3 { color: #5D4037; margin: 15px 0 10px; }
+                .section p, .section li { color: #5D4037; line-height: 1.7; margin: 8px 0; }
+                .tip-box {
+                    background: #FFF3E0;
+                    border-left: 4px solid #FF9800;
                     padding: 15px;
+                    margin: 15px 0;
                     border-radius: 5px;
-                    overflow-x: auto;
-                    border-left: 4px solid #00ff00;
                 }
                 code {
-                    color: #00ffff;
+                    background: #D7CCC8;
+                    padding: 3px 8px;
+                    border-radius: 4px;
+                    font-family: monospace;
+                    color: #3E2723;
                 }
-                .warning {
-                    background-color: #330000;
-                    border-left: 4px solid #ff0000;
+                pre {
+                    background: #D7CCC8;
                     padding: 15px;
-                    margin: 15px 0;
+                    border-radius: 8px;
+                    overflow-x: auto;
+                    margin: 10px 0;
                 }
-                .success {
-                    background-color: #003300;
-                    border-left: 4px solid #00ff00;
-                    padding: 15px;
-                    margin: 15px 0;
-                }
-                a {
-                    color: #00ffff;
-                    text-decoration: none;
-                    border-bottom: 1px dotted #00ffff;
-                }
-                a:hover {
-                    color: #00ff00;
-                    border-bottom: 1px solid #00ff00;
-                }
-                .tools {
-                    background-color: #0a0a0a;
-                    border: 2px solid #ffaa00;
-                    padding: 15px;
-                    margin: 20px 0;
-                }
+                a { color: #5D4037; font-weight: 600; text-decoration: none; }
+                a:hover { text-decoration: underline; }
+                .back-link { text-align: center; margin-top: 30px; }
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>📚 SECURITY MISCONFIGURATION TUTORIAL</h1>
-                
+                <div class="header">
+                    <h1>🎓 BeanScene Management Tutorial</h1>
+                    <p style="color: #5D4037;">Learn about the portal and working with the API</p>
+                </div>
+
                 <div class="section">
-                    <h2>What is Security Misconfiguration?</h2>
-                    <p><strong>Security Misconfiguration</strong> occurs when security settings are defined, implemented, or maintained improperly. This is one of the most common vulnerabilities and can happen at any level of an application stack.</p>
-                    <p>Common misconfigurations include:</p>
-                    <ul>
-                        <li><strong>Debug endpoints enabled in production</strong> - Exposing sensitive system information</li>
-                        <li><strong>Verbose error messages</strong> - Revealing stack traces and internal paths</li>
-                        <li><strong>Default credentials</strong> - Using unchanged default usernames and passwords</li>
-                        <li><strong>Missing security headers</strong> - Lack of HTTP security headers</li>
-                        <li><strong>Unnecessary features enabled</strong> - Running unused services that expand attack surface</li>
-                    </ul>
-                </div>
-
-                <div class="section vulnerable">
-                    <h2>❌ Vulnerability 1: Debug Endpoints</h2>
-                    <p>Debug endpoints are useful during development but dangerous in production:</p>
-                    <pre><code>// VULNERABLE - Debug endpoint exposed
-app.get('/debug', (req, res) => {
-    res.json({
-        environment: process.env.NODE_ENV,
-        nodeVersion: process.version,
-        memoryUsage: process.memoryUsage(),
-        environmentVariables: process.env, // ⚠️ DANGER!
-        databaseConfig: config.database
-    });
-});</code></pre>
-                    <div class="warning">
-                        <strong>⚠️ VULNERABILITY:</strong> This endpoint exposes sensitive system information including environment variables, database credentials, and API keys that attackers can use to compromise the system.
-                    </div>
-                </div>
-
-                <div class="section secure">
-                    <h2>✅ Secure Debug Endpoints</h2>
-                    <p>Proper implementation with access controls:</p>
-                    <pre><code>// SECURE - Debug endpoint with authentication
-app.get('/debug', requireAuth, requireAdmin, (req, res) => {
-    // Only accessible to authenticated admins
-    // Only expose non-sensitive information
-    res.json({
-        status: 'healthy',
-        version: '1.0.0',
-        uptime: process.uptime()
-    });
-});
-
-// Better yet: Disable entirely in production
-if (process.env.NODE_ENV !== 'production') {
-    app.get('/debug', (req, res) => {
-        // Debug info only in development
-    });
-}</code></pre>
-                    <div class="success">
-                        <strong>✅ SECURE:</strong> Debug endpoints should require authentication/authorization or be disabled entirely in production environments.
-                    </div>
-                </div>
-
-                <div class="section vulnerable">
-                    <h2>❌ Vulnerability 2: Verbose Error Messages</h2>
-                    <p>Detailed error messages can leak sensitive information:</p>
-                    <pre><code>// VULNERABLE - Stack traces exposed
-app.get('/api/data', (req, res) => {
-    try {
-        const data = database.query('SELECT * FROM users');
-        res.json(data);
-    } catch (error) {
-        // ⚠️ Exposing full error details
-        res.status(500).json({
-            error: error.message,
-            stack: error.stack, // Shows file paths and code
-            query: error.sql    // Shows database structure
-        });
-    }
-});</code></pre>
-                    <div class="warning">
-                        <strong>⚠️ VULNERABILITY:</strong> Stack traces reveal internal file structures, code logic, database schemas, and framework versions that attackers can exploit.
-                    </div>
-                </div>
-
-                <div class="section secure">
-                    <h2>✅ Secure Error Handling</h2>
-                    <p>Generic errors for users, detailed logs for developers:</p>
-                    <pre><code>// SECURE - Generic error messages
-app.get('/api/data', (req, res) => {
-    try {
-        const data = database.query('SELECT * FROM users');
-        res.json(data);
-    } catch (error) {
-        // Log detailed error server-side for debugging
-        logger.error('Database error:', error);
-        
-        // Return generic error to client
-        res.status(500).json({
-            error: 'Internal server error',
-            message: 'An error occurred processing your request'
-        });
-    }
-});</code></pre>
-                    <div class="success">
-                        <strong>✅ SECURE:</strong> Show generic error messages to users while logging detailed information server-side for debugging.
-                    </div>
-                </div>
-
-                <div class="section vulnerable">
-                    <h2>❌ Vulnerability 3: Default Credentials</h2>
-                    <p>Many systems ship with default credentials that are rarely changed:</p>
-                    <pre><code>// VULNERABLE - Default credentials unchanged
-const adminUser = {
-    username: 'admin',
-    password: 'admin123'  // ⚠️ Default password!
-};
-
-app.post('/login', (req, res) => {
-    const { username, password } = req.body;
-    
-    if (username === adminUser.username && 
-        password === adminUser.password) {
-        return res.json({ 
-            success: true, 
-            role: 'admin' 
-        });
-    }
-    
-    res.status(401).json({ error: 'Invalid credentials' });
-});</code></pre>
-                    <div class="warning">
-                        <strong>⚠️ VULNERABILITY:</strong> Default credentials like admin/admin, admin/password, root/root are the first thing attackers try and are widely documented online.
-                    </div>
-                </div>
-
-                <div class="section secure">
-                    <h2>✅ Secure Credential Management</h2>
-                    <p>Force password changes and use strong hashing:</p>
-                    <pre><code>// SECURE - Hashed passwords with forced change
-const bcrypt = require('bcrypt');
-
-// Store only hashed passwords
-const users = [
-    {
-        username: 'admin',
-        passwordHash: bcrypt.hashSync('strong_unique_password', 10),
-        mustChangePassword: false  // Forced on first login
-    }
-];
-
-app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-    const user = users.find(u => u.username === username);
-    
-    if (!user) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-    }
-    
-    const validPassword = await bcrypt.compare(password, user.passwordHash);
-    
-    if (!validPassword) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-    }
-    
-    if (user.mustChangePassword) {
-        return res.json({ 
-            success: true, 
-            requiresPasswordChange: true 
-        });
-    }
-    
-    res.json({ success: true, role: user.role });
-});</code></pre>
-                    <div class="success">
-                        <strong>✅ SECURE:</strong> Use strong password hashing, enforce password complexity, require changing default passwords on first login, and implement account lockout policies.
-                    </div>
-                </div>
-
-                <div class="section vulnerable">
-                    <h2>❌ Vulnerability 4: Missing Security Headers</h2>
-                    <p>Without security headers, applications are vulnerable to various attacks:</p>
-                    <pre><code>// VULNERABLE - No security headers
-const express = require('express');
-const app = express();
-
-// ⚠️ No security headers configured!
-app.get('/', (req, res) => {
-    res.send('Hello World');
-});
-
-// Response headers:
-// X-Powered-By: Express  ← Reveals technology
-// (missing CSP, HSTS, X-Frame-Options, etc.)</code></pre>
-                    <div class="warning">
-                        <strong>⚠️ VULNERABILITY:</strong> Missing security headers allow XSS, clickjacking, MIME-type sniffing attacks, and reveal technology stack information to attackers.
-                    </div>
-                </div>
-
-                <div class="section secure">
-                    <h2>✅ Secure Security Headers</h2>
-                    <p>Implement comprehensive security headers:</p>
-                    <pre><code>// SECURE - Comprehensive security headers
-const helmet = require('helmet');
-const express = require('express');
-const app = express();
-
-// Remove technology header
-app.disable('x-powered-by');
-
-// Add security headers
-app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: ["'self'"],
-            styleSrc: ["'self'", "'unsafe-inline'"],
-        }
-    },
-    hsts: {
-        maxAge: 31536000,
-        includeSubDomains: true
-    },
-    frameguard: {
-        action: 'deny'
-    },
-    noSniff: true,
-    xssFilter: true
-}));
-
-// Response now includes:
-// Strict-Transport-Security: max-age=31536000
-// Content-Security-Policy: default-src 'self'
-// X-Frame-Options: DENY
-// X-Content-Type-Options: nosniff</code></pre>
-                    <div class="success">
-                        <strong>✅ SECURE:</strong> Implement security headers to prevent common web vulnerabilities. Use libraries like Helmet.js to easily configure multiple headers.
+                    <h2>Part 1: Store System Information</h2>
+                    <p>Learn how to retrieve information about store systems and equipment.</p>
+                    <h3>Try It:</h3>
+                    <p>Access the systems endpoint to see store equipment:</p>
+                    <pre>curl http://localhost:3002/api/example/systems/100</pre>
+                    <p>Try different system IDs (100-103) to explore all equipment.</p>
+                    <div class="tip-box">
+                        💡 <strong>Learning Goal:</strong> Understand how APIs expose equipment data through simple ID-based endpoints.
                     </div>
                 </div>
 
                 <div class="section">
-                    <h2>How to Exploit Misconfigurations</h2>
-                    <p>Testing for security misconfigurations:</p>
-                    <ol>
-                        <li><strong>Enumerate endpoints:</strong> Try common paths like /debug, /admin, /config, /.env</li>
-                        <li><strong>Check error messages:</strong> Trigger errors and examine responses for sensitive data</li>
-                        <li><strong>Test default credentials:</strong> Try admin/admin, admin/password, root/root</li>
-                        <li><strong>Inspect HTTP headers:</strong> Look for technology disclosure and missing security headers</li>
-                        <li><strong>Review client-side code:</strong> Check for hardcoded API keys or credentials</li>
-                    </ol>
-                </div>
-
-                <div class="tools">
-                    <h2>🛠️ Tools for Testing</h2>
-                    
-                    <h3>1. Using curl (Command Line)</h3>
-                    <pre><code># Test debug endpoint
-curl http://localhost:3002/api/lab1/debug
-
-# View all response headers
-curl -I http://localhost:3002/
-
-# Test POST request with credentials
-curl -X POST http://localhost:3002/api/lab3/login \\
-  -H "Content-Type: application/json" \\
-  -d '{"username":"admin","password":"admin123"}'
-
-# Save response to file
-curl http://localhost:3002/api/lab2/config -o config.json</code></pre>
-
-                    <h3>2. Using Browser DevTools</h3>
-                    <p>1. Press <strong>F12</strong> to open DevTools</p>
-                    <p>2. Go to <strong>Network</strong> tab to inspect requests/responses</p>
-                    <p>3. In <strong>Console</strong> tab, test API endpoints:</p>
-                    <pre><code>// GET request
-fetch('http://localhost:3002/api/lab1/debug')
-    .then(r => r.json())
-    .then(data => console.log(data));
-
-// POST request
-fetch('http://localhost:3002/api/lab3/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: 'admin', password: 'admin123' })
-})
-    .then(r => r.json())
-    .then(data => console.log(data));</code></pre>
-
-                    <h3>3. Using Postman</h3>
-                    <p>1. Create a new request</p>
-                    <p>2. Select request type (GET/POST)</p>
-                    <p>3. Enter URL: <code>http://localhost:3002/api/lab1/debug</code></p>
-                    <p>4. For POST requests, add JSON body in the <strong>Body</strong> tab</p>
-                    <p>5. Click <strong>Send</strong> and inspect the response</p>
-
-                    <h3>4. Using Burp Suite</h3>
-                    <p>1. Configure browser proxy (127.0.0.1:8080)</p>
-                    <p>2. Visit the lab pages</p>
-                    <p>3. Intercept and modify requests in <strong>Proxy → Intercept</strong></p>
-                    <p>4. Use <strong>Repeater</strong> to test different payloads</p>
-                    <p>5. Use <strong>Intruder</strong> for automated testing</p>
+                    <h2>Part 2: Configuration Access</h2>
+                    <p>Some systems expose configuration information for management purposes.</p>
+                    <h3>Try It:</h3>
+                    <p>Check if there's a diagnostic endpoint:</p>
+                    <pre>curl http://localhost:3002/api/example/diagnostic</pre>
+                    <div class="tip-box">
+                        💡 <strong>Learning Goal:</strong> Discover how diagnostic endpoints can reveal system information.
+                    </div>
                 </div>
 
                 <div class="section">
-                    <h2>Real-World Impact</h2>
-                    <p>Security misconfigurations have led to major breaches:</p>
-                    <ul>
-                        <li><strong>Equifax (2017):</strong> Unpatched Apache Struts - 147 million records stolen</li>
-                        <li><strong>MongoDB databases:</strong> Thousands exposed with default no-authentication config</li>
-                        <li><strong>Amazon S3 buckets:</strong> Misconfigured permissions exposing sensitive data</li>
-                        <li><strong>Debug endpoints:</strong> Exposed database credentials and API keys</li>
-                        <li><strong>Default credentials:</strong> IoT devices compromised for botnets</li>
-                    </ul>
+                    <h2>Part 3: Authentication Systems</h2>
+                    <p>Learn about authentication endpoints and how credentials are verified.</p>
+                    <h3>Try It:</h3>
+                    <p>Test the auth check endpoint:</p>
+                    <pre>curl http://localhost:3002/api/example/auth-check</pre>
+                    <div class="tip-box">
+                        💡 <strong>Learning Goal:</strong> Understand how authentication systems verify access.
+                    </div>
                 </div>
 
-                <div class="section">
-                    <h2>Prevention Best Practices</h2>
-                    <ol>
-                        <li><strong>Hardening checklist:</strong> Follow security hardening guides for all components</li>
-                        <li><strong>Minimal attack surface:</strong> Disable unnecessary features, services, and accounts</li>
-                        <li><strong>Security headers:</strong> Implement all relevant HTTP security headers</li>
-                        <li><strong>Generic errors:</strong> Never expose stack traces or detailed errors to users</li>
-                        <li><strong>Strong passwords:</strong> Enforce password complexity and change defaults</li>
-                        <li><strong>Regular updates:</strong> Keep all software and dependencies updated</li>
-                        <li><strong>Configuration review:</strong> Regularly audit configurations for security issues</li>
-                        <li><strong>Environment separation:</strong> Use different configs for dev/staging/production</li>
-                        <li><strong>Automated scanning:</strong> Use tools to detect misconfigurations</li>
-                    </ol>
-                </div>
-
-                <div class="section" style="text-align: center; margin-top: 40px;">
-                    <h2>Ready to Practice?</h2>
-                    <p>Now that you understand security misconfigurations, try the labs:</p>
-                    <p><a href="/">← Back to Labs</a></p>
+                <div class="back-link">
+                    <a href="/">← Back to Portal</a>
                 </div>
             </div>
         </body>
@@ -584,123 +286,139 @@ fetch('http://localhost:3002/api/lab3/login', {
     `);
 });
 
-// Lab 1 - Debug Exposure (Easy)
+// Example API endpoints
+app.get('/api/example/systems/:id', (req, res) => {
+    const systemId = parseInt(req.params.id);
+    const system = storeSystemsExamples.find(s => s.id === systemId);
+    
+    if (!system) {
+        return res.status(404).json({ error: 'System not found', hint: 'Try IDs 100-103' });
+    }
+    
+    if (systemId === 103) {
+        return res.json({
+            ...system,
+            flag: 'FLAG{ST0R3_SYST3M_3NUM3R4T3D}',
+            message: 'You found the maintenance system!',
+            admin_note: 'System in maintenance mode - full access available'
+        });
+    }
+    
+    res.json(system);
+});
+
+app.get('/api/example/diagnostic', (req, res) => {
+    res.json({
+        status: 'operational',
+        flag: 'FLAG{D14GN0ST1C_4CC3SS3D}',
+        message: 'Diagnostic endpoint accessed successfully!',
+        store_health: {
+            pos_systems: 'online',
+            inventory: 'synced',
+            payment_gateway: 'connected'
+        }
+    });
+});
+
+app.get('/api/example/auth-check', (req, res) => {
+    res.json({
+        authenticated: false,
+        flag: 'FLAG{4UTH_SYST3M_CH3CK3D}',
+        message: 'Auth check completed!',
+        hint: 'Authentication would normally validate credentials here'
+    });
+});
+
+
+// Lab 1 - Staff Dashboard
 app.get('/lab1', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Lab 1 - Debug Exposure</title>
+            <title>Staff Dashboard - BeanScene</title>
             <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
-                    background-color: #1a1a1a;
-                    color: #00ff00;
-                    font-family: 'Courier New', monospace;
+                    font-family: 'Georgia', serif;
+                    background: linear-gradient(135deg, #6B4423 0%, #3E2723 100%);
                     padding: 20px;
-                    line-height: 1.6;
+                    min-height: 100vh;
                 }
-                .container {
-                    max-width: 900px;
-                    margin: 0 auto;
-                }
-                h1 {
+                .container { max-width: 900px; margin: 0 auto; }
+                .header {
+                    background: #EFEBE9;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 25px;
                     text-align: center;
-                    font-size: 2.5em;
-                    text-shadow: 0 0 10px #00ff00;
-                    border-bottom: 2px solid #00ff00;
-                    padding-bottom: 10px;
+                    border: 2px solid #A1887F;
                 }
-                .info-box {
-                    background-color: #0a0a0a;
-                    border: 2px solid #00ff00;
-                    padding: 20px;
-                    margin: 20px 0;
-                    border-radius: 5px;
+                h1 { color: #3E2723; font-size: 2em; margin-bottom: 8px; }
+                .section {
+                    background: #EFEBE9;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 20px;
+                    border: 2px solid #A1887F;
                 }
-                .hint-box {
-                    background-color: #0a0a0a;
-                    border-left: 4px solid #ffaa00;
+                .section h2 { color: #3E2723; margin-bottom: 15px; }
+                .section p, .section li { color: #5D4037; line-height: 1.7; margin: 8px 0; }
+                .staff-card {
+                    background: #FFF8E7;
                     padding: 15px;
-                    margin: 20px 0;
-                }
-                .endpoint {
-                    background-color: #000;
-                    padding: 15px;
-                    border-radius: 5px;
-                    border-left: 4px solid #00ffff;
-                    margin: 15px 0;
-                    font-family: monospace;
+                    margin: 10px 0;
+                    border-radius: 8px;
+                    border-left: 4px solid #8D6E63;
                 }
                 code {
-                    color: #00ffff;
+                    background: #D7CCC8;
+                    padding: 3px 8px;
+                    border-radius: 4px;
+                    font-family: monospace;
                 }
-                a {
-                    color: #00ffff;
-                    text-decoration: none;
-                    border-bottom: 1px dotted #00ffff;
+                .info-box {
+                    background: #E3F2FD;
+                    border-left: 4px solid #2196F3;
+                    padding: 15px;
+                    margin: 15px 0;
+                    border-radius: 5px;
                 }
-                a:hover {
-                    color: #00ff00;
-                    border-bottom: 1px solid #00ff00;
-                }
-                .difficulty {
-                    display: inline-block;
-                    padding: 5px 15px;
-                    border-radius: 3px;
-                    font-weight: bold;
-                    background-color: #00ff00;
-                    color: #000;
-                }
+                a { color: #5D4037; font-weight: 600; text-decoration: none; }
+                .back-link { text-align: center; margin-top: 30px; }
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>🔍 LAB 1: DEBUG EXPOSURE <span class="difficulty">EASY</span></h1>
-                
-                <div class="info-box">
-                    <h2>📋 Mission Brief</h2>
-                    <p><strong>Stage:</strong> Recon</p>
-                    <p><strong>Objective:</strong> Find and access the exposed debug endpoint</p>
-                    <p><strong>Difficulty:</strong> Easy</p>
-                    <p><strong>Flag:</strong> Will be revealed when you access the debug endpoint</p>
+                <div class="header">
+                    <h1>👥 Staff Dashboard</h1>
+                    <p style="color: #5D4037;">View team schedules and information</p>
                 </div>
 
-                <div class="info-box">
-                    <h2>🎯 Challenge Description</h2>
-                    <p>The development team often leaves debug endpoints enabled in production environments. These endpoints can expose sensitive system information that attackers can use to plan further attacks.</p>
-                    <p>Your task is to find the debug endpoint and capture the flag.</p>
-                </div>
-
-                <div class="endpoint">
-                    <strong>Target Endpoint:</strong><br>
-                    <code>GET http://localhost:3002/api/lab1/????</code><br><br>
-                    <strong>Hint:</strong> Common debug endpoint names
-                </div>
-
-                <div class="hint-box">
-                    <strong>💡 Hints:</strong>
-                    <ul>
-                        <li>Debug endpoints typically have predictable names</li>
-                        <li>Try common variations like: debug, status, info, diagnostics</li>
-                        <li>The endpoint is directly under /api/lab1/</li>
-                    </ul>
-                </div>
-
-                <div class="info-box">
-                    <h2>🛠️ Testing Instructions</h2>
-                    <p><strong>Using curl:</strong></p>
-                    <pre><code>curl http://localhost:3002/api/lab1/debug
-curl http://localhost:3002/api/lab1/status
-curl http://localhost:3002/api/lab1/info</code></pre>
+                <div class="section">
+                    <h2>Team Overview</h2>
+                    <p>Access staff information and shift schedules. Our team keeps BeanScene running smoothly.</p>
                     
-                    <p><strong>Using Browser Console (F12):</strong></p>
-                    <pre><code>fetch('http://localhost:3002/api/lab1/debug')
-    .then(r => r.json())
-    .then(data => console.log(data));</code></pre>
+                    ${staff.map(s => `
+                        <div class="staff-card">
+                            <strong>${s.name}</strong> - ${s.role}<br>
+                            Email: ${s.email}<br>
+                            Shift: ${s.shift}
+                        </div>
+                    `).join('')}
                 </div>
 
-                <div style="text-align: center; margin-top: 40px;">
-                    <a href="/">← Back to Home</a>
+                <div class="section">
+                    <h2>📊 System Information</h2>
+                    <p>Technical teams can access system diagnostics via our API:</p>
+                    <p><code>GET /api/staff/system-info</code></p>
+                    <div class="info-box">
+                        <strong>For IT Use:</strong> System diagnostics provide operational metrics for troubleshooting.
+                    </div>
+                </div>
+
+                <div class="back-link">
+                    <a href="/">← Back to Portal</a>
                 </div>
             </div>
         </body>
@@ -708,141 +426,110 @@ curl http://localhost:3002/api/lab1/info</code></pre>
     `);
 });
 
-// Lab 1 API - Exposed debug endpoint (vulnerable)
-app.get('/api/lab1/debug', (req, res) => {
-    // Vulnerable: Debug endpoint exposed in production
+// Lab 1 API - VULNERABLE debug endpoint
+app.get('/api/staff/system-info', (req, res) => {
+    // VULNERABLE: Debug info exposed in production
     res.json({
-        flag: 'NSA{D3BUG_F0UND}',
-        message: 'Congratulations! You found the exposed debug endpoint.',
-        vulnerability: 'Debug endpoints should never be accessible in production',
-        systemInfo: {
-            environment: process.env.NODE_ENV || 'production',
-            nodeVersion: process.version,
+        flag: 'FLAG{D3BUG_1NF0_3XP0S3D}',
+        message: 'System information retrieved successfully!',
+        vulnerability: 'Debug endpoint exposed - reveals system details',
+        system_info: {
+            node_version: process.version,
             platform: process.platform,
-            uptime: process.uptime() + ' seconds',
-            memoryUsage: process.memoryUsage()
+            uptime_seconds: Math.floor(process.uptime()),
+            memory_mb: Math.floor(process.memoryUsage().heapUsed / 1024 / 1024),
+            environment: process.env.NODE_ENV || 'production'
         },
-        hint: 'This information could help attackers plan further attacks!'
+        database_host: configData.database.host,
+        warning: 'This endpoint should not be accessible in production!'
     });
 });
 
-// Lab 2 - Configuration Leak (Medium)
+
+// Lab 2 - Store Settings
 app.get('/lab2', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Lab 2 - Configuration Leak</title>
+            <title>Store Settings - BeanScene</title>
             <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
-                    background-color: #1a1a1a;
-                    color: #00ff00;
-                    font-family: 'Courier New', monospace;
+                    font-family: 'Georgia', serif;
+                    background: linear-gradient(135deg, #6B4423 0%, #3E2723 100%);
                     padding: 20px;
-                    line-height: 1.6;
+                    min-height: 100vh;
                 }
-                .container {
-                    max-width: 900px;
-                    margin: 0 auto;
-                }
-                h1 {
+                .container { max-width: 900px; margin: 0 auto; }
+                .header {
+                    background: #EFEBE9;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 25px;
                     text-align: center;
-                    font-size: 2.5em;
-                    text-shadow: 0 0 10px #00ff00;
-                    border-bottom: 2px solid #00ff00;
-                    padding-bottom: 10px;
+                    border: 2px solid #A1887F;
                 }
-                .info-box {
-                    background-color: #0a0a0a;
-                    border: 2px solid #00ff00;
-                    padding: 20px;
-                    margin: 20px 0;
-                    border-radius: 5px;
+                h1 { color: #3E2723; font-size: 2em; }
+                .section {
+                    background: #EFEBE9;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 20px;
+                    border: 2px solid #A1887F;
                 }
-                .hint-box {
-                    background-color: #0a0a0a;
-                    border-left: 4px solid #ffaa00;
-                    padding: 15px;
-                    margin: 20px 0;
-                }
-                .endpoint {
-                    background-color: #000;
-                    padding: 15px;
-                    border-radius: 5px;
-                    border-left: 4px solid #00ffff;
-                    margin: 15px 0;
+                .section h2 { color: #3E2723; margin-bottom: 15px; }
+                .section p, .section li { color: #5D4037; line-height: 1.7; margin: 8px 0; }
+                code {
+                    background: #D7CCC8;
+                    padding: 3px 8px;
+                    border-radius: 4px;
                     font-family: monospace;
                 }
-                code {
-                    color: #00ffff;
+                .warning-box {
+                    background: #FFF3E0;
+                    border-left: 4px solid #FF9800;
+                    padding: 15px;
+                    margin: 15px 0;
+                    border-radius: 5px;
                 }
-                a {
-                    color: #00ffff;
-                    text-decoration: none;
-                    border-bottom: 1px dotted #00ffff;
-                }
-                a:hover {
-                    color: #00ff00;
-                    border-bottom: 1px solid #00ff00;
-                }
-                .difficulty {
-                    display: inline-block;
-                    padding: 5px 15px;
-                    border-radius: 3px;
-                    font-weight: bold;
-                    background-color: #ffaa00;
-                    color: #000;
-                }
+                a { color: #5D4037; font-weight: 600; text-decoration: none; }
+                .back-link { text-align: center; margin-top: 30px; }
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>🎭 LAB 2: CONFIGURATION LEAK <span class="difficulty">MEDIUM</span></h1>
-                
-                <div class="info-box">
-                    <h2>📋 Mission Brief</h2>
-                    <p><strong>Stage:</strong> Scanning</p>
-                    <p><strong>Objective:</strong> Retrieve sensitive configuration data</p>
-                    <p><strong>Difficulty:</strong> Medium</p>
-                    <p><strong>Flag:</strong> Will be revealed when you access the configuration endpoint</p>
+                <div class="header">
+                    <h1>⚙️ Store Settings</h1>
+                    <p style="color: #5D4037;">Configure store operations and integrations</p>
                 </div>
 
-                <div class="info-box">
-                    <h2>🎯 Challenge Description</h2>
-                    <p>Applications often have configuration endpoints that should be protected but are sometimes left accessible. These endpoints can expose database credentials, API keys, and other sensitive information.</p>
-                    <p>Your task is to find and access the configuration endpoint to retrieve sensitive data.</p>
-                </div>
-
-                <div class="endpoint">
-                    <strong>Target Endpoint:</strong><br>
-                    <code>GET http://localhost:3002/api/lab2/????</code><br><br>
-                    <strong>Hint:</strong> Where might configuration data be exposed?
-                </div>
-
-                <div class="hint-box">
-                    <strong>💡 Hints:</strong>
+                <div class="section">
+                    <h2>Configuration Management</h2>
+                    <p>Manage store settings, payment integrations, and operational parameters.</p>
+                    
+                    <div class="warning-box">
+                        <strong>⚠️ Manager Access:</strong> Configuration changes require manager approval.
+                    </div>
+                    
+                    <h3>Quick Settings:</h3>
                     <ul>
-                        <li>Configuration endpoints often use predictable names</li>
-                        <li>Try variations like: config, configuration, settings, env</li>
-                        <li>The endpoint might return database credentials and API keys</li>
+                        <li>Store hours configuration</li>
+                        <li>Payment gateway settings</li>
+                        <li>Inventory thresholds</li>
+                        <li>Email notification preferences</li>
                     </ul>
                 </div>
 
-                <div class="info-box">
-                    <h2>🛠️ Testing Instructions</h2>
-                    <p><strong>Using curl:</strong></p>
-                    <pre><code>curl http://localhost:3002/api/lab2/config
-curl http://localhost:3002/api/lab2/settings
-curl http://localhost:3002/api/lab2/env</code></pre>
-                    
-                    <p><strong>Using Browser Console (F12):</strong></p>
-                    <pre><code>fetch('http://localhost:3002/api/lab2/config')
-    .then(r => r.json())
-    .then(data => console.log(data));</code></pre>
+                <div class="section">
+                    <h2>🔧 Technical Configuration</h2>
+                    <p>IT staff can access configuration via API:</p>
+                    <p><code>GET /api/settings/config</code></p>
+                    <p style="margin-top: 10px; font-size: 0.9em;">For technical support and integration setup.</p>
                 </div>
 
-                <div style="text-align: center; margin-top: 40px;">
-                    <a href="/">← Back to Home</a>
+                <div class="back-link">
+                    <a href="/">← Back to Portal</a>
                 </div>
             </div>
         </body>
@@ -850,170 +537,110 @@ curl http://localhost:3002/api/lab2/env</code></pre>
     `);
 });
 
-// Lab 2 API - Configuration exposure endpoint (vulnerable)
-app.get('/api/lab2/config', (req, res) => {
-    // Vulnerable: Configuration endpoint exposed without authentication
+// Lab 2 API - VULNERABLE config exposure
+app.get('/api/settings/config', (req, res) => {
+    // VULNERABLE: Configuration exposed without authentication
     res.json({
-        flag: 'NSA{C0NF1G_L3AK3D}',
-        message: 'Congratulations! You accessed the configuration endpoint.',
-        vulnerability: 'Configuration data should never be publicly accessible',
+        flag: 'FLAG{C0NF1G_L34K3D}',
+        message: 'Configuration data retrieved!',
+        vulnerability: 'Configuration endpoint accessible without authentication',
         configuration: configData,
-        warning: 'This data includes database credentials and API keys!'
+        warning: 'Sensitive credentials exposed - database password, API keys, secrets!'
     });
 });
 
-// Lab 3 - Default Credentials (Hard)
+// Lab 3 - Manager Portal
 app.get('/lab3', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Lab 3 - Default Credentials</title>
+            <title>Manager Portal - BeanScene</title>
             <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
-                    background-color: #1a1a1a;
-                    color: #00ff00;
-                    font-family: 'Courier New', monospace;
+                    font-family: 'Georgia', serif;
+                    background: linear-gradient(135deg, #6B4423 0%, #3E2723 100%);
                     padding: 20px;
-                    line-height: 1.6;
+                    min-height: 100vh;
                 }
-                .container {
-                    max-width: 900px;
-                    margin: 0 auto;
-                }
-                h1 {
+                .container { max-width: 900px; margin: 0 auto; }
+                .header {
+                    background: #EFEBE9;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 25px;
                     text-align: center;
-                    font-size: 2.5em;
-                    text-shadow: 0 0 10px #00ff00;
-                    border-bottom: 2px solid #00ff00;
-                    padding-bottom: 10px;
+                    border: 2px solid #A1887F;
                 }
-                .info-box {
-                    background-color: #0a0a0a;
-                    border: 2px solid #00ff00;
-                    padding: 20px;
-                    margin: 20px 0;
-                    border-radius: 5px;
+                h1 { color: #3E2723; font-size: 2em; }
+                .section {
+                    background: #EFEBE9;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 20px;
+                    border: 2px solid #A1887F;
                 }
-                .hint-box {
-                    background-color: #0a0a0a;
-                    border-left: 4px solid #ffaa00;
-                    padding: 15px;
-                    margin: 20px 0;
-                }
-                .endpoint {
-                    background-color: #000;
-                    padding: 15px;
-                    border-radius: 5px;
-                    border-left: 4px solid #00ffff;
-                    margin: 15px 0;
+                .section h2 { color: #3E2723; margin-bottom: 15px; }
+                .section p, .section li { color: #5D4037; line-height: 1.7; margin: 8px 0; }
+                code {
+                    background: #D7CCC8;
+                    padding: 3px 8px;
+                    border-radius: 4px;
                     font-family: monospace;
                 }
-                code {
-                    color: #00ffff;
+                pre {
+                    background: #D7CCC8;
+                    padding: 15px;
+                    border-radius: 8px;
+                    overflow-x: auto;
+                    margin: 10px 0;
                 }
-                a {
-                    color: #00ffff;
-                    text-decoration: none;
-                    border-bottom: 1px dotted #00ffff;
-                }
-                a:hover {
-                    color: #00ff00;
-                    border-bottom: 1px solid #00ff00;
-                }
-                .difficulty {
-                    display: inline-block;
-                    padding: 5px 15px;
-                    border-radius: 3px;
-                    font-weight: bold;
-                    background-color: #ff0000;
-                    color: #fff;
-                }
-                .warning {
-                    background-color: #330000;
-                    border-left: 4px solid #ff0000;
+                .restricted {
+                    background: #FFEBEE;
+                    border-left: 4px solid #D32F2F;
                     padding: 15px;
                     margin: 15px 0;
+                    border-radius: 5px;
                 }
+                a { color: #5D4037; font-weight: 600; text-decoration: none; }
+                .back-link { text-align: center; margin-top: 30px; }
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>👑 LAB 3: DEFAULT CREDENTIALS <span class="difficulty">HARD</span></h1>
-                
-                <div class="info-box">
-                    <h2>📋 Mission Brief</h2>
-                    <p><strong>Stage:</strong> Initial Access</p>
-                    <p><strong>Objective:</strong> Access the admin panel using default credentials</p>
-                    <p><strong>Difficulty:</strong> Hard</p>
-                    <p><strong>Flag:</strong> Will be revealed when you successfully authenticate</p>
+                <div class="header">
+                    <h1>🔐 Manager Portal</h1>
+                    <p style="color: #5D4037;">Administrative controls and reporting</p>
                 </div>
 
-                <div class="info-box">
-                    <h2>🎯 Challenge Description</h2>
-                    <p>Many systems ship with default administrative credentials that are never changed in production. Attackers can use these well-known credentials to gain unauthorized access.</p>
-                    <p>Your task is to find the admin login endpoint and authenticate using default credentials.</p>
+                <div class="restricted">
+                    <strong>🔒 Authentication Required</strong><br>
+                    This area requires manager credentials. Please contact your store manager for access.
                 </div>
 
-                <div class="warning">
-                    <strong>⚠️ WARNING:</strong> This challenge requires you to find TWO things:
-                    <ol>
-                        <li>The admin login endpoint</li>
-                        <li>The default credentials to use</li>
-                    </ol>
-                </div>
-
-                <div class="endpoint">
-                    <strong>Admin Panel Check:</strong><br>
-                    <code>GET http://localhost:3002/api/lab3/admin</code><br><br>
-                    <strong>Login Endpoint (you need to find this):</strong><br>
-                    <code>POST http://localhost:3002/api/lab3/????</code><br>
-                    <code>Content-Type: application/json</code><br>
-                    <code>{"username": "????", "password": "????"}</code>
-                </div>
-
-                <div class="hint-box">
-                    <strong>💡 Hints:</strong>
+                <div class="section">
+                    <h2>Manager Features</h2>
+                    <p>The manager portal provides access to:</p>
                     <ul>
-                        <li>First, try accessing /api/lab3/admin to see if you're authenticated</li>
-                        <li>You need to find the login endpoint - try common names like: login, auth, signin</li>
-                        <li>Default credentials are often: admin/admin, admin/password, admin/admin123</li>
-                        <li>This is a POST request with JSON body containing username and password</li>
+                        <li>Financial reports and sales analytics</li>
+                        <li>Staff management and scheduling</li>
+                        <li>Inventory ordering and management</li>
+                        <li>System configuration and settings</li>
                     </ul>
                 </div>
 
-                <div class="info-box">
-                    <h2>🛠️ Testing Instructions</h2>
-                    <p><strong>Using curl:</strong></p>
-                    <pre><code># Check admin access first
-curl http://localhost:3002/api/lab3/admin
-
-# Try to login with default credentials
-curl -X POST http://localhost:3002/api/lab3/login \\
+                <div class="section">
+                    <h2>🔑 Access Instructions</h2>
+                    <p>Authenticate via the admin API:</p>
+                    <pre>curl -X POST http://localhost:3002/api/manager/login \\
   -H "Content-Type: application/json" \\
-  -d '{"username":"admin","password":"admin123"}'
-
-# Check admin access again after login
-curl http://localhost:3002/api/lab3/admin</code></pre>
-                    
-                    <p><strong>Using Browser Console (F12):</strong></p>
-                    <pre><code>// Check admin access
-fetch('http://localhost:3002/api/lab3/admin')
-    .then(r => r.json())
-    .then(data => console.log(data));
-
-// Try to login
-fetch('http://localhost:3002/api/lab3/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: 'admin', password: 'admin123' })
-})
-    .then(r => r.json())
-    .then(data => console.log(data));</code></pre>
+  -d '{"username":"admin","password":"your_password"}'</pre>
+                    <p style="margin-top: 10px; font-size: 0.9em; color: #666;">Manager credentials are provided during onboarding.</p>
                 </div>
 
-                <div style="text-align: center; margin-top: 40px;">
-                    <a href="/">← Back to Home</a>
+                <div class="back-link">
+                    <a href="/">← Back to Portal</a>
                 </div>
             </div>
         </body>
@@ -1021,65 +648,40 @@ fetch('http://localhost:3002/api/lab3/login', {
     `);
 });
 
-// Lab 3 API - Admin panel check
-app.get('/api/lab3/admin', (req, res) => {
-    // Check if authenticated (in real app, would check session)
-    const isAuthenticated = req.headers['x-admin-auth'] === 'authenticated';
-    
-    if (!isAuthenticated) {
-        return res.status(401).json({
-            error: 'Unauthorized',
-            message: 'You must be authenticated as admin to access this panel',
-            hint: 'Find the login endpoint and authenticate first'
-        });
-    }
-    
-    res.json({
-        message: 'Welcome to the Admin Panel',
-        adminAccess: true,
-        hint: 'You have access, but you need to login first to get the flag!'
-    });
-});
-
-// Lab 3 API - Login endpoint (vulnerable to default credentials)
-app.post('/api/lab3/login', (req, res) => {
+// Lab 3 API - VULNERABLE default credentials
+app.post('/api/manager/login', (req, res) => {
     const { username, password } = req.body;
     
     if (!username || !password) {
-        return res.status(400).json({
-            error: 'Bad Request',
-            message: 'Username and password are required'
-        });
+        return res.status(400).json({ error: 'Username and password required' });
     }
     
-    // Vulnerable: Using default credentials
-    if (username === adminCredentials.username && 
-        password === adminCredentials.password) {
+    // VULNERABLE: Using default credentials
+    if (username === adminCredentials.username && password === adminCredentials.password) {
         return res.json({
             success: true,
-            flag: 'NSA{4DM1N_P4N3L_PWN3D}',
-            message: 'Congratulations! You successfully logged in with default credentials.',
-            vulnerability: 'Default credentials should always be changed in production',
+            flag: 'FLAG{D3F4ULT_CR3DS_US3D}',
+            message: 'Authentication successful with default credentials!',
+            vulnerability: 'Default admin credentials never changed',
             credentials_used: { username, password },
-            token: 'admin_access_token_12345',
-            warning: 'In a real attack, you would now have full administrative access!'
+            token: 'manager_access_token_' + Date.now(),
+            warning: 'Default credentials should always be changed after setup!'
         });
     }
     
     res.status(401).json({
         error: 'Invalid credentials',
-        message: 'Username or password is incorrect'
+        hint: 'Try common default credentials'
     });
 });
 
 app.listen(PORT, () => {
-    console.log(`\x1b[32m
+    console.log(`\x1b[33m
 ╔════════════════════════════════════════════╗
-║   A02: SECURITY MISCONFIGURATION LAB      ║
+║   ☕ BeanScene Coffee Management Portal   ║
 ║   Server running on port ${PORT}           ║
 ║                                            ║
-║   Access the lab:                         ║
-║   http://localhost:${PORT}                    ║
+║   Access: http://localhost:${PORT}            ║
 ╚════════════════════════════════════════════╝
 \x1b[0m`);
 });

@@ -13,13 +13,13 @@ const upload = multer({
   }
 });
 
-const cyberpunkStyles = `
+const harvestStyles = `
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Courier New', monospace;
-      background: linear-gradient(135deg, #0a0a0a 0%, #1a001a 100%);
-      color: #00ff41;
+      background: linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 100%);
+      color: #047857;
       min-height: 100vh;
       padding: 20px;
     }
@@ -27,35 +27,35 @@ const cyberpunkStyles = `
       max-width: 1200px;
       margin: 0 auto;
       background: rgba(0, 0, 0, 0.8);
-      border: 2px solid #ff00ff;
+      border: 2px solid #10B981;
       border-radius: 10px;
       padding: 30px;
       box-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
     }
     h1 {
-      color: #ff00ff;
-      text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+      color: #10B981;
+      text-shadow: 0 0 10px #10B981, 0 0 20px #10B981;
       margin-bottom: 10px;
       font-size: 2.5em;
       text-align: center;
     }
     h2 {
-      color: #00ffff;
-      text-shadow: 0 0 10px #00ffff;
+      color: #059669;
+      text-shadow: 0 0 10px #059669;
       margin: 30px 0 15px 0;
       font-size: 1.8em;
-      border-bottom: 2px solid #00ffff;
+      border-bottom: 2px solid #059669;
       padding-bottom: 10px;
     }
     h3 {
-      color: #ffff00;
-      text-shadow: 0 0 5px #ffff00;
+      color: #F59E0B;
+      text-shadow: 0 0 5px #F59E0B;
       margin: 20px 0 10px 0;
       font-size: 1.3em;
     }
     .subtitle {
       text-align: center;
-      color: #00ff41;
+      color: #047857;
       margin-bottom: 30px;
       font-size: 1.1em;
     }
@@ -67,18 +67,18 @@ const cyberpunkStyles = `
       flex-wrap: wrap;
     }
     .nav-links a {
-      color: #00ffff;
+      color: #059669;
       text-decoration: none;
       padding: 12px 25px;
-      border: 2px solid #00ffff;
+      border: 2px solid #059669;
       border-radius: 5px;
       transition: all 0.3s;
-      text-shadow: 0 0 5px #00ffff;
+      text-shadow: 0 0 5px #059669;
     }
     .nav-links a:hover {
-      background: #00ffff;
+      background: #059669;
       color: #000;
-      box-shadow: 0 0 20px #00ffff;
+      box-shadow: 0 0 20px #059669;
     }
     .vulnerable {
       background: rgba(139, 0, 0, 0.3);
@@ -104,16 +104,16 @@ const cyberpunkStyles = `
     }
     pre {
       background: #000;
-      border: 1px solid #00ff41;
+      border: 1px solid #047857;
       padding: 15px;
       border-radius: 5px;
       overflow-x: auto;
-      color: #00ff41;
+      color: #047857;
       margin: 10px 0;
       line-height: 1.5;
     }
     code {
-      color: #00ff41;
+      color: #047857;
       font-family: 'Courier New', monospace;
     }
     .info-box {
@@ -126,14 +126,14 @@ const cyberpunkStyles = `
     }
     .lab-card {
       background: rgba(255, 0, 255, 0.1);
-      border: 2px solid #ff00ff;
+      border: 2px solid #10B981;
       padding: 20px;
       border-radius: 8px;
       margin: 20px 0;
     }
     .lab-card h3 {
-      color: #ff00ff;
-      text-shadow: 0 0 5px #ff00ff;
+      color: #10B981;
+      text-shadow: 0 0 5px #10B981;
     }
     .difficulty {
       display: inline-block;
@@ -143,7 +143,7 @@ const cyberpunkStyles = `
       margin: 10px 0;
     }
     .easy { background: #00ff00; color: #000; }
-    .medium { background: #ffff00; color: #000; }
+    .medium { background: #F59E0B; color: #000; }
     .hard { background: #ff0000; color: #fff; }
     ul {
       margin-left: 20px;
@@ -154,15 +154,15 @@ const cyberpunkStyles = `
     }
     .endpoint {
       background: rgba(255, 255, 0, 0.2);
-      border-left: 4px solid #ffff00;
+      border-left: 4px solid #F59E0B;
       padding: 10px;
       margin: 10px 0;
       font-family: 'Courier New', monospace;
     }
     .flag {
-      color: #ff00ff;
+      color: #10B981;
       font-weight: bold;
-      text-shadow: 0 0 5px #ff00ff;
+      text-shadow: 0 0 5px #10B981;
     }
     form {
       margin: 15px 0;
@@ -172,15 +172,15 @@ const cyberpunkStyles = `
       margin: 10px 0;
       padding: 10px;
       background: rgba(0, 0, 0, 0.5);
-      border: 1px solid #00ff41;
-      color: #00ff41;
+      border: 1px solid #047857;
+      color: #047857;
       border-radius: 5px;
     }
     #result {
       margin-top: 20px;
       padding: 15px;
       background: rgba(0, 0, 0, 0.7);
-      border: 1px solid #00ff41;
+      border: 1px solid #047857;
       border-radius: 5px;
       min-height: 50px;
     }
@@ -193,33 +193,43 @@ app.get('/', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>A08: Software and Data Integrity Failures</title>
+      <title>FreshHarvest Market 🌱 - Vendor Portal</title>
       <meta charset="UTF-8">
-      ${cyberpunkStyles}
+      ${harvestStyles}
     </head>
     <body>
       <div class="container">
-        <h1>🔐 A08: SOFTWARE AND DATA INTEGRITY FAILURES</h1>
-        <p class="subtitle">OWASP Top 10 - Integrity Verification Lab</p>
+        <h1>🌱 FRESHHARVEST MARKET</h1>
+        <p class="subtitle">Organic Farmers Market - Vendor Management Portal</p>
         
         <div class="info-box">
-          <p><strong>Mission Objective:</strong> Learn about software and data integrity failures through practical exercises.</p>
-          <p style="margin-top: 10px;">Navigate through examples and labs to understand integrity validation vulnerabilities.</p>
+          <p><strong>Welcome Vendors!</strong> Manage your products, updates, and inventory through our vendor portal.</p>
+          <p style="margin-top: 10px;">Our system helps local farmers and artisans sell fresh, organic products to the community.</p>
         </div>
 
         <div class="nav-links">
-          <a href="/example">📚 Example</a>
-          <a href="/lab1">🎯 Lab 1 - Recon</a>
-          <a href="/lab2">🎯 Lab 2 - Scanning</a>
-          <a href="/lab3">🎯 Lab 3 - Initial Access</a>
+          <a href="/example">📚 Tutorial</a>
+          <a href="/lab1">🎯 Lab 1 - Product Updates</a>
+          <a href="/lab2">🎯 Lab 2 - Vendor Portal</a>
+          <a href="/lab3">🎯 Lab 3 - File Manager</a>
         </div>
 
         <div class="lab-card">
-          <h3>Lab Overview</h3>
+          <h3>🌾 Our Vendors</h3>
+          <ul style="font-size: 1.1em;">
+            <li><strong>Green Valley Farms</strong> - Organic tomatoes, peppers, seasonal vegetables</li>
+            <li><strong>Urban Harvest Co-op</strong> - Fresh herbs, microgreens, salad mixes</li>
+            <li><strong>Bee Happy Apiary</strong> - Local honey, beeswax candles, pollen</li>
+            <li><strong>Artisan Bread Collective</strong> - Sourdough, whole grain, specialty loaves</li>
+          </ul>
+        </div>
+
+        <div class="lab-card">
+          <h3>🎯 Portal Features</h3>
           <ul>
-            <li><strong>Lab 1 (Easy):</strong> Reconnaissance - Identify unsigned update mechanisms</li>
-            <li><strong>Lab 2 (Medium):</strong> Scanning - Discover missing checksum validation</li>
-            <li><strong>Lab 3 (Hard):</strong> Initial Access - Exploit unsigned file uploads</li>
+            <li><strong>Lab 1 (Easy):</strong> Product catalog updates and inventory management</li>
+            <li><strong>Lab 2 (Medium):</strong> Download vendor resources and price lists</li>
+            <li><strong>Lab 3 (Hard):</strong> Upload product images and documents</li>
           </ul>
         </div>
       </div>
@@ -236,7 +246,7 @@ app.get('/example', (req, res) => {
     <head>
       <title>A08: Integrity Failures - Examples</title>
       <meta charset="UTF-8">
-      ${cyberpunkStyles}
+      ${harvestStyles}
     </head>
     <body>
       <div class="container">
@@ -359,20 +369,20 @@ async function installDependencySecure(packageName, expectedSHA256) {
 
         <h2>Defense Mechanisms</h2>
         <div class="info-box">
-          <h3 style="color: #00ffff; margin-top: 0;">Digital Signatures</h3>
+          <h3 style="color: #059669; margin-top: 0;">Digital Signatures</h3>
           <p>Use asymmetric cryptography (RSA, ECDSA) to sign code and verify authenticity with public keys.</p>
           
-          <h3 style="color: #00ffff; margin-top: 20px;">Checksums & Hashes</h3>
+          <h3 style="color: #059669; margin-top: 20px;">Checksums & Hashes</h3>
           <p>Generate and verify SHA-256/SHA-512 hashes to ensure data integrity during transmission.</p>
           
-          <h3 style="color: #00ffff; margin-top: 20px;">Subresource Integrity (SRI)</h3>
+          <h3 style="color: #059669; margin-top: 20px;">Subresource Integrity (SRI)</h3>
           <pre style="margin-top: 10px;">
 &lt;script src="https://cdn.example.com/library.js"
         integrity="sha384-oqVuAfXRKap7fdgcCY5uykM6+R9GqQ8K/ux..."
         crossorigin="anonymous"&gt;&lt;/script&gt;
           </pre>
           
-          <h3 style="color: #00ffff; margin-top: 20px;">Secure CI/CD Pipelines</h3>
+          <h3 style="color: #059669; margin-top: 20px;">Secure CI/CD Pipelines</h3>
           <ul>
             <li>Separate build environments from production</li>
             <li>Sign all artifacts in the build pipeline</li>
@@ -400,15 +410,15 @@ async function installDependencySecure(packageName, expectedSHA256) {
   `);
 });
 
-// Lab 1 - Easy: Reconnaissance
+// Lab 1 - Easy: Product Updates
 app.get('/lab1', (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Lab 1 - Reconnaissance</title>
+      <title>Lab 1 - Product Updates</title>
       <meta charset="UTF-8">
-      ${cyberpunkStyles}
+      ${harvestStyles}
     </head>
     <body>
       <div class="container">
@@ -433,7 +443,7 @@ app.get('/lab1', (req, res) => {
         </div>
 
         <div class="info-box">
-          <h3 style="color: #00ffff; margin-top: 0;">What to Look For</h3>
+          <h3 style="color: #059669; margin-top: 0;">What to Look For</h3>
           <ul>
             <li>Update information endpoints</li>
             <li>Missing digital signatures</li>
@@ -474,20 +484,20 @@ app.get('/api/lab1/update-info', (req, res) => {
     releaseNotes: 'Security improvements and bug fixes',
     size: '45.2 MB',
     vulnerability: 'No digital signature provided!',
-    flag: 'NSA{UPD4T3_F0UND}',
+    flag: 'HARVEST{UPD4T3_N0T_V3R1F13D}',
     message: 'Flag captured! You identified an unsigned update mechanism.'
   });
 });
 
-// Lab 2 - Medium: Scanning
+// Lab 2 - Medium: Vendor Portal
 app.get('/lab2', (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Lab 2 - Scanning</title>
+      <title>Lab 2 - Vendor Portal</title>
       <meta charset="UTF-8">
-      ${cyberpunkStyles}
+      ${harvestStyles}
     </head>
     <body>
       <div class="container">
@@ -512,7 +522,7 @@ app.get('/lab2', (req, res) => {
         </div>
 
         <div class="info-box">
-          <h3 style="color: #00ffff; margin-top: 0;">Investigation Steps</h3>
+          <h3 style="color: #059669; margin-top: 0;">Investigation Steps</h3>
           <ul>
             <li>Attempt to download files</li>
             <li>Check if checksums (MD5, SHA256) are provided</li>
@@ -523,7 +533,7 @@ app.get('/lab2', (req, res) => {
 
         <h3>Test File Download</h3>
         <pre>curl http://localhost:3008/api/lab2/download?file=update.zip</pre>
-        <p style="margin-top: 10px;">Or click: <a href="/api/lab2/download?file=update.zip" style="color: #00ffff;">Download File</a></p>
+        <p style="margin-top: 10px;">Or click: <a href="/api/lab2/download?file=update.zip" style="color: #059669;">Download File</a></p>
 
         <div id="result"></div>
       </div>
@@ -542,7 +552,7 @@ app.get('/api/lab2/download', (req, res) => {
     size: '12.8 MB',
     contentType: 'application/zip',
     vulnerability: 'No checksum verification provided!',
-    flag: 'NSA{N0_CHK5UM_V3R1FY}',
+    flag: 'HARVEST{N0_CHK5UM_0RG4N1C}',
     message: 'Flag captured! You discovered missing checksum validation.',
     secureAlternative: {
       filename: filename,
@@ -554,15 +564,15 @@ app.get('/api/lab2/download', (req, res) => {
   });
 });
 
-// Lab 3 - Hard: Initial Access
+// Lab 3 - Hard: File Manager
 app.get('/lab3', (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Lab 3 - Initial Access</title>
+      <title>Lab 3 - File Manager</title>
       <meta charset="UTF-8">
-      ${cyberpunkStyles}
+      ${harvestStyles}
     </head>
     <body>
       <div class="container">
@@ -587,7 +597,7 @@ app.get('/lab3', (req, res) => {
         </div>
 
         <div class="info-box">
-          <h3 style="color: #00ffff; margin-top: 0;">Attack Vector</h3>
+          <h3 style="color: #059669; margin-top: 0;">Attack Vector</h3>
           <ul>
             <li>Create a malicious payload file</li>
             <li>Upload without a valid signature</li>
@@ -599,7 +609,7 @@ app.get('/lab3', (req, res) => {
         <h3>Upload Test File</h3>
         <form id="uploadForm" enctype="multipart/form-data">
           <input type="file" id="fileInput" name="file" required />
-          <p style="margin-top: 10px; color: #ffff00;">Create any file to test the upload vulnerability</p>
+          <p style="margin-top: 10px; color: #F59E0B;">Create any file to test the upload vulnerability</p>
         </form>
 
         <h3 style="margin-top: 20px;">Command Line Upload</h3>
@@ -650,7 +660,7 @@ app.post('/api/lab3/upload', upload.single('file'), (req, res) => {
     mimetype: req.file.mimetype,
     uploadedAt: new Date().toISOString(),
     vulnerability: 'File accepted without signature verification!',
-    flag: 'NSA{N0_CHK5UM_N0_PR0BL3M}',
+    flag: 'HARVEST{N0_S1GN4TUR3_FR3SH}',
     message: 'Flag captured! You successfully uploaded an unsigned file.',
     risk: 'In a real system, this could allow code execution',
     secureAlternative: {

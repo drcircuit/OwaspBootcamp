@@ -5,15 +5,15 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static('public'));
 
-// Users database
+// Users database - ZenFlow Yoga Studio Members
 const users = [
-    { id: 1, username: 'alice', email: 'alice@company.com', role: 'user', ssn: '123-45-6789' },
-    { id: 2, username: 'bob', email: 'bob@company.com', role: 'user', ssn: '987-65-4321' },
-    { id: 3, username: 'charlie', email: 'charlie@company.com', role: 'user', ssn: '555-12-3456' },
-    { id: 4, username: 'admin', email: 'admin@company.com', role: 'admin', ssn: '000-00-0000' }
+    { id: 1, username: 'emma_s', email: 'emma.stevens@email.com', role: 'member', membership: 'Premium', creditCard: '**** 4532', renewalDate: '2025-03-15', joinDate: '2023-01-15', favoriteClass: 'Vinyasa Flow' },
+    { id: 2, username: 'sarah_m', email: 'sarah.martinez@email.com', role: 'member', membership: 'Basic', creditCard: '**** 7821', renewalDate: '2025-02-28', joinDate: '2024-06-20', favoriteClass: 'Hatha Yoga' },
+    { id: 3, username: 'mike_chen', email: 'mike.chen@email.com', role: 'member', membership: 'Premium', creditCard: '**** 3345', renewalDate: '2025-04-10', joinDate: '2023-09-08', favoriteClass: 'Power Yoga' },
+    { id: 4, username: 'instructor_jane', email: 'jane.williams@zenflow.yoga', role: 'instructor', membership: 'Staff', creditCard: '**** 9012', accessLevel: 'full', specialization: 'Vinyasa & Meditation', yearsTeaching: 8 }
 ];
 
-const CURRENT_USER_ID = 2; // Bob is the current logged-in user
+const CURRENT_USER_ID = 2; // Sarah is the current logged-in member
 
 // Home page
 app.get('/', (req, res) => {
@@ -21,469 +21,166 @@ app.get('/', (req, res) => {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>A01: Broken Access Control</title>
+            <title>ZenFlow Yoga - Member Portal</title>
             <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
-                    background-color: #1a1a1a;
-                    color: #00ff00;
-                    font-family: 'Courier New', monospace;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                    background: linear-gradient(135deg, #e8f5e9 0%, #c5e1a5 100%);
+                    min-height: 100vh;
                     padding: 20px;
-                    line-height: 1.6;
                 }
-                .container {
-                    max-width: 1000px;
-                    margin: 0 auto;
+                .header {
+                    background: white;
+                    padding: 20px 40px;
+                    border-radius: 15px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+                    margin-bottom: 30px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
                 }
-                h1 {
-                    text-align: center;
-                    font-size: 2.5em;
-                    text-shadow: 0 0 10px #00ff00;
-                    border-bottom: 2px solid #00ff00;
-                    padding-bottom: 10px;
+                .logo {
+                    font-size: 2em;
+                    font-weight: 600;
+                    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
                 }
-                h2 {
-                    color: #00ff00;
-                    margin-top: 30px;
-                }
-                .challenge {
-                    background-color: #0a0a0a;
-                    border: 2px solid #00ff00;
-                    padding: 20px;
-                    margin: 20px 0;
-                    border-radius: 5px;
-                    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
-                }
-                .challenge h3 {
-                    margin-top: 0;
-                    color: #00ff00;
-                    font-size: 1.5em;
-                }
-                .difficulty {
-                    display: inline-block;
-                    padding: 5px 15px;
-                    border-radius: 3px;
-                    font-weight: bold;
-                    margin-left: 10px;
-                }
-                .easy { background-color: #00ff00; color: #000; }
-                .medium { background-color: #ffaa00; color: #000; }
-                .hard { background-color: #ff0000; color: #fff; }
-                .example { background-color: #0088ff; color: #fff; }
-                a {
-                    color: #00ffff;
-                    text-decoration: none;
-                    border-bottom: 1px dotted #00ffff;
-                }
-                a:hover {
-                    color: #00ff00;
-                    border-bottom: 1px solid #00ff00;
-                }
-                .info {
-                    background-color: #0a0a0a;
-                    border-left: 4px solid #00ff00;
-                    padding: 15px;
-                    margin: 20px 0;
-                }
-                code {
-                    background-color: #000;
-                    padding: 2px 6px;
-                    border-radius: 3px;
-                    color: #00ffff;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>⚠️ A01: BROKEN ACCESS CONTROL ⚠️</h1>
-                
-                <div class="info">
-                    <strong>⚡ SYSTEM STATUS:</strong> You are logged in as <strong>Bob</strong> (User ID: ${CURRENT_USER_ID})<br>
-                    <strong>🎯 OBJECTIVE:</strong> Explore access control vulnerabilities and capture the flags<br>
-                    <strong>🛠️ TOOLS:</strong> Use curl, Postman, Burp Suite, or Browser DevTools
-                </div>
-
-                <div class="challenge">
-                    <h3>📚 Example - Tools Walkthrough <span class="difficulty example">TUTORIAL</span></h3>
-                    <p>Comprehensive hands-on tutorial teaching Browser DevTools, cURL, Burp Suite, and ID Enumeration. Complete 4 interactive challenges to master all the tools you'll need for the labs.</p>
-                    <p><strong>⚠️ START HERE</strong> if you're new to web security testing!</p>
-                    <p><a href="/example">→ Start Tutorial</a></p>
-                </div>
-
-                <div class="challenge">
-                    <h3>🔍 Lab 1 - User Enumeration <span class="difficulty easy">EASY</span></h3>
-                    <p><strong>Stage:</strong> Recon</p>
-                    <p><strong>Description:</strong> The system has multiple users. Can you discover them all? Your current user ID is ${CURRENT_USER_ID}.</p>
-                    <p><strong>Hint:</strong> Try different user IDs in the API endpoint</p>
-                    <p><strong>Flag:</strong> Capture the flag when you discover all users</p>
-                    <p><a href="/lab1">→ Start Lab 1</a></p>
-                </div>
-
-                <div class="challenge">
-                    <h3>🎭 Lab 2 - Profile Access <span class="difficulty medium">MEDIUM</span></h3>
-                    <p><strong>Stage:</strong> Initial Access</p>
-                    <p><strong>Description:</strong> Users have profile pages with sensitive information. Can you access someone else's profile data?</p>
-                    <p><strong>Hint:</strong> The API validates you're logged in, but does it check whose profile you're accessing?</p>
-                    <p><strong>Flag:</strong> Capture the flag when you view another user's private data</p>
-                    <p><a href="/lab2">→ Start Lab 2</a></p>
-                </div>
-
-                <div class="challenge">
-                    <h3>👑 Lab 3 - Privilege Escalation <span class="difficulty hard">HARD</span></h3>
-                    <p><strong>Stage:</strong> Maintained Access</p>
-                    <p><strong>Description:</strong> Only administrators should access the admin panel. Can you escalate your privileges?</p>
-                    <p><strong>Hint:</strong> Being logged in as Bob doesn't mean you can't try to access admin resources...</p>
-                    <p><strong>Flag:</strong> Capture the flag when you gain admin access</p>
-                    <p><a href="/lab3">→ Start Lab 3</a></p>
-                </div>
-
-                <div class="info">
-                    <strong>⚡ PRO TIP:</strong> Use your browser's DevTools (F12) to inspect network requests, or use command-line tools like curl for more control.
-                </div>
-            </div>
-        </body>
-        </html>
-    `);
-});
-
-// Example page - Comprehensive walkthrough with 4 sub-challenges
-app.get('/example', (req, res) => {
-    res.send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Example - Tools Walkthrough</title>
-            <style>
-                body {
-                    background-color: #1a1a1a;
-                    color: #00ff00;
-                    font-family: 'Courier New', monospace;
-                    padding: 20px;
-                    line-height: 1.6;
+                .user-info {
+                    font-size: 0.9em;
+                    color: #666;
                 }
                 .container {
                     max-width: 1200px;
                     margin: 0 auto;
                 }
-                h1 {
-                    text-align: center;
-                    font-size: 2.5em;
-                    text-shadow: 0 0 10px #00ff00;
-                    border-bottom: 2px solid #00ff00;
-                    padding-bottom: 10px;
+                .welcome-section {
+                    background: white;
+                    padding: 40px;
+                    border-radius: 15px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+                    margin-bottom: 30px;
                 }
-                h2 {
-                    color: #00ff00;
-                    margin-top: 30px;
-                    border-bottom: 2px solid #00ff00;
-                    padding-bottom: 5px;
+                .welcome-section h1 {
+                    color: #2e7d32;
+                    margin-bottom: 15px;
+                    font-size: 2.2em;
                 }
-                h3 {
-                    color: #00ffff;
+                .welcome-section p {
+                    color: #555;
+                    line-height: 1.8;
+                    font-size: 1.1em;
+                }
+                .nav-cards {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                    gap: 20px;
                     margin-top: 20px;
                 }
-                .part {
-                    background-color: #0a0a0a;
-                    border: 3px solid #00ff00;
-                    padding: 25px;
-                    margin: 30px 0;
-                    border-radius: 5px;
-                    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-                }
-                .part h2 {
-                    margin-top: 0;
-                    color: #00ff00;
-                    font-size: 1.8em;
-                }
-                pre {
-                    background-color: #000;
-                    padding: 15px;
-                    border-radius: 5px;
-                    overflow-x: auto;
-                    border-left: 4px solid #00ff00;
-                }
-                code {
-                    color: #00ffff;
-                }
-                .endpoint {
-                    background-color: #000;
-                    padding: 15px;
-                    border-radius: 5px;
-                    border-left: 4px solid #ffaa00;
-                    margin: 15px 0;
-                    font-family: monospace;
-                }
-                .hint {
-                    background-color: #1a1a00;
-                    border-left: 4px solid #ffaa00;
-                    padding: 15px;
-                    margin: 15px 0;
-                }
-                .flag {
-                    background-color: #001a00;
-                    border-left: 4px solid #00ff00;
-                    padding: 15px;
-                    margin: 15px 0;
-                    font-weight: bold;
-                }
-                a {
-                    color: #00ffff;
+                .card {
+                    background: white;
+                    padding: 30px;
+                    border-radius: 15px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+                    transition: transform 0.2s, box-shadow 0.2s;
                     text-decoration: none;
-                    border-bottom: 1px dotted #00ffff;
+                    color: inherit;
+                    display: block;
+                    border-left: 4px solid #66bb6a;
                 }
-                a:hover {
-                    color: #00ff00;
-                    border-bottom: 1px solid #00ff00;
+                .card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
                 }
-                .intro {
-                    background-color: #0a0a0a;
-                    border: 2px solid #00ffff;
+                .card h3 {
+                    color: #2e7d32;
+                    margin-bottom: 15px;
+                    font-size: 1.4em;
+                }
+                .card p {
+                    color: #666;
+                    line-height: 1.6;
+                    margin-bottom: 15px;
+                }
+                .card-badge {
+                    display: inline-block;
+                    padding: 6px 14px;
+                    border-radius: 20px;
+                    font-size: 0.75em;
+                    font-weight: 600;
+                    margin-top: 10px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+                .badge-tutorial { background: #e3f2fd; color: #1976d2; }
+                .badge-easy { background: #e8f5e9; color: #388e3c; }
+                .badge-medium { background: #fff3e0; color: #f57c00; }
+                .badge-hard { background: #ffebee; color: #d32f2f; }
+                .footer {
+                    text-align: center;
+                    color: rgba(0,0,0,0.6);
+                    margin-top: 40px;
                     padding: 20px;
-                    margin: 20px 0;
-                    border-radius: 5px;
                 }
-                ul {
-                    line-height: 1.8;
+                .footer a {
+                    color: rgba(0,0,0,0.6);
+                    text-decoration: none;
+                    transition: color 0.2s;
                 }
-                .step {
-                    margin: 10px 0;
-                    padding-left: 10px;
+                .footer a:hover {
+                    color: #2e7d32;
                 }
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>🎓 COMPREHENSIVE TOOLS WALKTHROUGH</h1>
-                
-                <div class="intro">
-                    <h2>Welcome to the Example Tutorial</h2>
-                    <p>This walkthrough teaches you ALL the tools and techniques needed for the 3 labs ahead. Complete all 4 parts to master:</p>
-                    <ul>
-                        <li><strong>Browser DevTools</strong> - Inspecting network requests</li>
-                        <li><strong>cURL</strong> - Command-line HTTP requests</li>
-                        <li><strong>Burp Suite</strong> - Intercepting and modifying requests</li>
-                        <li><strong>ID Enumeration</strong> - Systematic discovery of resources</li>
-                    </ul>
-                    <p>⚠️ <strong>Important:</strong> You must use the actual tools - no buttons will do the work for you!</p>
-                </div>
-
-                <!-- PART 1: Browser DevTools -->
-                <div class="part">
-                    <h2>🔍 Part 1: Browser DevTools</h2>
-                    
-                    <h3>What You'll Learn</h3>
-                    <p>Browser DevTools (F12) is your first line of investigation. The Network tab shows all HTTP requests your browser makes, revealing API endpoints, parameters, and responses.</p>
-                    
-                    <h3>How to Use DevTools</h3>
-                    <div class="step">
-                        <strong>Step 1:</strong> Press <code>F12</code> (or right-click → Inspect) to open DevTools<br>
-                        <strong>Step 2:</strong> Click the <strong>Network</strong> tab<br>
-                        <strong>Step 3:</strong> Refresh the page or trigger an action to see requests<br>
-                        <strong>Step 4:</strong> Click on a request to view details (Headers, Response, etc.)
-                    </div>
-                    
-                    <h3>Your Challenge</h3>
-                    <p>Use DevTools to inspect the API endpoint below and retrieve user data.</p>
-                    
-                    <div class="endpoint">
-                        <strong>API Endpoint:</strong><br>
-                        <code>GET http://localhost:3001/api/example/part1/user/:id</code>
-                    </div>
-                    
-                    <h3>Instructions</h3>
-                    <div class="step">
-                        1. Open DevTools (F12) and go to the <strong>Network</strong> tab<br>
-                        2. In the <strong>Console</strong> tab, paste this command:<br>
-                        <pre><code>fetch('http://localhost:3001/api/example/part1/user/1')
-    .then(r => r.json())
-    .then(data => console.log(data));</code></pre>
-                        3. Press Enter and check the response<br>
-                        4. Look in the <strong>Network</strong> tab - you'll see the request appear<br>
-                        5. Click on it to inspect headers, response, timing, etc.<br>
-                        6. Try changing the user ID to <code>42</code> to get the flag
-                    </div>
-                    
-                    <div class="hint">
-                        💡 <strong>Hint:</strong> The flag is hidden at user ID 42. Modify the fetch URL to access it.
-                    </div>
-                    
-                    <div class="flag">
-                        🎯 <strong>Flag:</strong> <code>NSA{D3VT00LS_M4ST3R}</code>
+                <div class="header">
+                    <div class="logo">🧘 ZenFlow Yoga</div>
+                    <div class="user-info">
+                        Logged in as: <strong>sarah_m</strong> (Member #${CURRENT_USER_ID})
                     </div>
                 </div>
 
-                <!-- PART 2: Using cURL -->
-                <div class="part">
-                    <h2>💻 Part 2: Using cURL</h2>
-                    
-                    <h3>What You'll Learn</h3>
-                    <p>cURL is a command-line tool for making HTTP requests. It's more powerful than browser tools and essential for automation and testing.</p>
-                    
-                    <h3>Basic cURL Syntax</h3>
-                    <pre><code># Basic GET request
-curl http://localhost:3001/api/endpoint
-
-# GET with custom header
-curl -H "X-Custom-Header: value" http://localhost:3001/api/endpoint
-
-# View response headers
-curl -i http://localhost:3001/api/endpoint
-
-# Follow redirects
-curl -L http://localhost:3001/api/endpoint
-
-# Save response to file
-curl http://localhost:3001/api/endpoint -o output.json</code></pre>
-                    
-                    <h3>Your Challenge</h3>
-                    <p>The API endpoint below returns data, but only responds with the flag when accessed via cURL (checks User-Agent header).</p>
-                    
-                    <div class="endpoint">
-                        <strong>API Endpoint:</strong><br>
-                        <code>GET http://localhost:3001/api/example/part2/test</code>
-                    </div>
-                    
-                    <h3>Instructions</h3>
-                    <div class="step">
-                        1. Open a terminal/command prompt<br>
-                        2. Run this cURL command:<br>
-                        <pre><code>curl http://localhost:3001/api/example/part2/test</code></pre>
-                        3. The endpoint detects you're using cURL and returns the flag<br>
-                        4. Try it in a browser - you'll get a different response!
-                    </div>
-                    
-                    <div class="hint">
-                        💡 <strong>Hint:</strong> The server checks the User-Agent header. cURL identifies itself differently than browsers.
-                    </div>
-                    
-                    <div class="flag">
-                        🎯 <strong>Flag:</strong> <code>NSA{CURL_C0MM4ND3R}</code>
-                    </div>
+                <div class="welcome-section">
+                    <h1>Welcome to Your Member Portal, Sarah! 🌸</h1>
+                    <p>Namaste! Access your membership details, connect with our community, view upcoming classes, and manage your account—all in one place.</p>
                 </div>
 
-                <!-- PART 3: Burp Suite -->
-                <div class="part">
-                    <h2>🔥 Part 3: Burp Suite</h2>
-                    
-                    <h3>What You'll Learn</h3>
-                    <p>Burp Suite is an intercepting proxy that sits between your browser and the server. You can capture, inspect, and modify requests before they're sent.</p>
-                    
-                    <h3>Setting Up Burp Suite</h3>
-                    <div class="step">
-                        <strong>Step 1:</strong> Download and install Burp Suite Community Edition<br>
-                        <strong>Step 2:</strong> Start Burp and go to the <strong>Proxy</strong> tab<br>
-                        <strong>Step 3:</strong> Configure your browser to use proxy 127.0.0.1:8080<br>
-                        <strong>Step 4:</strong> In Burp, turn <strong>Intercept On</strong><br>
-                        <strong>Step 5:</strong> Browse to a page - Burp will capture the request<br>
-                        <strong>Step 6:</strong> Modify the request and click <strong>Forward</strong>
-                    </div>
-                    
-                    <h3>Using Burp Repeater</h3>
-                    <p>Right-click any request → <strong>Send to Repeater</strong> → Modify and resend multiple times</p>
-                    
-                    <h3>Your Challenge</h3>
-                    <p>The API endpoint below only returns the flag when you modify a specific parameter in the request.</p>
-                    
-                    <div class="endpoint">
-                        <strong>API Endpoint:</strong><br>
-                        <code>GET http://localhost:3001/api/example/part3/intercept?access=user</code>
-                    </div>
-                    
-                    <h3>Instructions</h3>
-                    <div class="step">
-                        <strong>Option A - Using Burp Suite:</strong><br>
-                        1. Set up Burp proxy as described above<br>
-                        2. Visit the URL in your browser<br>
-                        3. Intercept the request in Burp<br>
-                        4. Change the parameter from <code>access=user</code> to <code>access=admin</code><br>
-                        5. Forward the modified request<br><br>
-                        
-                        <strong>Option B - Using cURL (simpler):</strong><br>
-                        <pre><code>curl "http://localhost:3001/api/example/part3/intercept?access=admin"</code></pre>
-                    </div>
-                    
-                    <div class="hint">
-                        💡 <strong>Hint:</strong> Change the access parameter from "user" to "admin" to get elevated privileges and retrieve the flag.
-                    </div>
-                    
-                    <div class="flag">
-                        🎯 <strong>Flag:</strong> <code>NSA{BURP_1NT3RC3PT0R}</code>
-                    </div>
+                <div class="nav-cards">
+                    <a href="/example" class="card">
+                        <h3>📚 Getting Started Guide</h3>
+                        <p>New to our portal? Learn how to make the most of your membership, book classes, and update your preferences.</p>
+                        <span class="card-badge badge-tutorial">Help Center</span>
+                    </a>
+
+                    <a href="/lab1" class="card">
+                        <h3>👥 Community Directory</h3>
+                        <p>Connect with fellow members and instructors in our vibrant yoga community.</p>
+                        <span class="card-badge badge-easy">Community</span>
+                    </a>
+
+                    <a href="/lab2" class="card">
+                        <h3>👤 My Profile</h3>
+                        <p>View and manage your membership details, payment information, and personal preferences.</p>
+                        <span class="card-badge badge-medium">Account</span>
+                    </a>
+
+                    <a href="/lab3" class="card">
+                        <h3>📅 Instructor Dashboard</h3>
+                        <p>Instructor-only area for managing class schedules, viewing bookings, and accessing teaching resources.</p>
+                        <span class="card-badge badge-hard">Staff Access</span>
+                    </a>
                 </div>
 
-                <!-- PART 4: ID Enumeration -->
-                <div class="part">
-                    <h2>🔢 Part 4: ID Enumeration</h2>
-                    
-                    <h3>What You'll Learn</h3>
-                    <p>ID Enumeration is the systematic process of testing sequential IDs to discover hidden resources. Many APIs use predictable numeric IDs, allowing you to map out all resources.</p>
-                    
-                    <h3>Enumeration Techniques</h3>
-                    <pre><code># Test sequential IDs
-curl http://localhost:3001/api/resource/1
-curl http://localhost:3001/api/resource/2
-curl http://localhost:3001/api/resource/3
-
-# Or use a loop (bash)
-for i in {1..10}; do
-    curl http://localhost:3001/api/resource/$i
-done
-
-# With error handling
-for i in {1..10}; do
-    echo "Testing ID: $i"
-    curl -s http://localhost:3001/api/resource/$i | grep -q "error" || echo "Found: $i"
-done</code></pre>
-                    
-                    <h3>Your Challenge</h3>
-                    <p>The API has data for user IDs 1-5. Discover all 5 users to receive the flag.</p>
-                    
-                    <div class="endpoint">
-                        <strong>API Endpoint:</strong><br>
-                        <code>GET http://localhost:3001/api/example/part4/enumerate/:id</code>
-                    </div>
-                    
-                    <h3>Instructions</h3>
-                    <div class="step">
-                        <strong>Method 1 - Manual Testing:</strong><br>
-                        <pre><code>curl http://localhost:3001/api/example/part4/enumerate/1
-curl http://localhost:3001/api/example/part4/enumerate/2
-curl http://localhost:3001/api/example/part4/enumerate/3
-curl http://localhost:3001/api/example/part4/enumerate/4
-curl http://localhost:3001/api/example/part4/enumerate/5</code></pre>
-                        
-                        <strong>Method 2 - Using a Loop (Linux/Mac):</strong><br>
-                        <pre><code>for i in {1..10}; do curl http://localhost:3001/api/example/part4/enumerate/$i; done</code></pre>
-                        
-                        <strong>Method 3 - Browser DevTools:</strong><br>
-                        Open Console (F12) and run:<br>
-                        <pre><code>for(let i=1; i<=10; i++) {
-    fetch(\`http://localhost:3001/api/example/part4/enumerate/\${i}\`)
-        .then(r => r.json())
-        .then(data => console.log(\`ID \${i}:\`, data));
-}</code></pre>
-                    </div>
-                    
-                    <div class="hint">
-                        💡 <strong>Hint:</strong> Keep track of which IDs return valid data. When you've found all 5 valid users, request ID 5 again to get the flag.
-                    </div>
-                    
-                    <div class="flag">
-                        🎯 <strong>Flag:</strong> <code>NSA{3NUM3R4T10N_PR0}</code>
-                    </div>
-                </div>
-
-                <!-- Conclusion -->
-                <div class="intro" style="text-align: center; margin-top: 40px;">
-                    <h2>🎉 Tutorial Complete!</h2>
-                    <p>You've learned all the essential tools for the labs:</p>
-                    <ul style="text-align: left;">
-                        <li>✅ Browser DevTools for inspecting network traffic</li>
-                        <li>✅ cURL for command-line HTTP requests</li>
-                        <li>✅ Burp Suite for intercepting and modifying requests</li>
-                        <li>✅ ID Enumeration for systematic resource discovery</li>
-                    </ul>
-                    <p><strong>Ready to apply these skills?</strong></p>
-                    <p><a href="/">← Start the Labs</a></p>
+                <div class="footer">
+                    <p>🧘 ZenFlow Yoga Studio • 123 Peaceful Lane, Downtown • (555) 123-4567</p>
+                    <p style="margin-top: 10px; font-size: 0.9em;">
+                        <a href="/about">About Us</a> | 
+                        <a href="/contact">Contact</a> | 
+                        <a href="/classes">Class Schedule</a> | 
+                        <a href="/membership">Membership Plans</a>
+                    </p>
                 </div>
             </div>
         </body>
@@ -491,124 +188,263 @@ curl http://localhost:3001/api/example/part4/enumerate/5</code></pre>
     `);
 });
 
-// Example API Endpoints
+// Example page - Member Portal Guide
+app.get('/example', (req, res) => {
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Getting Started - ZenFlow Yoga</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                    background: linear-gradient(135deg, #e8f5e9 0%, #c5e1a5 100%);
+                    min-height: 100vh;
+                    padding: 20px;
+                    line-height: 1.6;
+                }
+                .container {
+                    max-width: 900px;
+                    margin: 0 auto;
+                }
+                .header {
+                    background: white;
+                    padding: 30px;
+                    border-radius: 15px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+                    margin-bottom: 30px;
+                    text-align: center;
+                }
+                h1 {
+                    color: #2e7d32;
+                    font-size: 2.5em;
+                    margin-bottom: 10px;
+                }
+                .subtitle {
+                    color: #666;
+                    font-size: 1.1em;
+                }
+                .section {
+                    background: white;
+                    padding: 30px;
+                    border-radius: 15px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+                    margin-bottom: 25px;
+                    border-left: 4px solid #66bb6a;
+                }
+                .section h2 {
+                    color: #2e7d32;
+                    margin-bottom: 15px;
+                    font-size: 1.8em;
+                }
+                .section h3 {
+                    color: #43a047;
+                    margin-top: 20px;
+                    margin-bottom: 10px;
+                }
+                .section p {
+                    color: #555;
+                    margin-bottom: 15px;
+                    line-height: 1.7;
+                }
+                .feature-box {
+                    background: #f1f8e9;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    border-left: 3px solid #66bb6a;
+                }
+                .tip-box {
+                    background: #fff3e0;
+                    border-left: 4px solid #fb8c00;
+                    padding: 15px;
+                    margin: 15px 0;
+                    border-radius: 5px;
+                }
+                ul {
+                    margin-left: 20px;
+                    margin-bottom: 15px;
+                }
+                ul li {
+                    margin: 8px 0;
+                    color: #555;
+                }
+                .btn {
+                    display: inline-block;
+                    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+                    color: white;
+                    padding: 12px 30px;
+                    border-radius: 25px;
+                    text-decoration: none;
+                    font-weight: 600;
+                    transition: transform 0.2s;
+                    margin-top: 10px;
+                }
+                .btn:hover {
+                    transform: translateY(-2px);
+                }
+                .back-link {
+                    text-align: center;
+                    margin-top: 30px;
+                }
+                .back-link a {
+                    color: #2e7d32;
+                    text-decoration: none;
+                    font-weight: 600;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🧘 Getting Started with Your Member Portal</h1>
+                    <p class="subtitle">Everything you need to know about accessing and managing your ZenFlow membership</p>
+                </div>
 
-// Part 1: Browser DevTools - User lookup by ID
-app.get('/api/example/part1/user/:id', (req, res) => {
-    const userId = parseInt(req.params.id);
-    
-    if (userId === 42) {
-        return res.json({
-            id: 42,
-            username: 'devtools_master',
-            message: 'Congratulations! You used Browser DevTools to inspect network requests.',
-            flag: 'NSA{D3VT00LS_M4ST3R}'
-        });
-    }
-    
-    // Generic response for other IDs
-    return res.json({
-        id: userId,
-        username: `user${userId}`,
-        message: 'This is a regular user. Try ID 42 to get the flag!'
-    });
+                <div class="section">
+                    <h2>🌟 Welcome to ZenFlow!</h2>
+                    <p>We're thrilled to have you as part of our yoga community. This guide will help you navigate your member portal and make the most of your membership.</p>
+                    
+                    <div class="feature-box">
+                        <h3>Your Member Benefits</h3>
+                        <ul>
+                            <li><strong>Unlimited Class Access:</strong> Book any class through our scheduling system</li>
+                            <li><strong>Community Directory:</strong> Connect with fellow yoga enthusiasts</li>
+                            <li><strong>Personal Profile:</strong> Track your progress and manage your account</li>
+                            <li><strong>Online Resources:</strong> Access meditation guides and yoga tutorials</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>🎓 Interactive Tutorials</h2>
+                    <p>Learn how to interact with our API and explore member features through these hands-on exercises:</p>
+                </div>
+
+                <div class="section">
+                    <h2>📱 Part 1: Browser DevTools - Member Discovery</h2>
+                    <p>Learn how to browse member profiles using browser developer tools:</p>
+                    
+                    <h3>Tutorial Steps:</h3>
+                    <ol style="margin-left: 20px; color: #555;">
+                        <li>Open your browser's Developer Tools (F12 or Right-click → Inspect)</li>
+                        <li>Go to the Network tab to monitor API requests</li>
+                        <li>Visit this URL in your browser: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">/api/example/part1/member/100</code></li>
+                        <li>Notice the JSON response showing member profile data</li>
+                        <li>Try different member IDs (101, 102, etc.) to browse profiles</li>
+                        <li><strong>Challenge:</strong> Find the hidden VIP member profile (ID 108)!</li>
+                    </ol>
+                    
+                    <div class="tip-box">
+                        💡 <strong>Learning Goal:</strong> Understand how web applications expose data through APIs and how sequential IDs can be enumerated to discover hidden resources.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>💻 Part 2: Command Line - cURL Access</h2>
+                    <p>Explore how to interact with APIs using command-line tools:</p>
+                    
+                    <h3>Tutorial Steps:</h3>
+                    <ol style="margin-left: 20px; color: #555;">
+                        <li>Open your terminal or command prompt</li>
+                        <li>Run this cURL command: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">curl http://localhost:3000/api/example/part2/test</code></li>
+                        <li>Observe the JSON response indicating successful cURL access</li>
+                        <li>Compare: Try accessing the same URL in your browser to see the difference</li>
+                    </ol>
+                    
+                    <div class="feature-box">
+                        <h3>What You'll Learn:</h3>
+                        <p>This endpoint checks the User-Agent header to determine if the request came from cURL. It demonstrates how APIs can detect and respond differently to various client types.</p>
+                    </div>
+                    
+                    <div class="tip-box">
+                        💡 <strong>Learning Goal:</strong> Discover how HTTP headers work and how command-line tools can access APIs in ways browsers typically cannot.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>🔍 Part 3: Request Interception - Parameter Manipulation</h2>
+                    <p>Learn how to intercept and modify HTTP requests to change application behavior:</p>
+                    
+                    <h3>Tutorial Steps (Using Browser DevTools):</h3>
+                    <ol style="margin-left: 20px; color: #555;">
+                        <li>Visit: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">/api/example/part3/intercept</code></li>
+                        <li>Notice you receive "member" level access by default</li>
+                        <li>Now modify the URL to include an access parameter: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">/api/example/part3/intercept?access=instructor</code></li>
+                        <li>Observe how changing the parameter grants instructor-level access!</li>
+                    </ol>
+                    
+                    <h3>Advanced: Using Burp Suite (Optional):</h3>
+                    <ol style="margin-left: 20px; color: #555;">
+                        <li>Configure your browser to use Burp Suite as a proxy</li>
+                        <li>Enable request interception in Burp Suite</li>
+                        <li>Make a request to <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">/api/example/part3/intercept</code></li>
+                        <li>Intercept the request and add <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">?access=instructor</code> to the URL</li>
+                        <li>Forward the modified request to gain elevated access</li>
+                    </ol>
+                    
+                    <div class="tip-box">
+                        💡 <strong>Learning Goal:</strong> Understand how URL parameters control access levels and why applications should never trust client-provided access control parameters.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>🔢 Part 4: Sequential Enumeration - Finding All Members</h2>
+                    <p>Practice systematic enumeration to discover all records in a system:</p>
+                    
+                    <h3>Tutorial Steps:</h3>
+                    <ol style="margin-left: 20px; color: #555;">
+                        <li>Start with member ID 100: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">/api/example/part4/enumerate/100</code></li>
+                        <li>Notice the response includes your enumeration progress</li>
+                        <li>Continue with IDs 101, 102, 103, 104, and 105</li>
+                        <li><strong>Challenge:</strong> Find all 6 active members (IDs 100-105) to receive the flag!</li>
+                    </ol>
+                    
+                    <h3>Automation Tip (Advanced):</h3>
+                    <p style="margin-left: 20px; color: #555; margin-top: 10px;">You can automate enumeration using a bash loop:</p>
+                    <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin-left: 20px; overflow-x: auto; font-family: monospace; font-size: 0.9em; color: #333;">for i in {100..105}; do
+  curl http://localhost:3000/api/example/part4/enumerate/$i
+done</pre>
+                    
+                    <div class="tip-box">
+                        💡 <strong>Learning Goal:</strong> Learn how predictable, sequential IDs allow attackers to enumerate all records in a database, exposing sensitive information at scale.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>📞 Need Help?</h2>
+                    <p>Our team is here to support you on your yoga journey:</p>
+                    <ul>
+                        <li><strong>Email:</strong> support@zenflow.yoga</li>
+                        <li><strong>Phone:</strong> (555) 123-4567</li>
+                        <li><strong>Visit Us:</strong> 123 Peaceful Lane, Downtown</li>
+                        <li><strong>Hours:</strong> Monday-Friday 6am-8pm, Saturday-Sunday 7am-6pm</li>
+                    </ul>
+                </div>
+
+                <div class="back-link">
+                    <a href="/">← Back to Member Portal</a>
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
 });
 
-// Part 2: cURL - Detects User-Agent
-app.get('/api/example/part2/test', (req, res) => {
-    const userAgent = req.headers['user-agent'] || '';
-    
-    // Check if request came from cURL
-    if (userAgent.toLowerCase().includes('curl')) {
-        return res.json({
-            message: 'Congratulations! You used cURL to make this request.',
-            userAgent: userAgent,
-            flag: 'NSA{CURL_C0MM4ND3R}',
-            tip: 'cURL is essential for testing APIs from the command line!'
-        });
-    }
-    
-    // Browser or other client
-    return res.json({
-        message: 'This endpoint requires cURL to access.',
-        userAgent: userAgent,
-        hint: 'Try accessing this endpoint using: curl http://localhost:3001/api/example/part2/test'
-    });
-});
-
-// Part 3: Burp Suite - Requires modified parameter
-app.get('/api/example/part3/intercept', (req, res) => {
-    const access = req.query.access;
-    
-    if (access === 'admin') {
-        return res.json({
-            message: 'Congratulations! You modified the request parameter.',
-            access: 'admin',
-            flag: 'NSA{BURP_1NT3RC3PT0R}',
-            tip: 'You successfully intercepted and modified the request. This is how attackers bypass client-side restrictions!'
-        });
-    }
-    
-    return res.json({
-        message: 'Access denied. Regular users cannot access this resource.',
-        access: access || 'none',
-        hint: 'Try changing the access parameter to "admin" in the URL or using Burp Suite to intercept and modify the request.'
-    });
-});
-
-// Part 4: ID Enumeration - Track discovered users
-const enumerationData = [
-    { id: 1, username: 'alice', department: 'Engineering' },
-    { id: 2, username: 'bob', department: 'Sales' },
-    { id: 3, username: 'charlie', department: 'Marketing' },
-    { id: 4, username: 'diana', department: 'HR' },
-    { id: 5, username: 'eve', department: 'Security' }
-];
-
-app.get('/api/example/part4/enumerate/:id', (req, res) => {
-    const userId = parseInt(req.params.id);
-    const user = enumerationData.find(u => u.id === userId);
-    
-    if (!user) {
-        return res.status(404).json({ 
-            error: 'User not found',
-            message: `No user exists with ID ${userId}`
-        });
-    }
-    
-    // Special response when accessing the last valid user (ID 5)
-    if (userId === 5) {
-        return res.json({
-            id: user.id,
-            username: user.username,
-            department: user.department,
-            message: 'Congratulations! You discovered all 5 users through enumeration.',
-            flag: 'NSA{3NUM3R4T10N_PR0}',
-            allUsers: enumerationData.map(u => u.username),
-            tip: 'Systematic enumeration helps you map out all resources in a system!'
-        });
-    }
-    
-    return res.json({
-        id: user.id,
-        username: user.username,
-        department: user.department,
-        message: `Found user ${userId}. Keep enumerating to find all users!`
-    });
-});
-
-// Lab 1 - User Enumeration (Easy)
+// Lab 1 - Community Directory
 app.get('/lab1', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Lab 1 - User Enumeration</title>
+            <title>Community Directory - ZenFlow Yoga</title>
             <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
-                    background-color: #1a1a1a;
-                    color: #00ff00;
-                    font-family: 'Courier New', monospace;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                    background: linear-gradient(135deg, #e8f5e9 0%, #c5e1a5 100%);
+                    min-height: 100vh;
                     padding: 20px;
                     line-height: 1.6;
                 }
@@ -616,155 +452,234 @@ app.get('/lab1', (req, res) => {
                     max-width: 900px;
                     margin: 0 auto;
                 }
-                h1 {
+                .header {
+                    background: white;
+                    padding: 30px;
+                    border-radius: 15px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+                    margin-bottom: 30px;
                     text-align: center;
+                }
+                h1 {
+                    color: #2e7d32;
                     font-size: 2.5em;
-                    text-shadow: 0 0 10px #00ff00;
-                    border-bottom: 2px solid #00ff00;
-                    padding-bottom: 10px;
+                    margin-bottom: 10px;
                 }
-                .info-box {
-                    background-color: #0a0a0a;
-                    border: 2px solid #00ff00;
+                .subtitle {
+                    color: #666;
+                    font-size: 1.1em;
+                }
+                .info-section {
+                    background: white;
+                    padding: 30px;
+                    border-radius: 15px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+                    margin-bottom: 25px;
+                    border-left: 4px solid #66bb6a;
+                }
+                .info-section h2 {
+                    color: #2e7d32;
+                    margin-bottom: 15px;
+                }
+                .info-section p {
+                    color: #555;
+                    margin-bottom: 15px;
+                }
+                .search-box {
+                    background: #f1f8e9;
+                    padding: 25px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                }
+                .search-input {
+                    width: 100%;
+                    padding: 12px;
+                    border: 2px solid #66bb6a;
+                    border-radius: 8px;
+                    font-size: 1em;
+                    margin-top: 10px;
+                }
+                .member-card {
+                    background: white;
                     padding: 20px;
-                    margin: 20px 0;
-                    border-radius: 5px;
-                }
-                .hint-box {
-                    background-color: #0a0a0a;
-                    border-left: 4px solid #ffaa00;
-                    padding: 15px;
-                    margin: 20px 0;
-                }
-                .endpoint {
-                    background-color: #000;
-                    padding: 15px;
-                    border-radius: 5px;
-                    border-left: 4px solid #00ffff;
+                    border-radius: 10px;
                     margin: 15px 0;
-                    font-family: monospace;
+                    box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+                    border-left: 3px solid #66bb6a;
+                }
+                .member-name {
+                    color: #2e7d32;
+                    font-size: 1.3em;
+                    font-weight: 600;
+                    margin-bottom: 5px;
+                }
+                .member-info {
+                    color: #666;
+                    font-size: 0.95em;
+                }
+                .tip-box {
+                    background: #fff3e0;
+                    border-left: 4px solid #fb8c00;
+                    padding: 15px;
+                    margin: 20px 0;
+                    border-radius: 5px;
+                }
+                .back-link {
+                    text-align: center;
+                    margin-top: 30px;
+                }
+                .back-link a {
+                    color: #2e7d32;
+                    text-decoration: none;
+                    font-weight: 600;
                 }
                 code {
-                    color: #00ffff;
-                }
-                a {
-                    color: #00ffff;
-                    text-decoration: none;
-                    border-bottom: 1px dotted #00ffff;
-                }
-                a:hover {
-                    color: #00ff00;
-                    border-bottom: 1px solid #00ff00;
-                }
-                .difficulty {
-                    display: inline-block;
-                    padding: 5px 15px;
+                    background: #f5f5f5;
+                    padding: 2px 6px;
                     border-radius: 3px;
-                    font-weight: bold;
-                    background-color: #00ff00;
-                    color: #000;
+                    font-family: 'Courier New', monospace;
+                    color: #c62828;
                 }
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>🔍 LAB 1: USER ENUMERATION <span class="difficulty">EASY</span></h1>
-                
-                <div class="info-box">
-                    <h2>📋 Mission Brief</h2>
-                    <p><strong>Stage:</strong> Recon</p>
-                    <p><strong>Objective:</strong> Discover all users in the system</p>
-                    <p><strong>Current User:</strong> Bob (ID: ${CURRENT_USER_ID})</p>
-                    <p><strong>Flag:</strong> Will be revealed when you find all users</p>
+                <div class="header">
+                    <h1>👥 Community Directory</h1>
+                    <p class="subtitle">Connect with fellow yoga enthusiasts and instructors</p>
                 </div>
 
-                <div class="info-box">
-                    <h2>🎯 Challenge Description</h2>
-                    <p>The application has a user lookup endpoint that returns basic information about users. You know your own user ID is ${CURRENT_USER_ID}.</p>
-                    <p>Your task is to enumerate and discover all users in the system. How many users are there? What are their usernames?</p>
-                </div>
-
-                <div class="endpoint">
-                    <strong>API Endpoint:</strong><br>
-                    <code>GET http://localhost:3001/api/lab1/user/:id</code><br><br>
-                    <strong>Example:</strong><br>
-                    <code>GET http://localhost:3001/api/lab1/user/2</code>
-                </div>
-
-                <div class="hint-box">
-                    <strong>💡 Hints:</strong>
-                    <ul>
-                        <li>Try sequential user IDs starting from 1</li>
-                        <li>The endpoint returns different responses for existing vs non-existing users</li>
-                        <li>Keep track of all users you discover</li>
-                        <li>There are exactly 4 users in the system</li>
-                    </ul>
-                </div>
-
-                <div class="info-box">
-                    <h2>🛠️ Testing Instructions</h2>
-                    <p><strong>Using curl:</strong></p>
-                    <pre><code>curl http://localhost:3001/api/lab1/user/1
-curl http://localhost:3001/api/lab1/user/2
-curl http://localhost:3001/api/lab1/user/3
-# ... continue testing</code></pre>
+                <div class="info-section">
+                    <h2>Welcome to Our Community</h2>
+                    <p>The ZenFlow Community Directory helps you connect with other members who share your passion for yoga. Browse member profiles, find practice partners, and get to know our instructors.</p>
                     
-                    <p><strong>Using Browser Console (F12):</strong></p>
-                    <pre><code>fetch('http://localhost:3001/api/lab1/user/1')
-    .then(r => r.json())
-    .then(data => console.log(data));</code></pre>
+                    <div class="search-box">
+                        <strong>🔍 Search for Members</strong>
+                        <input type="text" class="search-input" placeholder="Enter member ID (e.g., 1, 2, 3...)" id="searchInput">
+                        <p style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                            Try searching by member ID to view their public profile. You can find member IDs through class rosters or community events.
+                        </p>
+                    </div>
                 </div>
 
-                <div style="text-align: center; margin-top: 40px;">
-                    <a href="/">← Back to Home</a>
+                <div class="info-section">
+                    <h2>Featured Members</h2>
+                    
+                    <div class="member-card">
+                        <div class="member-name">Sarah Martinez (You)</div>
+                        <div class="member-info">
+                            📧 sarah.martinez@email.com<br>
+                            🎫 Basic Membership<br>
+                            💫 Favorite Class: Hatha Yoga
+                        </div>
+                    </div>
+                    
+                    <div class="tip-box">
+                        💡 <strong>How to Connect:</strong> Use the member lookup API to find other members by their ID. The API returns basic contact information to help you connect with your community.
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h2>📡 API Information</h2>
+                    <p>Developers and members can use our API to programmatically access the directory:</p>
+                    <p style="margin-top: 15px;">
+                        <strong>Endpoint:</strong> <code>GET /api/members/user/:id</code><br>
+                        <strong>Example:</strong> <code>GET /api/members/user/2</code>
+                    </p>
+                    <p style="margin-top: 15px; color: #666; font-size: 0.95em;">
+                        This endpoint returns public profile information for community members. All members can view basic contact details to facilitate connections within our yoga community.
+                    </p>
+                </div>
+
+                <div class="back-link">
+                    <a href="/">← Back to Member Portal</a>
                 </div>
             </div>
+            
+            <script>
+                document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        const id = this.value.trim();
+                        if (id) {
+                            window.location.href = '/api/members/user/' + id;
+                        }
+                    }
+                });
+            </script>
         </body>
         </html>
     `);
 });
 
-// Lab 1 API - User enumeration endpoint (vulnerable)
-app.get('/api/lab1/user/:id', (req, res) => {
+// Lab 1 API - Community directory endpoint (vulnerable to enumeration)
+app.get('/api/members/user/:id', (req, res) => {
     const userId = parseInt(req.params.id);
     const user = users.find(u => u.id === userId);
     
     if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ 
+            error: 'Member not found',
+            message: 'No member exists with this ID in our directory.'
+        });
     }
     
-    // Vulnerable: Returns user info without authorization
-    const foundUsers = users.filter(u => u.id <= userId).length;
+    // Vulnerable: Returns user info without proper access control
+    // Flag only shown when accessing the last user (ID 4) after enumeration
     
-    if (foundUsers === 4) {
+    if (userId === 4) {
         return res.json({
             id: user.id,
             username: user.username,
             email: user.email,
-            flag: 'NSA{F0UND_TH3_US3RS}',
-            message: 'Congratulations! You have discovered all users in the system.'
+            role: user.role,
+            membership: user.membership,
+            flag: 'FLAG{C0MMUN1TY_3NUM3R4T10N_C0MPL3T3}',
+            message: 'You have successfully enumerated all community members!',
+            stats: {
+                totalMembers: users.length,
+                members: users.filter(u => u.role === 'member').length,
+                instructors: users.filter(u => u.role === 'instructor').length
+            }
         });
     }
     
-    return res.json({
+    // Normal response - looks like legitimate directory data
+    const response = {
         id: user.id,
         username: user.username,
-        email: user.email
-    });
+        email: user.email,
+        role: user.role,
+        membership: user.membership
+    };
+    
+    // Add extra info for members
+    if (user.role === 'member') {
+        response.joinDate = user.joinDate;
+        response.favoriteClass = user.favoriteClass;
+    }
+    
+    // Add extra info for instructors
+    if (user.role === 'instructor') {
+        response.specialization = user.specialization;
+        response.yearsTeaching = user.yearsTeaching;
+    }
+    
+    return res.json(response);
 });
 
-// Lab 2 - Profile Access (Medium)
+// Lab 2 - My Profile
 app.get('/lab2', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Lab 2 - Profile Access</title>
+            <title>My Profile - ZenFlow Yoga</title>
             <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
-                    background-color: #1a1a1a;
-                    color: #00ff00;
-                    font-family: 'Courier New', monospace;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                    background: linear-gradient(135deg, #e8f5e9 0%, #c5e1a5 100%);
+                    min-height: 100vh;
                     padding: 20px;
                     line-height: 1.6;
                 }
@@ -772,108 +687,159 @@ app.get('/lab2', (req, res) => {
                     max-width: 900px;
                     margin: 0 auto;
                 }
-                h1 {
+                .header {
+                    background: white;
+                    padding: 30px;
+                    border-radius: 15px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+                    margin-bottom: 30px;
                     text-align: center;
+                }
+                h1 {
+                    color: #2e7d32;
                     font-size: 2.5em;
-                    text-shadow: 0 0 10px #00ff00;
-                    border-bottom: 2px solid #00ff00;
-                    padding-bottom: 10px;
+                    margin-bottom: 10px;
+                }
+                .subtitle {
+                    color: #666;
+                    font-size: 1.1em;
+                }
+                .profile-section {
+                    background: white;
+                    padding: 30px;
+                    border-radius: 15px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+                    margin-bottom: 25px;
+                    border-left: 4px solid #66bb6a;
+                }
+                .profile-section h2 {
+                    color: #2e7d32;
+                    margin-bottom: 20px;
+                }
+                .profile-field {
+                    display: flex;
+                    padding: 15px 0;
+                    border-bottom: 1px solid #f0f0f0;
+                }
+                .profile-field:last-child {
+                    border-bottom: none;
+                }
+                .field-label {
+                    font-weight: 600;
+                    color: #666;
+                    width: 180px;
+                }
+                .field-value {
+                    color: #333;
+                    flex: 1;
                 }
                 .info-box {
-                    background-color: #0a0a0a;
-                    border: 2px solid #00ff00;
+                    background: #f1f8e9;
                     padding: 20px;
-                    margin: 20px 0;
-                    border-radius: 5px;
-                }
-                .hint-box {
-                    background-color: #0a0a0a;
-                    border-left: 4px solid #ffaa00;
-                    padding: 15px;
+                    border-radius: 10px;
                     margin: 20px 0;
                 }
-                .endpoint {
-                    background-color: #000;
-                    padding: 15px;
-                    border-radius: 5px;
-                    border-left: 4px solid #00ffff;
-                    margin: 15px 0;
-                    font-family: monospace;
+                .info-box p {
+                    color: #555;
+                    font-size: 0.95em;
                 }
                 code {
-                    color: #00ffff;
-                }
-                a {
-                    color: #00ffff;
-                    text-decoration: none;
-                    border-bottom: 1px dotted #00ffff;
-                }
-                a:hover {
-                    color: #00ff00;
-                    border-bottom: 1px solid #00ff00;
-                }
-                .difficulty {
-                    display: inline-block;
-                    padding: 5px 15px;
+                    background: #f5f5f5;
+                    padding: 2px 6px;
                     border-radius: 3px;
-                    font-weight: bold;
-                    background-color: #ffaa00;
-                    color: #000;
+                    font-family: 'Courier New', monospace;
+                    color: #c62828;
+                    font-size: 0.9em;
+                }
+                .back-link {
+                    text-align: center;
+                    margin-top: 30px;
+                }
+                .back-link a {
+                    color: #2e7d32;
+                    text-decoration: none;
+                    font-weight: 600;
+                }
+                .btn {
+                    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+                    color: white;
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    margin-top: 15px;
                 }
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>🎭 LAB 2: PROFILE ACCESS <span class="difficulty">MEDIUM</span></h1>
-                
-                <div class="info-box">
-                    <h2>📋 Mission Brief</h2>
-                    <p><strong>Stage:</strong> Initial Access</p>
-                    <p><strong>Objective:</strong> Access another user's private profile data</p>
-                    <p><strong>Current User:</strong> Bob (ID: ${CURRENT_USER_ID})</p>
-                    <p><strong>Flag:</strong> Will be revealed when you access someone else's profile</p>
+                <div class="header">
+                    <h1>👤 My Profile</h1>
+                    <p class="subtitle">Manage your membership and personal information</p>
                 </div>
 
-                <div class="info-box">
-                    <h2>🎯 Challenge Description</h2>
-                    <p>Users have profile pages containing sensitive information like Social Security Numbers. The application should only allow users to view their own profile.</p>
-                    <p>You are logged in as Bob (User ID: ${CURRENT_USER_ID}). Can you access another user's private profile information?</p>
-                </div>
-
-                <div class="endpoint">
-                    <strong>API Endpoint:</strong><br>
-                    <code>GET http://localhost:3001/api/lab2/user/:id/profile</code><br><br>
-                    <strong>Your Profile:</strong><br>
-                    <code>GET http://localhost:3001/api/lab2/user/${CURRENT_USER_ID}/profile</code><br><br>
-                    <strong>Try accessing:</strong><br>
-                    <code>GET http://localhost:3001/api/lab2/user/1/profile</code>
-                </div>
-
-                <div class="hint-box">
-                    <strong>💡 Hints:</strong>
-                    <ul>
-                        <li>The endpoint checks if you're logged in (you are - as Bob)</li>
-                        <li>But does it check WHOSE profile you're accessing?</li>
-                        <li>Try accessing profiles with different user IDs</li>
-                        <li>Your goal is to view someone else's SSN</li>
-                    </ul>
-                </div>
-
-                <div class="info-box">
-                    <h2>🛠️ Testing Instructions</h2>
-                    <p><strong>Using curl:</strong></p>
-                    <pre><code>curl http://localhost:3001/api/lab2/user/2/profile  # Your profile
-curl http://localhost:3001/api/lab2/user/1/profile  # Alice's profile?
-curl http://localhost:3001/api/lab2/user/3/profile  # Charlie's profile?</code></pre>
+                <div class="profile-section">
+                    <h2>📋 Account Information</h2>
                     
-                    <p><strong>Using Browser Console (F12):</strong></p>
-                    <pre><code>fetch('http://localhost:3001/api/lab2/user/1/profile')
-    .then(r => r.json())
-    .then(data => console.log(data));</code></pre>
+                    <div class="profile-field">
+                        <div class="field-label">Member ID:</div>
+                        <div class="field-value">#${CURRENT_USER_ID}</div>
+                    </div>
+                    <div class="profile-field">
+                        <div class="field-label">Username:</div>
+                        <div class="field-value">sarah_m</div>
+                    </div>
+                    <div class="profile-field">
+                        <div class="field-label">Email:</div>
+                        <div class="field-value">sarah.martinez@email.com</div>
+                    </div>
+                    <div class="profile-field">
+                        <div class="field-label">Member Since:</div>
+                        <div class="field-value">June 2024</div>
+                    </div>
                 </div>
 
-                <div style="text-align: center; margin-top: 40px;">
-                    <a href="/">← Back to Home</a>
+                <div class="profile-section">
+                    <h2>🎫 Membership Details</h2>
+                    
+                    <div class="profile-field">
+                        <div class="field-label">Plan:</div>
+                        <div class="field-value">Basic Membership</div>
+                    </div>
+                    <div class="profile-field">
+                        <div class="field-label">Renewal Date:</div>
+                        <div class="field-value">February 28, 2025</div>
+                    </div>
+                    <div class="profile-field">
+                        <div class="field-label">Favorite Class:</div>
+                        <div class="field-value">Hatha Yoga</div>
+                    </div>
+                    
+                    <button class="btn">Upgrade to Premium</button>
+                </div>
+
+                <div class="profile-section">
+                    <h2>💳 Payment Information</h2>
+                    
+                    <div class="profile-field">
+                        <div class="field-label">Payment Method:</div>
+                        <div class="field-value">Credit Card ending in 7821</div>
+                    </div>
+                    <div class="profile-field">
+                        <div class="field-label">Billing Status:</div>
+                        <div class="field-value">✅ Active</div>
+                    </div>
+                    
+                    <div class="info-box">
+                        <p><strong>🔒 Secure Profile Access</strong></p>
+                        <p style="margin-top: 10px;">Your profile information is private and accessible only through our secure API at <code>GET /api/profile/user/${CURRENT_USER_ID}</code></p>
+                        <p style="margin-top: 10px; font-size: 0.9em; color: #777;">This data is encrypted and protected by our authentication system.</p>
+                    </div>
+                </div>
+
+                <div class="back-link">
+                    <a href="/">← Back to Member Portal</a>
                 </div>
             </div>
         </body>
@@ -882,52 +848,67 @@ curl http://localhost:3001/api/lab2/user/3/profile  # Charlie's profile?</code><
 });
 
 // Lab 2 API - Profile access endpoint (vulnerable to IDOR)
-app.get('/api/lab2/user/:id/profile', (req, res) => {
+app.get('/api/profile/user/:id', (req, res) => {
     const userId = parseInt(req.params.id);
     const user = users.find(u => u.id === userId);
     
     if (!user) {
-        return res.status(404).json({ error: 'User not found' });
-    }
-    
-    // Vulnerable: Checks that someone is logged in, but not WHO is accessing
-    // In a real app, this would check req.session.userId
-    // For this lab, we simulate that Bob (ID 2) is always logged in
-    
-    // If accessing someone else's profile
-    if (userId !== CURRENT_USER_ID) {
-        return res.json({
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            ssn: user.ssn,
-            flag: 'NSA{1D0R_V1A_1NC3PT10N}',
-            message: `Congratulations! You accessed ${user.username}'s private profile data using IDOR.`
+        return res.status(404).json({ 
+            error: 'Member not found',
+            message: 'Invalid member ID'
         });
     }
     
-    // Accessing own profile
-    return res.json({
+    // Vulnerable: Checks that someone is logged in, but not WHO is accessing
+    // Should verify: req.session.userId === userId
+    // Instead: returns data for ANY valid user ID
+    
+    // Build response with sensitive data
+    const profileData = {
         id: user.id,
         username: user.username,
         email: user.email,
-        ssn: user.ssn,
-        message: 'This is your own profile. Try accessing another user\'s profile!'
-    });
+        role: user.role,
+        membership: user.membership,
+        creditCard: user.creditCard,
+        renewalDate: user.renewalDate
+    };
+    
+    // Add member-specific data
+    if (user.role === 'member') {
+        profileData.joinDate = user.joinDate;
+        profileData.favoriteClass = user.favoriteClass;
+    }
+    
+    // Add instructor-specific data
+    if (user.role === 'instructor') {
+        profileData.specialization = user.specialization;
+        profileData.yearsTeaching = user.yearsTeaching;
+        profileData.accessLevel = user.accessLevel;
+    }
+    
+    // If accessing someone else's profile (IDOR vulnerability exploited)
+    if (userId !== CURRENT_USER_ID) {
+        profileData.flag = 'FLAG{1D0R_PR0F1L3_4CC3SS_V1OL4T10N}';
+        profileData._vuln_note = 'Unauthorized access: You accessed another member\'s private profile!';
+    }
+    
+    return res.json(profileData);
 });
 
-// Lab 3 - Privilege Escalation (Hard)
+// Lab 3 - Instructor Dashboard
 app.get('/lab3', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Lab 3 - Privilege Escalation</title>
+            <title>Instructor Dashboard - ZenFlow Yoga</title>
             <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
-                    background-color: #1a1a1a;
-                    color: #00ff00;
-                    font-family: 'Courier New', monospace;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                    background: linear-gradient(135deg, #e8f5e9 0%, #c5e1a5 100%);
+                    min-height: 100vh;
                     padding: 20px;
                     line-height: 1.6;
                 }
@@ -935,117 +916,135 @@ app.get('/lab3', (req, res) => {
                     max-width: 900px;
                     margin: 0 auto;
                 }
-                h1 {
+                .header {
+                    background: white;
+                    padding: 30px;
+                    border-radius: 15px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+                    margin-bottom: 30px;
                     text-align: center;
+                }
+                h1 {
+                    color: #2e7d32;
                     font-size: 2.5em;
-                    text-shadow: 0 0 10px #00ff00;
-                    border-bottom: 2px solid #00ff00;
-                    padding-bottom: 10px;
+                    margin-bottom: 10px;
                 }
-                .info-box {
-                    background-color: #0a0a0a;
-                    border: 2px solid #00ff00;
+                .subtitle {
+                    color: #666;
+                    font-size: 1.1em;
+                }
+                .alert-box {
+                    background: #ffebee;
+                    border-left: 4px solid #d32f2f;
                     padding: 20px;
-                    margin: 20px 0;
-                    border-radius: 5px;
-                }
-                .hint-box {
-                    background-color: #0a0a0a;
-                    border-left: 4px solid #ffaa00;
-                    padding: 15px;
+                    border-radius: 10px;
                     margin: 20px 0;
                 }
-                .endpoint {
-                    background-color: #000;
-                    padding: 15px;
-                    border-radius: 5px;
-                    border-left: 4px solid #00ffff;
+                .alert-box h2 {
+                    color: #c62828;
+                    margin-bottom: 10px;
+                }
+                .alert-box p {
+                    color: #666;
+                }
+                .info-section {
+                    background: white;
+                    padding: 30px;
+                    border-radius: 15px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+                    margin-bottom: 25px;
+                    border-left: 4px solid #66bb6a;
+                }
+                .info-section h2 {
+                    color: #2e7d32;
+                    margin-bottom: 15px;
+                }
+                .info-section p {
+                    color: #555;
+                    margin-bottom: 15px;
+                    line-height: 1.7;
+                }
+                .feature-list {
+                    background: #f1f8e9;
+                    padding: 20px 20px 20px 40px;
+                    border-radius: 10px;
                     margin: 15px 0;
-                    font-family: monospace;
+                }
+                .feature-list li {
+                    color: #555;
+                    margin: 8px 0;
                 }
                 code {
-                    color: #00ffff;
-                }
-                a {
-                    color: #00ffff;
-                    text-decoration: none;
-                    border-bottom: 1px dotted #00ffff;
-                }
-                a:hover {
-                    color: #00ff00;
-                    border-bottom: 1px solid #00ff00;
-                }
-                .difficulty {
-                    display: inline-block;
-                    padding: 5px 15px;
+                    background: #f5f5f5;
+                    padding: 2px 6px;
                     border-radius: 3px;
-                    font-weight: bold;
-                    background-color: #ff0000;
-                    color: #fff;
+                    font-family: 'Courier New', monospace;
+                    color: #c62828;
+                    font-size: 0.9em;
                 }
-                .warning {
-                    background-color: #330000;
-                    border-left: 4px solid #ff0000;
-                    padding: 15px;
-                    margin: 15px 0;
+                .back-link {
+                    text-align: center;
+                    margin-top: 30px;
+                }
+                .back-link a {
+                    color: #2e7d32;
+                    text-decoration: none;
+                    font-weight: 600;
                 }
             </style>
         </head>
         <body>
             <div class="container">
-                <h1>👑 LAB 3: PRIVILEGE ESCALATION <span class="difficulty">HARD</span></h1>
-                
-                <div class="info-box">
-                    <h2>📋 Mission Brief</h2>
-                    <p><strong>Stage:</strong> Maintained Access</p>
-                    <p><strong>Objective:</strong> Gain administrative access</p>
-                    <p><strong>Current User:</strong> Bob (ID: ${CURRENT_USER_ID}, Role: user)</p>
-                    <p><strong>Flag:</strong> Will be revealed when you access the admin panel</p>
+                <div class="header">
+                    <h1>📅 Instructor Dashboard</h1>
+                    <p class="subtitle">Manage classes, bookings, and teaching resources</p>
                 </div>
 
-                <div class="info-box">
-                    <h2>🎯 Challenge Description</h2>
-                    <p>The application has an admin panel that should only be accessible to administrators. Regular users like Bob should receive a "Forbidden" error.</p>
-                    <p>You are logged in as Bob, a regular user. Can you find a way to access the admin panel and escalate your privileges?</p>
+                <div class="alert-box">
+                    <h2>🔒 Staff Access Required</h2>
+                    <p>You are currently logged in as <strong>sarah_m</strong> (Basic Member).</p>
+                    <p style="margin-top: 10px;">This area is restricted to ZenFlow instructors and staff members only. If you believe you should have access, please contact our admin team at staff@zenflow.yoga.</p>
                 </div>
 
-                <div class="warning">
-                    <strong>⚠️ WARNING:</strong> This is a privilege escalation challenge. You need to think about how the application determines who is an administrator.
-                </div>
-
-                <div class="endpoint">
-                    <strong>API Endpoint:</strong><br>
-                    <code>GET http://localhost:3001/api/lab3/user/:id/admin</code><br><br>
-                    <strong>Example (will fail for you):</strong><br>
-                    <code>GET http://localhost:3001/api/lab3/user/${CURRENT_USER_ID}/admin</code>
-                </div>
-
-                <div class="hint-box">
-                    <strong>💡 Hints:</strong>
-                    <ul>
-                        <li>The endpoint checks your role, but WHERE does it get that role from?</li>
-                        <li>You know from Lab 1 that there are 4 users in the system</li>
-                        <li>One of these users might have admin privileges...</li>
-                        <li>Can you access the admin panel by pretending to be someone else?</li>
-                        <li>Think IDOR, but for privilege escalation</li>
+                <div class="info-section">
+                    <h2>About the Instructor Dashboard</h2>
+                    <p>Our Instructor Dashboard provides teaching staff with tools to manage their classes and connect with students:</p>
+                    
+                    <ul class="feature-list">
+                        <li><strong>Class Scheduling:</strong> Create and manage your class schedule</li>
+                        <li><strong>Student Roster:</strong> View registered students for each class</li>
+                        <li><strong>Booking Management:</strong> Handle class cancellations and waitlists</li>
+                        <li><strong>Teaching Resources:</strong> Access lesson plans and studio guidelines</li>
+                        <li><strong>Performance Analytics:</strong> Track class attendance and student feedback</li>
                     </ul>
                 </div>
 
-                <div class="info-box">
-                    <h2>🛠️ Testing Instructions</h2>
-                    <p><strong>Using curl:</strong></p>
-                    <pre><code>curl http://localhost:3001/api/lab3/user/2/admin  # Your attempt (will fail)
-curl http://localhost:3001/api/lab3/user/1/admin  # Try other users?
-# Keep testing different user IDs...</code></pre>
-                    
-                    <p><strong>Using Browser Console (F12):</strong></p>
-                    <pre><code>fetch('http://localhost:3001/api/lab3/user/4/admin')
-    .then(r => r.json())
-    .then(data => console.log(data));</code></pre>
+                <div class="info-section">
+                    <h2>🎓 Becoming an Instructor</h2>
+                    <p>Interested in teaching at ZenFlow? We're always looking for passionate, certified yoga instructors to join our team.</p>
+                    <p style="margin-top: 15px;"><strong>Requirements:</strong></p>
+                    <ul class="feature-list">
+                        <li>200-hour (minimum) yoga teacher certification</li>
+                        <li>Liability insurance</li>
+                        <li>CPR/First Aid certification</li>
+                        <li>Experience teaching group classes</li>
+                    </ul>
+                    <p style="margin-top: 15px;">Contact <strong>careers@zenflow.yoga</strong> for more information about joining our teaching staff.</p>
                 </div>
 
-                <div style="text-align: center; margin-top: 40px;">
-                    <a href="/">← Back to Home</a>
+                <div class="info-section">
+                    <h2>🔧 Technical Information</h2>
+                    <p>The instructor dashboard is accessed through a staff-only API endpoint:</p>
+                    <p style="margin-top: 15px;">
+                        <strong>Endpoint:</strong> <code>GET /api/instructor/user/:id/dashboard</code>
+                    </p>
+                    <p style="margin-top: 10px; color: #777; font-size: 0.9em;">
+                        This endpoint verifies instructor credentials and role-based permissions before granting access to administrative features.
+                    </p>
+                </div>
+
+                <div class="back-link">
+                    <a href="/">← Back to Member Portal</a>
                 </div>
             </div>
         </body>
@@ -1053,51 +1052,255 @@ curl http://localhost:3001/api/lab3/user/1/admin  # Try other users?
     `);
 });
 
-// Lab 3 API - Admin panel endpoint (vulnerable to privilege escalation via IDOR)
-app.get('/api/lab3/user/:id/admin', (req, res) => {
+// Lab 3 API - Instructor dashboard endpoint (vulnerable to privilege escalation via IDOR)
+app.get('/api/instructor/user/:id/dashboard', (req, res) => {
     const userId = parseInt(req.params.id);
     const user = users.find(u => u.id === userId);
     
     if (!user) {
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ 
+            error: 'Member not found',
+            message: 'Invalid member ID'
+        });
     }
     
-    // Vulnerable: Checks the role of the requested user ID, not the current user
-    // Should check: if (CURRENT_USER.role !== 'admin')
-    // Instead checks: if (user.role !== 'admin') where user is from URL parameter
+    // Vulnerable: No session management or authentication
+    // Should have: 
+    //   1. Session management to track current logged-in user
+    //   2. Check if req.session.userId exists and is valid
+    //   3. Verify req.session.user.role === 'instructor'
+    // Instead: Checks the role of the requested user ID (from URL parameter)
+    // This allows privilege escalation by requesting instructor IDs
     
-    if (user.role !== 'admin') {
+    if (user.role !== 'instructor') {
         return res.status(403).json({ 
-            error: 'Forbidden',
-            message: 'Access denied. Admin privileges required.'
+            error: 'Access Denied',
+            message: 'This area is restricted to ZenFlow instructors only.',
+            yourRole: 'member',
+            requiredRole: 'instructor'
         });
     }
     
-    // If we get here, the user found via ID is an admin
-    const isActuallyAdmin = (userId === 4); // User ID 4 is the real admin
+    // If we get here, the requested user ID belongs to an instructor
+    // Build instructor dashboard data
+    const dashboardData = {
+        message: 'Welcome to the Instructor Dashboard',
+        instructor: {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            specialization: user.specialization,
+            yearsTeaching: user.yearsTeaching
+        },
+        upcomingClasses: [
+            { date: '2025-01-20', time: '9:00 AM', type: 'Vinyasa Flow', enrolled: 12 },
+            { date: '2025-01-22', time: '6:00 PM', type: 'Meditation', enrolled: 8 },
+            { date: '2025-01-25', time: '10:00 AM', type: 'Power Yoga', enrolled: 15 }
+        ],
+        studentStats: {
+            totalStudents: 45,
+            averageAttendance: '87%',
+            rating: 4.8
+        },
+        resources: {
+            lessonPlans: '/instructor/resources/lessons',
+            studioGuidelines: '/instructor/resources/guidelines',
+            attendanceReports: '/instructor/reports/attendance'
+        }
+    };
     
-    if (isActuallyAdmin && userId !== CURRENT_USER_ID) {
+    // If privilege escalation occurred (accessing instructor dashboard as regular member)
+    if (userId !== CURRENT_USER_ID) {
+        dashboardData.flag = 'FLAG{PR1V1L3G3_3SC4L4T10N_1NSTRUCT0R}';
+        dashboardData._vuln_note = 'Privilege escalation detected: Regular member accessed instructor dashboard!';
+    }
+    
+    return res.json(dashboardData);
+});
+
+// ============================================================================
+// EXAMPLE API ENDPOINTS - For Instructor Demonstrations
+// ============================================================================
+
+// Example member profiles database for demonstrations
+const exampleMembers = [
+    { id: 100, name: 'Alex Rivera', email: 'alex.r@email.com', membershipType: 'Premium', favoriteClass: 'Vinyasa Flow', joinedDate: '2023-05-12' },
+    { id: 101, name: 'Jordan Lee', email: 'jordan.l@email.com', membershipType: 'Basic', favoriteClass: 'Hatha Yoga', joinedDate: '2024-01-08' },
+    { id: 102, name: 'Taylor Brooks', email: 'taylor.b@email.com', membershipType: 'Premium', favoriteClass: 'Power Yoga', joinedDate: '2023-11-20' },
+    { id: 103, name: 'Morgan Chen', email: 'morgan.c@email.com', membershipType: 'Basic', favoriteClass: 'Yin Yoga', joinedDate: '2024-03-15' },
+    { id: 104, name: 'Casey Wong', email: 'casey.w@email.com', membershipType: 'Premium', favoriteClass: 'Ashtanga', joinedDate: '2023-08-30' },
+    { id: 105, name: 'Riley Martinez', email: 'riley.m@email.com', membershipType: 'Family', favoriteClass: 'Restorative Yoga', joinedDate: '2024-02-18' },
+    { id: 108, name: 'Jamie Thompson', email: 'jamie.t@zenflow.yoga', membershipType: 'Staff', role: 'hidden_member', favoriteClass: 'Kundalini', joinedDate: '2022-01-05', specialNote: 'VIP Founding Member' }
+];
+
+// Track enumeration progress for Part 4
+// Note: Global state is intentional for this demo - it tracks progress across all requests
+// to simulate real-world enumeration where the attacker makes multiple sequential requests
+const enumerationProgress = new Set();
+
+// Example Part 1 - DevTools Demo: Browse member profiles by ID
+app.get('/api/example/part1/member/:id', (req, res) => {
+    const memberId = parseInt(req.params.id);
+    const member = exampleMembers.find(m => m.id === memberId);
+    
+    if (!member) {
+        return res.status(404).json({
+            error: 'Member not found',
+            message: 'No member profile exists with this ID.',
+            hint: 'Try IDs between 100-110'
+        });
+    }
+    
+    // Flag appears when accessing the hidden member (ID 108)
+    if (memberId === 108) {
         return res.json({
-            message: 'Welcome to the Admin Panel',
-            user: user.username,
-            role: user.role,
-            flag: 'NSA{R00T_4CC3SS_4CH13V3D}',
-            adminData: {
-                totalUsers: users.length,
-                systemVersion: '1.0.0',
-                secretKey: 'admin_secret_key_12345'
-            },
-            congratulations: 'You successfully escalated privileges to admin through IDOR!'
+            success: true,
+            member: member,
+            flag: 'FLAG{D3VT00LS_M3MB3R_D1SC0V3RY}',
+            message: '🎉 Congratulations! You discovered the hidden VIP member profile!',
+            tutorial: 'You successfully used browser DevTools to enumerate member IDs and find hidden resources.'
         });
     }
     
-    return res.json({
-        message: 'Welcome to the Admin Panel',
-        user: user.username,
-        role: user.role,
-        adminData: {
-            totalUsers: users.length,
-            systemVersion: '1.0.0'
+    // Regular member profile
+    res.json({
+        success: true,
+        member: {
+            id: member.id,
+            name: member.name,
+            email: member.email,
+            membershipType: member.membershipType,
+            favoriteClass: member.favoriteClass,
+            joinedDate: member.joinedDate
+        }
+    });
+});
+
+// Example Part 2 - cURL Demo: API that checks User-Agent
+app.get('/api/example/part2/test', (req, res) => {
+    const userAgent = req.headers['user-agent'] || '';
+    
+    // Check if request came from cURL
+    if (userAgent.toLowerCase().includes('curl')) {
+        return res.json({
+            success: true,
+            flag: 'FLAG{CURL_C0MM4ND_L1N3_M4ST3R}',
+            message: '🎉 Success! You accessed the API using cURL!',
+            tutorial: 'You learned how command-line tools can interact with web APIs in ways the browser cannot.',
+            requestInfo: {
+                userAgent: userAgent,
+                method: req.method,
+                timestamp: new Date().toISOString()
+            }
+        });
+    }
+    
+    // Default response for browser requests
+    res.json({
+        success: false,
+        message: 'This endpoint requires cURL access.',
+        hint: 'Try accessing this endpoint using the cURL command-line tool instead of your browser.',
+        yourUserAgent: userAgent,
+        expectedUserAgent: 'curl/*'
+    });
+});
+
+// Example Part 3 - Intercept Demo: Access level parameter manipulation
+app.get('/api/example/part3/intercept', (req, res) => {
+    const accessLevel = req.query.access || 'member';
+    
+    // Vulnerable: trusts client-provided access level parameter
+    if (accessLevel === 'instructor') {
+        return res.json({
+            success: true,
+            accessLevel: 'instructor',
+            flag: 'FLAG{1NT3RC3PT_P4R4M_M4N1PUL4T10N}',
+            message: '🎉 Access granted! You manipulated the access parameter to gain instructor privileges!',
+            tutorial: 'You learned how to intercept and modify HTTP requests to change application behavior.',
+            instructorData: {
+                upcomingClasses: [
+                    { date: '2025-01-20', time: '9:00 AM', class: 'Vinyasa Flow', enrolled: 12, capacity: 15 },
+                    { date: '2025-01-22', time: '6:00 PM', class: 'Meditation Session', enrolled: 8, capacity: 20 },
+                    { date: '2025-01-25', time: '10:00 AM', class: 'Power Yoga', enrolled: 15, capacity: 15 }
+                ],
+                teachingResources: {
+                    lessonPlans: 'https://zenflow.yoga/instructor/lessons',
+                    studentRoster: 'https://zenflow.yoga/instructor/roster',
+                    salaryInfo: '$45/hour base rate + bonuses'
+                }
+            }
+        });
+    }
+    
+    // Member-level access (default)
+    res.json({
+        success: true,
+        accessLevel: 'member',
+        message: 'Member portal access',
+        memberData: {
+            upcomingClasses: [
+                { date: '2025-01-20', time: '9:00 AM', class: 'Vinyasa Flow', spotsLeft: 3 },
+                { date: '2025-01-22', time: '6:00 PM', class: 'Meditation Session', spotsLeft: 12 },
+                { date: '2025-01-25', time: '10:00 AM', class: 'Power Yoga', spotsLeft: 0 }
+            ]
+        },
+        hint: 'Standard member access. Notice the URL parameters...'
+    });
+});
+
+// Example Part 4 - Enumeration Demo: Find all active members
+app.get('/api/example/part4/enumerate/:id', (req, res) => {
+    const memberId = parseInt(req.params.id);
+    const member = exampleMembers.find(m => m.id === memberId && m.id >= 100 && m.id <= 105);
+    
+    if (!member) {
+        return res.status(404).json({
+            error: 'Member not found',
+            message: 'No active member found with this ID.',
+            hint: 'Active members have IDs in the range 100-105'
+        });
+    }
+    
+    // Track enumeration progress
+    enumerationProgress.add(memberId);
+    
+    // Check if all active members (100-105) have been enumerated
+    const allActiveMembers = [100, 101, 102, 103, 104, 105];
+    const allFound = allActiveMembers.every(id => enumerationProgress.has(id));
+    
+    if (allFound) {
+        return res.json({
+            success: true,
+            member: member,
+            flag: 'FLAG{3NUM3R4T10N_C0MPL3T3_4LL_M3MB3RS}',
+            message: '🎉 Congratulations! You successfully enumerated all active members!',
+            tutorial: 'You learned how sequential ID enumeration can expose all records in a system.',
+            stats: {
+                totalMembersFound: enumerationProgress.size,
+                activeMembers: allActiveMembers.length,
+                memberList: allActiveMembers.map(id => {
+                    const m = exampleMembers.find(member => member.id === id);
+                    return { id: m.id, name: m.name, email: m.email };
+                })
+            }
+        });
+    }
+    
+    // Normal response - show progress
+    res.json({
+        success: true,
+        member: {
+            id: member.id,
+            name: member.name,
+            email: member.email,
+            membershipType: member.membershipType,
+            favoriteClass: member.favoriteClass
+        },
+        progress: {
+            found: enumerationProgress.size,
+            total: allActiveMembers.length,
+            remaining: allActiveMembers.length - enumerationProgress.size,
+            hint: 'Keep enumerating to find all active members (IDs 100-105)'
         }
     });
 });
@@ -1105,10 +1308,10 @@ app.get('/api/lab3/user/:id/admin', (req, res) => {
 app.listen(PORT, () => {
     console.log(`\x1b[32m
 ╔════════════════════════════════════════════╗
-║   A01: BROKEN ACCESS CONTROL LAB          ║
+║   🧘 ZenFlow Yoga - Member Portal         ║
 ║   Server running on port ${PORT}           ║
 ║                                            ║
-║   Access the lab:                         ║
+║   Access the portal:                      ║
 ║   http://localhost:${PORT}                    ║
 ╚════════════════════════════════════════════╝
 \x1b[0m`);
