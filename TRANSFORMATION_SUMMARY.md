@@ -1,7 +1,11 @@
 # OWASP Lab Transformation Summary
 
 ## Overview
-Three OWASP security training labs have been transformed into realistic business scenarios while maintaining all security vulnerabilities and learning objectives.
+Three OWASP security training labs (A06, A07, A08) have been transformed from hacker/cyberpunk themes to realistic business scenarios while maintaining all security vulnerabilities and learning objectives.
+
+**Goal:** Make security training more relatable and engaging through professional business contexts.
+
+**Date:** December 2024
 
 ## Transformations
 
