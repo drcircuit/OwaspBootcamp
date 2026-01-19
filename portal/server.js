@@ -70,20 +70,22 @@ async function runMigrations() {
       const countResult = await pool.query('SELECT COUNT(*)::int as count FROM challenges');
       const challengeCount = countResult.rows[0].count;
       
-      // Expected: 51 challenges (A01-A10 + Citadel)
-      if (challengeCount < 51) {
+      // Expected: At least 51 challenges (A01-A10 + Citadel final exam)
+      // If significantly fewer, repopulate from init.sql
+      if (challengeCount < 50) {
         console.log(`Found only ${challengeCount} challenges, populating missing challenges...`);
         
         // Clear existing challenges to avoid duplicates
         await pool.query('TRUNCATE TABLE challenges CASCADE');
         console.log('Cleared existing challenges');
         
-        // Read and execute init.sql challenges section
+        // Read init.sql asynchronously
         const initSqlPath = path.join(__dirname, 'db', 'init.sql');
-        const initSql = fs.readFileSync(initSqlPath, 'utf8');
+        const initSql = await fs.promises.readFile(initSqlPath, 'utf8');
         
-        // Extract just the INSERT statements for challenges
-        const challengeInserts = initSql.match(/INSERT INTO challenges[\s\S]*?;/g);
+        // Extract INSERT statements specifically for challenges table
+        // Match: INSERT INTO challenges ... VALUES ... ;
+        const challengeInserts = initSql.match(/INSERT INTO challenges\s+\([^)]+\)\s+VALUES\s+[\s\S]*?;/gi);
         
         if (challengeInserts) {
           for (const insertStmt of challengeInserts) {
