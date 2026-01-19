@@ -318,49 +318,97 @@ app.get('/example', (req, res) => {
                 </div>
 
                 <div class="section">
-                    <h2>👥 Exploring the Community Directory</h2>
-                    <p>Our Community Directory helps you connect with other members and instructors. You can:</p>
-                    <ul>
-                        <li>Browse member profiles to find yoga buddies</li>
-                        <li>View instructor specializations and teaching styles</li>
-                        <li>Send messages to coordinate carpools or study groups</li>
-                    </ul>
-                    
-                    <div class="tip-box">
-                        💡 <strong>Tip:</strong> The directory shows basic contact information for all members. Visit the Community Directory to see who shares your interests!
-                    </div>
+                    <h2>🎓 Interactive Tutorials</h2>
+                    <p>Learn how to interact with our API and explore member features through these hands-on exercises:</p>
                 </div>
 
                 <div class="section">
-                    <h2>👤 Managing Your Profile</h2>
-                    <p>Your profile is your personal space to manage everything related to your membership:</p>
+                    <h2>📱 Part 1: Browser DevTools - Member Discovery</h2>
+                    <p>Learn how to browse member profiles using browser developer tools:</p>
                     
-                    <h3>What's in Your Profile:</h3>
-                    <ul>
-                        <li><strong>Membership Details:</strong> View your current plan and renewal date</li>
-                        <li><strong>Payment Information:</strong> Manage your payment methods securely</li>
-                        <li><strong>Class History:</strong> Track which classes you've attended</li>
-                        <li><strong>Personal Preferences:</strong> Set your favorite class types and instructors</li>
-                    </ul>
-                    
-                    <div class="feature-box">
-                        <h3>Privacy & Security</h3>
-                        <p>Your profile information is private and only visible to you. We use industry-standard security to protect your payment details and personal data.</p>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2>📅 Class Booking & Scheduling</h2>
-                    <p>Booking classes is easy! Here's how:</p>
+                    <h3>Tutorial Steps:</h3>
                     <ol style="margin-left: 20px; color: #555;">
-                        <li>Visit the Class Schedule page from the main menu</li>
-                        <li>Browse upcoming classes by date, instructor, or style</li>
-                        <li>Click "Book Now" on any class that interests you</li>
-                        <li>Receive a confirmation email with class details</li>
+                        <li>Open your browser's Developer Tools (F12 or Right-click → Inspect)</li>
+                        <li>Go to the Network tab to monitor API requests</li>
+                        <li>Visit this URL in your browser: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">/api/example/part1/member/100</code></li>
+                        <li>Notice the JSON response showing member profile data</li>
+                        <li>Try different member IDs (101, 102, etc.) to browse profiles</li>
+                        <li><strong>Challenge:</strong> Find the hidden VIP member profile (ID 108)!</li>
                     </ol>
                     
                     <div class="tip-box">
-                        💡 <strong>Tip:</strong> Premium members can book classes up to 30 days in advance, while Basic members can book 7 days ahead.
+                        💡 <strong>Learning Goal:</strong> Understand how web applications expose data through APIs and how sequential IDs can be enumerated to discover hidden resources.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>💻 Part 2: Command Line - cURL Access</h2>
+                    <p>Explore how to interact with APIs using command-line tools:</p>
+                    
+                    <h3>Tutorial Steps:</h3>
+                    <ol style="margin-left: 20px; color: #555;">
+                        <li>Open your terminal or command prompt</li>
+                        <li>Run this cURL command: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">curl http://localhost:3000/api/example/part2/test</code></li>
+                        <li>Observe the JSON response indicating successful cURL access</li>
+                        <li>Compare: Try accessing the same URL in your browser to see the difference</li>
+                    </ol>
+                    
+                    <div class="feature-box">
+                        <h3>What You'll Learn:</h3>
+                        <p>This endpoint checks the User-Agent header to determine if the request came from cURL. It demonstrates how APIs can detect and respond differently to various client types.</p>
+                    </div>
+                    
+                    <div class="tip-box">
+                        💡 <strong>Learning Goal:</strong> Discover how HTTP headers work and how command-line tools can access APIs in ways browsers typically cannot.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>🔍 Part 3: Request Interception - Parameter Manipulation</h2>
+                    <p>Learn how to intercept and modify HTTP requests to change application behavior:</p>
+                    
+                    <h3>Tutorial Steps (Using Browser DevTools):</h3>
+                    <ol style="margin-left: 20px; color: #555;">
+                        <li>Visit: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">/api/example/part3/intercept</code></li>
+                        <li>Notice you receive "member" level access by default</li>
+                        <li>Now modify the URL to include an access parameter: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">/api/example/part3/intercept?access=instructor</code></li>
+                        <li>Observe how changing the parameter grants instructor-level access!</li>
+                    </ol>
+                    
+                    <h3>Advanced: Using Burp Suite (Optional):</h3>
+                    <ol style="margin-left: 20px; color: #555;">
+                        <li>Configure your browser to use Burp Suite as a proxy</li>
+                        <li>Enable request interception in Burp Suite</li>
+                        <li>Make a request to <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">/api/example/part3/intercept</code></li>
+                        <li>Intercept the request and add <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">?access=instructor</code> to the URL</li>
+                        <li>Forward the modified request to gain elevated access</li>
+                    </ol>
+                    
+                    <div class="tip-box">
+                        💡 <strong>Learning Goal:</strong> Understand how URL parameters control access levels and why applications should never trust client-provided access control parameters.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>🔢 Part 4: Sequential Enumeration - Finding All Members</h2>
+                    <p>Practice systematic enumeration to discover all records in a system:</p>
+                    
+                    <h3>Tutorial Steps:</h3>
+                    <ol style="margin-left: 20px; color: #555;">
+                        <li>Start with member ID 100: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">/api/example/part4/enumerate/100</code></li>
+                        <li>Notice the response includes your enumeration progress</li>
+                        <li>Continue with IDs 101, 102, 103, 104, and 105</li>
+                        <li><strong>Challenge:</strong> Find all 6 active members (IDs 100-105) to receive the flag!</li>
+                    </ol>
+                    
+                    <h3>Automation Tip (Advanced):</h3>
+                    <p style="margin-left: 20px; color: #555; margin-top: 10px;">You can automate enumeration using a bash loop:</p>
+                    <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin-left: 20px; overflow-x: auto; font-family: monospace; font-size: 0.9em; color: #333;">for i in {100..105}; do
+  curl http://localhost:3000/api/example/part4/enumerate/$i
+done</pre>
+                    
+                    <div class="tip-box">
+                        💡 <strong>Learning Goal:</strong> Learn how predictable, sequential IDs allow attackers to enumerate all records in a database, exposing sensitive information at scale.
                     </div>
                 </div>
 
@@ -1068,6 +1116,191 @@ app.get('/api/instructor/user/:id/dashboard', (req, res) => {
     }
     
     return res.json(dashboardData);
+});
+
+// ============================================================================
+// EXAMPLE API ENDPOINTS - For Instructor Demonstrations
+// ============================================================================
+
+// Example member profiles database for demonstrations
+const exampleMembers = [
+    { id: 100, name: 'Alex Rivera', email: 'alex.r@email.com', membershipType: 'Premium', favoriteClass: 'Vinyasa Flow', joinedDate: '2023-05-12' },
+    { id: 101, name: 'Jordan Lee', email: 'jordan.l@email.com', membershipType: 'Basic', favoriteClass: 'Hatha Yoga', joinedDate: '2024-01-08' },
+    { id: 102, name: 'Taylor Brooks', email: 'taylor.b@email.com', membershipType: 'Premium', favoriteClass: 'Power Yoga', joinedDate: '2023-11-20' },
+    { id: 103, name: 'Morgan Chen', email: 'morgan.c@email.com', membershipType: 'Basic', favoriteClass: 'Yin Yoga', joinedDate: '2024-03-15' },
+    { id: 104, name: 'Casey Wong', email: 'casey.w@email.com', membershipType: 'Premium', favoriteClass: 'Ashtanga', joinedDate: '2023-08-30' },
+    { id: 105, name: 'Riley Martinez', email: 'riley.m@email.com', membershipType: 'Family', favoriteClass: 'Restorative Yoga', joinedDate: '2024-02-18' },
+    { id: 108, name: 'Jamie Thompson', email: 'jamie.t@zenflow.yoga', membershipType: 'Staff', role: 'hidden_member', favoriteClass: 'Kundalini', joinedDate: '2022-01-05', specialNote: 'VIP Founding Member' }
+];
+
+// Track enumeration progress for Part 4
+const enumerationProgress = new Set();
+
+// Example Part 1 - DevTools Demo: Browse member profiles by ID
+app.get('/api/example/part1/member/:id', (req, res) => {
+    const memberId = parseInt(req.params.id);
+    const member = exampleMembers.find(m => m.id === memberId);
+    
+    if (!member) {
+        return res.status(404).json({
+            error: 'Member not found',
+            message: 'No member profile exists with this ID.',
+            hint: 'Try IDs between 100-110'
+        });
+    }
+    
+    // Flag appears when accessing the hidden member (ID 108)
+    if (memberId === 108) {
+        return res.json({
+            success: true,
+            member: member,
+            flag: 'FLAG{D3VT00LS_M3MB3R_D1SC0V3RY}',
+            message: '🎉 Congratulations! You discovered the hidden VIP member profile!',
+            tutorial: 'You successfully used browser DevTools to enumerate member IDs and find hidden resources.'
+        });
+    }
+    
+    // Regular member profile
+    res.json({
+        success: true,
+        member: {
+            id: member.id,
+            name: member.name,
+            email: member.email,
+            membershipType: member.membershipType,
+            favoriteClass: member.favoriteClass,
+            joinedDate: member.joinedDate
+        }
+    });
+});
+
+// Example Part 2 - cURL Demo: API that checks User-Agent
+app.get('/api/example/part2/test', (req, res) => {
+    const userAgent = req.headers['user-agent'] || '';
+    
+    // Check if request came from cURL
+    if (userAgent.toLowerCase().includes('curl')) {
+        return res.json({
+            success: true,
+            flag: 'FLAG{CURL_C0MM4ND_L1N3_M4ST3R}',
+            message: '🎉 Success! You accessed the API using cURL!',
+            tutorial: 'You learned how command-line tools can interact with web APIs in ways the browser cannot.',
+            requestInfo: {
+                userAgent: userAgent,
+                method: req.method,
+                timestamp: new Date().toISOString()
+            }
+        });
+    }
+    
+    // Default response for browser requests
+    res.json({
+        success: false,
+        message: 'This endpoint requires cURL access.',
+        hint: 'Try accessing this endpoint using the cURL command-line tool instead of your browser.',
+        yourUserAgent: userAgent,
+        expectedUserAgent: 'curl/*'
+    });
+});
+
+// Example Part 3 - Intercept Demo: Access level parameter manipulation
+app.get('/api/example/part3/intercept', (req, res) => {
+    const accessLevel = req.query.access || 'member';
+    
+    // Vulnerable: trusts client-provided access level parameter
+    if (accessLevel === 'instructor') {
+        return res.json({
+            success: true,
+            accessLevel: 'instructor',
+            flag: 'FLAG{1NT3RC3PT_P4R4M_M4N1PUL4T10N}',
+            message: '🎉 Access granted! You manipulated the access parameter to gain instructor privileges!',
+            tutorial: 'You learned how to intercept and modify HTTP requests to change application behavior.',
+            instructorData: {
+                upcomingClasses: [
+                    { date: '2025-01-20', time: '9:00 AM', class: 'Vinyasa Flow', enrolled: 12, capacity: 15 },
+                    { date: '2025-01-22', time: '6:00 PM', class: 'Meditation Session', enrolled: 8, capacity: 20 },
+                    { date: '2025-01-25', time: '10:00 AM', class: 'Power Yoga', enrolled: 15, capacity: 15 }
+                ],
+                teachingResources: {
+                    lessonPlans: 'https://zenflow.yoga/instructor/lessons',
+                    studentRoster: 'https://zenflow.yoga/instructor/roster',
+                    salaryInfo: '$45/hour base rate + bonuses'
+                }
+            }
+        });
+    }
+    
+    // Member-level access (default)
+    res.json({
+        success: true,
+        accessLevel: 'member',
+        message: 'Member portal access',
+        memberData: {
+            upcomingClasses: [
+                { date: '2025-01-20', time: '9:00 AM', class: 'Vinyasa Flow', spotsLeft: 3 },
+                { date: '2025-01-22', time: '6:00 PM', class: 'Meditation Session', spotsLeft: 12 },
+                { date: '2025-01-25', time: '10:00 AM', class: 'Power Yoga', spotsLeft: 0 }
+            ]
+        },
+        hint: 'Standard member access. Notice the URL parameters...'
+    });
+});
+
+// Example Part 4 - Enumeration Demo: Find all active members
+app.get('/api/example/part4/enumerate/:id', (req, res) => {
+    const memberId = parseInt(req.params.id);
+    const member = exampleMembers.find(m => m.id === memberId && m.id >= 100 && m.id <= 105);
+    
+    if (!member) {
+        return res.status(404).json({
+            error: 'Member not found',
+            message: 'No active member found with this ID.',
+            hint: 'Active members have IDs in the range 100-105'
+        });
+    }
+    
+    // Track enumeration progress
+    enumerationProgress.add(memberId);
+    
+    // Check if all active members (100-105) have been enumerated
+    const allActiveMembers = [100, 101, 102, 103, 104, 105];
+    const allFound = allActiveMembers.every(id => enumerationProgress.has(id));
+    
+    if (allFound) {
+        return res.json({
+            success: true,
+            member: member,
+            flag: 'FLAG{3NUM3R4T10N_C0MPL3T3_4LL_M3MB3RS}',
+            message: '🎉 Congratulations! You successfully enumerated all active members!',
+            tutorial: 'You learned how sequential ID enumeration can expose all records in a system.',
+            stats: {
+                totalMembersFound: enumerationProgress.size,
+                activeMembers: allActiveMembers.length,
+                memberList: allActiveMembers.map(id => {
+                    const m = exampleMembers.find(member => member.id === id);
+                    return { id: m.id, name: m.name, email: m.email };
+                })
+            }
+        });
+    }
+    
+    // Normal response - show progress
+    res.json({
+        success: true,
+        member: {
+            id: member.id,
+            name: member.name,
+            email: member.email,
+            membershipType: member.membershipType,
+            favoriteClass: member.favoriteClass
+        },
+        progress: {
+            found: enumerationProgress.size,
+            total: allActiveMembers.length,
+            remaining: allActiveMembers.length - enumerationProgress.size,
+            hint: 'Keep enumerating to find all active members (IDs 100-105)'
+        }
+    });
 });
 
 app.listen(PORT, () => {
