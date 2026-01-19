@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
 const { Pool } = require('pg');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3100;
@@ -64,6 +65,43 @@ async function runMigrations() {
             END IF;
         END $$;
       `);
+      
+      // Populate challenges if table is empty or missing challenges
+      const countResult = await pool.query('SELECT COUNT(*)::int as count FROM challenges');
+      const challengeCount = countResult.rows[0].count;
+      
+      // Expected: 51 challenges (A01-A10 + Citadel)
+      if (challengeCount < 51) {
+        console.log(`Found only ${challengeCount} challenges, populating missing challenges...`);
+        
+        // Clear existing challenges to avoid duplicates
+        await pool.query('TRUNCATE TABLE challenges CASCADE');
+        console.log('Cleared existing challenges');
+        
+        // Read and execute init.sql challenges section
+        const initSqlPath = path.join(__dirname, 'db', 'init.sql');
+        const initSql = fs.readFileSync(initSqlPath, 'utf8');
+        
+        // Extract just the INSERT statements for challenges
+        const challengeInserts = initSql.match(/INSERT INTO challenges[\s\S]*?;/g);
+        
+        if (challengeInserts) {
+          for (const insertStmt of challengeInserts) {
+            try {
+              await pool.query(insertStmt);
+            } catch (err) {
+              console.error('Error inserting challenge:', err.message);
+            }
+          }
+          console.log(`Successfully populated ${challengeInserts.length} challenge insert statements`);
+          
+          // Verify count
+          const newCount = await pool.query('SELECT COUNT(*)::int as count FROM challenges');
+          console.log(`Total challenges in database: ${newCount.rows[0].count}`);
+        }
+      } else {
+        console.log(`Found ${challengeCount} challenges - no population needed`);
+      }
       
       console.log('Database migrations completed successfully');
       return;
