@@ -17,6 +17,57 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD || 'portal_pass',
 });
 
+// Run database migrations on startup
+async function runMigrations() {
+  try {
+    console.log('Running database migrations...');
+    
+    // Add challenge_type column if it doesn't exist
+    await pool.query(`
+      DO $$ 
+      BEGIN
+          IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                         WHERE table_name='challenges' AND column_name='challenge_type') THEN
+              ALTER TABLE challenges ADD COLUMN challenge_type VARCHAR(20) DEFAULT 'lab';
+              RAISE NOTICE 'Added challenge_type column';
+          END IF;
+      END $$;
+    `);
+    
+    // Add lab_number column if it doesn't exist
+    await pool.query(`
+      DO $$ 
+      BEGIN
+          IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                         WHERE table_name='challenges' AND column_name='lab_number') THEN
+              ALTER TABLE challenges ADD COLUMN lab_number INTEGER;
+              RAISE NOTICE 'Added lab_number column';
+          END IF;
+      END $$;
+    `);
+    
+    // Add challenge_order column if it doesn't exist
+    await pool.query(`
+      DO $$ 
+      BEGIN
+          IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                         WHERE table_name='challenges' AND column_name='challenge_order') THEN
+              ALTER TABLE challenges ADD COLUMN challenge_order INTEGER;
+              RAISE NOTICE 'Added challenge_order column';
+          END IF;
+      END $$;
+    `);
+    
+    console.log('Database migrations completed successfully');
+  } catch (err) {
+    console.error('Migration error:', err);
+    console.error('The application will continue, but some features may not work correctly.');
+  }
+}
+
+// Run migrations immediately
+runMigrations();
+
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

@@ -27,6 +27,29 @@ CREATE TABLE IF NOT EXISTS challenges (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Migration: Add missing columns to existing databases
+-- These statements are safe to run multiple times (idempotent)
+DO $$ 
+BEGIN
+    -- Add challenge_type column if it doesn't exist
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name='challenges' AND column_name='challenge_type') THEN
+        ALTER TABLE challenges ADD COLUMN challenge_type VARCHAR(20) DEFAULT 'lab';
+    END IF;
+    
+    -- Add lab_number column if it doesn't exist
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name='challenges' AND column_name='lab_number') THEN
+        ALTER TABLE challenges ADD COLUMN lab_number INTEGER;
+    END IF;
+    
+    -- Add challenge_order column if it doesn't exist
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name='challenges' AND column_name='challenge_order') THEN
+        ALTER TABLE challenges ADD COLUMN challenge_order INTEGER;
+    END IF;
+END $$;
+
 -- Track user progress on challenges
 CREATE TABLE IF NOT EXISTS user_progress (
     id SERIAL PRIMARY KEY,
@@ -192,8 +215,8 @@ INSERT INTO challenges (owasp_category, title, description, difficulty, points, 
 INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order) VALUES
     ('ALL', 'Citadel: Final Exam', 'Exploit Evil Corp''s corporate website. All vulnerabilities present, no hints.', 'Expert', 500, 'NSA{C1T4D3L_C0MPL3T3}', 'Apply everything you learned', 'http://localhost:3000', 'exam', NULL, 1);
 
--- Create index for faster queries
-CREATE INDEX idx_user_progress_user ON user_progress(user_id);
-CREATE INDEX idx_user_progress_challenge ON user_progress(challenge_id);
-CREATE INDEX idx_challenges_category ON challenges(owasp_category);
-CREATE INDEX idx_challenges_order ON challenges(challenge_order);
+-- Create indexes for faster queries (IF NOT EXISTS requires PostgreSQL 9.5+)
+CREATE INDEX IF NOT EXISTS idx_user_progress_user ON user_progress(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_progress_challenge ON user_progress(challenge_id);
+CREATE INDEX IF NOT EXISTS idx_challenges_category ON challenges(owasp_category);
+CREATE INDEX IF NOT EXISTS idx_challenges_order ON challenges(challenge_order);
