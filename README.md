@@ -46,6 +46,7 @@ Each OWASP Top 10 topic now follows a **structured learning path**:
 - Side-by-side comparison of vulnerable vs. secure code
 - Demonstrates proper tool usage (curl, Burp Suite, sqlmap)
 - **NO exploit buttons** - teaches methodology, not shortcuts
+- Some topics (A01, A05, A07) have multi-part examples teaching different tools
 
 #### **Progressive Labs** (3 per topic)
 - **Lab 1 (Easy)**: Recon/Scanning stage - discover the vulnerability
@@ -55,9 +56,11 @@ Each OWASP Top 10 topic now follows a **structured learning path**:
 - Each lab awards points and flags upon completion
 
 ### 3. **Citadel Mode** (Full Application - Final Exam)
-A realistic vulnerable web application containing all OWASP Top 10 2025 vulnerabilities where students:
-- Face realistic vulnerabilities without overt hints
-- Break through multiple security layers
+A realistic vulnerable web application disguised as "Evil Capitalistic Corp" corporate website:
+- **Looks like a real corporate website** - no OWASP references or educational hints
+- Contains all OWASP Top 10 2025 vulnerabilities naturally integrated
+- Students must discover and exploit vulnerabilities without guidance
+- Break through multiple security layers to achieve objectives
 - Practice complete penetration testing techniques
 - Apply knowledge from all instructional labs
 - Discover flags embedded naturally in the application
@@ -78,7 +81,7 @@ Each topic includes **1 example + 3 progressive labs**:
 | A08 | Integrity Failures | 3008 | Example + Lab 1 (Update Mechanism) + Lab 2 (Missing Checksum) + Lab 3 (Malicious Upload) |
 | A09 | Security Logging Failures | 3009 | Example + Lab 1 (Missing Logs) + Lab 2 (Log Leaks) + Lab 3 (Cover Tracks) |
 | A10 | Exception Mishandling | 3010 | Example + Lab 1 (Trigger Errors) + Lab 2 (Stack Traces) + Lab 3 (Suppress Evidence) |
-| **Citadel** | All Vulnerabilities (Exam) | 3000 | Realistic application with all vulnerabilities, no hints |
+| **Citadel** | All Vulnerabilities (Exam) | 3000 | Realistic "Evil Capitalistic Corp" corporate site - all vulnerabilities, no OWASP hints |
 
 ## 🚀 Quick Start
 
