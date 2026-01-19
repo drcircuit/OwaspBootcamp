@@ -699,9 +699,6 @@ app.get('/lab3', (req, res) => {
 
         <div class="section warning">
           <h2>⚠️ Advanced Challenge</h2>
-          <p>For a real exploit, use <code>curl</code> or browser DevTools to manually set the session cookie:</p>
-          <div class="code"><pre>curl http://localhost:3007/api/lab3/profile \\
-  -H "Cookie: session=5001"</pre></div>
         </div>
       </div>
 
