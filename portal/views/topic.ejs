@@ -196,7 +196,7 @@
                                     </details>
                                 <% } %>
                                 
-                                <% if (!challenge.completed && challenge.hint) { %>
+                                <% if (challenge.hint) { %>
                                     <details style="margin: 15px 0; color: var(--neon-blue);">
                                         <summary style="cursor: pointer; user-select: none;">💡 Show Hint</summary>
                                         <p style="margin-top: 10px; padding: 10px; background: rgba(0, 212, 255, 0.1); border-left: 3px solid var(--neon-blue); border-radius: 4px;">
