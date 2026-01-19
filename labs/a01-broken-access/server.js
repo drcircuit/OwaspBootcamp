@@ -5,6 +5,21 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static('public'));
 
+// Middleware to set default cookies if not present
+app.use((req, res, next) => {
+    const cookies = req.headers.cookie || '';
+    
+    // Set default cookies if not present
+    if (!cookies.includes('userId=')) {
+        res.cookie('userId', CURRENT_USER_ID, { httpOnly: false });
+    }
+    if (!cookies.includes('userRole=')) {
+        res.cookie('userRole', 'member', { httpOnly: false });
+    }
+    
+    next();
+});
+
 // Users database - ZenFlow Yoga Studio Members
 const users = [
     { id: 1, username: 'emma_s', email: 'emma.stevens@email.com', role: 'member', membership: 'Premium', creditCard: '**** 4532', renewalDate: '2025-03-15', joinDate: '2023-01-15', favoriteClass: 'Vinyasa Flow' },
@@ -188,13 +203,13 @@ app.get('/', (req, res) => {
     `);
 });
 
-// Example page - Help & Info
+// Example page - Interactive Tutorial
 app.get('/example', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Member Portal Help - ZenFlow Yoga</title>
+            <title>Getting Started - ZenFlow Yoga</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
@@ -205,7 +220,7 @@ app.get('/example', (req, res) => {
                     line-height: 1.6;
                 }
                 .container {
-                    max-width: 900px;
+                    max-width: 1000px;
                     margin: 0 auto;
                 }
                 .header {
@@ -225,7 +240,7 @@ app.get('/example', (req, res) => {
                     color: #666;
                     font-size: 1.1em;
                 }
-                .section {
+                .tutorial-section {
                     background: white;
                     padding: 30px;
                     border-radius: 15px;
@@ -233,30 +248,96 @@ app.get('/example', (req, res) => {
                     margin-bottom: 25px;
                     border-left: 4px solid #66bb6a;
                 }
-                .section h2 {
+                .tutorial-section h2 {
                     color: #2e7d32;
                     margin-bottom: 15px;
                     font-size: 1.8em;
                 }
-                .section p {
+                .tutorial-section p {
                     color: #555;
                     margin-bottom: 15px;
                     line-height: 1.7;
                 }
-                .feature-box {
+                .tutorial-box {
                     background: #f1f8e9;
                     padding: 20px;
                     border-radius: 10px;
                     margin: 15px 0;
                     border-left: 3px solid #66bb6a;
                 }
-                ul {
-                    margin-left: 20px;
-                    margin-bottom: 15px;
+                .interactive-demo {
+                    background: #fff3e0;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    border-left: 3px solid #fb8c00;
                 }
-                ul li {
-                    margin: 8px 0;
-                    color: #555;
+                .demo-controls {
+                    margin: 15px 0;
+                }
+                .demo-input {
+                    width: 100%;
+                    padding: 12px;
+                    border: 2px solid #66bb6a;
+                    border-radius: 8px;
+                    font-size: 1em;
+                    margin: 10px 0;
+                }
+                .demo-button {
+                    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-size: 1em;
+                    margin: 5px;
+                }
+                .demo-button:hover {
+                    background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+                }
+                .demo-button:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+                .output-box {
+                    background: #f5f5f5;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin: 15px 0;
+                    font-family: 'Courier New', monospace;
+                    font-size: 0.9em;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                    max-height: 300px;
+                    overflow-y: auto;
+                    border: 1px solid #ddd;
+                }
+                .flag-reveal {
+                    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 1.2em;
+                    display: none;
+                }
+                .hint-box {
+                    background: #e3f2fd;
+                    border-left: 4px solid #2196f3;
+                    padding: 15px;
+                    margin: 15px 0;
+                    border-radius: 5px;
+                }
+                code {
+                    background: #f5f5f5;
+                    padding: 2px 6px;
+                    border-radius: 3px;
+                    font-family: 'Courier New', monospace;
+                    color: #c62828;
                 }
                 .back-link {
                     text-align: center;
@@ -267,45 +348,264 @@ app.get('/example', (req, res) => {
                     text-decoration: none;
                     font-weight: 600;
                 }
+                ol {
+                    margin-left: 20px;
+                    margin-bottom: 15px;
+                }
+                ol li {
+                    margin: 8px 0;
+                    color: #555;
+                }
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>🧘 Member Portal Help</h1>
-                    <p class="subtitle">Your guide to ZenFlow membership features</p>
+                    <h1>📚 Getting Started Guide</h1>
+                    <p class="subtitle">Learn to navigate the member portal with interactive examples</p>
                 </div>
 
-                <div class="section">
-                    <h2>🌟 Welcome to ZenFlow!</h2>
-                    <p>We're thrilled to have you as part of our yoga community. Your member portal provides easy access to all the features you need to manage your membership.</p>
+                <!-- Part 1: DevTools Discovery -->
+                <div class="tutorial-section">
+                    <h2>Part 1: Browser DevTools Discovery 🔍</h2>
+                    <p>Learn how to use your browser's developer tools to explore API endpoints and discover hidden resources.</p>
                     
-                    <div class="feature-box">
-                        <h3>Your Member Benefits</h3>
-                        <ul>
-                            <li><strong>Unlimited Class Access:</strong> Book any class through our scheduling system</li>
-                            <li><strong>Community Directory:</strong> Connect with fellow yoga enthusiasts</li>
-                            <li><strong>Personal Profile:</strong> Track your progress and manage your account</li>
-                            <li><strong>Online Resources:</strong> Access meditation guides and yoga tutorials</li>
-                        </ul>
+                    <div class="tutorial-box">
+                        <h3>🎯 Your Mission</h3>
+                        <p>The member directory allows you to search for members by ID. Try different IDs to discover all members, including a hidden VIP member at ID 108!</p>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>Interactive Demo</h3>
+                        <p>Enter a member ID to view their profile. Open your browser's DevTools (F12) to watch the network requests!</p>
+                        <div class="demo-controls">
+                            <input type="number" id="part1-id" class="demo-input" placeholder="Enter member ID (try 100-110)" value="100">
+                            <button onclick="part1Search()" class="demo-button">🔍 Search Member</button>
+                        </div>
+                        <div id="part1-output" class="output-box"></div>
+                        <div id="part1-flag" class="flag-reveal"></div>
+                    </div>
+
+                    <div class="hint-box">
+                        <strong>💡 Tip:</strong> Press F12 to open DevTools, go to the Network tab, and watch what happens when you click the search button!
                     </div>
                 </div>
 
-                <div class="section">
-                    <h2>📞 Need Help?</h2>
-                    <p>Our team is here to support you on your yoga journey:</p>
-                    <ul>
-                        <li><strong>Email:</strong> support@zenflow.yoga</li>
-                        <li><strong>Phone:</strong> (555) 123-4567</li>
-                        <li><strong>Visit Us:</strong> 123 Peaceful Lane, Downtown</li>
-                        <li><strong>Hours:</strong> Monday-Friday 6am-8pm, Saturday-Sunday 7am-6pm</li>
-                    </ul>
+                <!-- Part 2: cURL Command Line -->
+                <div class="tutorial-section">
+                    <h2>Part 2: Command-Line Tools 💻</h2>
+                    <p>APIs can be accessed not just through browsers, but also via command-line tools like cURL. This gives you more control over requests.</p>
+                    
+                    <div class="tutorial-box">
+                        <h3>🎯 Your Mission</h3>
+                        <p>Access the API using cURL from your terminal to get the flag. The server checks the User-Agent header!</p>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>Try it yourself</h3>
+                        <p>Copy and paste this command in your terminal:</p>
+                        <div class="output-box">curl http://localhost:3001/api/example/part2/test</div>
+                        <p style="margin-top: 15px;">Or test it directly from the browser (won't show the flag):</p>
+                        <button onclick="part2Test()" class="demo-button">🌐 Test from Browser</button>
+                        <div id="part2-output" class="output-box" style="display:none;"></div>
+                        <div id="part2-flag" class="flag-reveal"></div>
+                    </div>
+
+                    <div class="hint-box">
+                        <strong>💡 Tip:</strong> The server can detect whether you're using a browser or cURL by checking the User-Agent header!
+                    </div>
+                </div>
+
+                <!-- Part 3: Request Interception -->
+                <div class="tutorial-section">
+                    <h2>Part 3: Parameter Manipulation 🎛️</h2>
+                    <p>Learn how modifying request parameters can change application behavior and potentially escalate privileges.</p>
+                    
+                    <div class="tutorial-box">
+                        <h3>🎯 Your Mission</h3>
+                        <p>The portal checks your access level via a query parameter. Can you change it to gain instructor privileges?</p>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>Interactive Demo</h3>
+                        <p>Try different access levels and see what data you can retrieve:</p>
+                        <div class="demo-controls">
+                            <select id="part3-access" class="demo-input">
+                                <option value="member">Member Access</option>
+                                <option value="instructor">Instructor Access</option>
+                            </select>
+                            <button onclick="part3Test()" class="demo-button">🔓 Test Access Level</button>
+                        </div>
+                        <div id="part3-output" class="output-box"></div>
+                        <div id="part3-flag" class="flag-reveal"></div>
+                    </div>
+
+                    <div class="hint-box">
+                        <strong>💡 Tip:</strong> Open DevTools Network tab to see the actual URL being requested and the parameters being sent!
+                    </div>
+                </div>
+
+                <!-- Part 4: Sequential Enumeration -->
+                <div class="tutorial-section">
+                    <h2>Part 4: Sequential Enumeration 🔢</h2>
+                    <p>Many systems use sequential IDs. Attackers can enumerate through all IDs to discover all records in a database.</p>
+                    
+                    <div class="tutorial-box">
+                        <h3>🎯 Your Mission</h3>
+                        <p>Find all active members (IDs 100-105) by enumerating through the IDs. The flag appears when you've found them all!</p>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>Interactive Demo</h3>
+                        <p>Click to enumerate members one by one, or use the auto-enumerate feature:</p>
+                        <div class="demo-controls">
+                            <input type="number" id="part4-id" class="demo-input" placeholder="Enter member ID (100-105)" value="100">
+                            <button onclick="part4Search()" class="demo-button">🔍 Search Single ID</button>
+                            <button onclick="part4AutoEnumerate()" id="part4-auto-btn" class="demo-button">⚡ Auto-Enumerate (100-105)</button>
+                        </div>
+                        <div id="part4-output" class="output-box"></div>
+                        <div id="part4-flag" class="flag-reveal"></div>
+                    </div>
+
+                    <div class="hint-box">
+                        <strong>💡 Tip:</strong> In real attacks, scripts automate this enumeration process to quickly discover all resources!
+                    </div>
                 </div>
 
                 <div class="back-link">
                     <a href="/">← Back to Member Portal</a>
                 </div>
             </div>
+
+            <script>
+                // Part 1: DevTools Discovery
+                async function part1Search() {
+                    const id = document.getElementById('part1-id').value;
+                    const output = document.getElementById('part1-output');
+                    const flagDiv = document.getElementById('part1-flag');
+                    
+                    output.textContent = 'Loading...';
+                    flagDiv.style.display = 'none';
+                    
+                    try {
+                        const response = await fetch('/api/example/part1/member/' + id);
+                        const data = await response.json();
+                        output.textContent = JSON.stringify(data, null, 2);
+                        
+                        if (data.flag) {
+                            flagDiv.textContent = '🎉 ' + data.flag;
+                            flagDiv.style.display = 'block';
+                        }
+                    } catch (error) {
+                        output.textContent = 'Error: ' + error.message;
+                    }
+                }
+
+                // Part 2: cURL Test
+                async function part2Test() {
+                    const output = document.getElementById('part2-output');
+                    const flagDiv = document.getElementById('part2-flag');
+                    
+                    output.style.display = 'block';
+                    output.textContent = 'Loading...';
+                    flagDiv.style.display = 'none';
+                    
+                    try {
+                        const response = await fetch('/api/example/part2/test');
+                        const data = await response.json();
+                        output.textContent = JSON.stringify(data, null, 2);
+                        
+                        if (data.flag) {
+                            flagDiv.textContent = '🎉 ' + data.flag;
+                            flagDiv.style.display = 'block';
+                        }
+                    } catch (error) {
+                        output.textContent = 'Error: ' + error.message;
+                    }
+                }
+
+                // Part 3: Parameter Manipulation
+                async function part3Test() {
+                    const access = document.getElementById('part3-access').value;
+                    const output = document.getElementById('part3-output');
+                    const flagDiv = document.getElementById('part3-flag');
+                    
+                    output.textContent = 'Loading...';
+                    flagDiv.style.display = 'none';
+                    
+                    try {
+                        const response = await fetch('/api/example/part3/intercept?access=' + access);
+                        const data = await response.json();
+                        output.textContent = JSON.stringify(data, null, 2);
+                        
+                        if (data.flag) {
+                            flagDiv.textContent = '🎉 ' + data.flag;
+                            flagDiv.style.display = 'block';
+                        }
+                    } catch (error) {
+                        output.textContent = 'Error: ' + error.message;
+                    }
+                }
+
+                // Part 4: Sequential Enumeration
+                async function part4Search() {
+                    const id = document.getElementById('part4-id').value;
+                    const output = document.getElementById('part4-output');
+                    const flagDiv = document.getElementById('part4-flag');
+                    
+                    output.textContent = 'Loading...';
+                    flagDiv.style.display = 'none';
+                    
+                    try {
+                        const response = await fetch('/api/example/part4/enumerate/' + id);
+                        const data = await response.json();
+                        output.textContent = JSON.stringify(data, null, 2);
+                        
+                        if (data.flag) {
+                            flagDiv.textContent = '🎉 ' + data.flag;
+                            flagDiv.style.display = 'block';
+                        }
+                    } catch (error) {
+                        output.textContent = 'Error: ' + error.message;
+                    }
+                }
+
+                async function part4AutoEnumerate() {
+                    const output = document.getElementById('part4-output');
+                    const flagDiv = document.getElementById('part4-flag');
+                    const btn = document.getElementById('part4-auto-btn');
+                    
+                    btn.disabled = true;
+                    btn.textContent = 'Enumerating...';
+                    output.textContent = 'Starting enumeration...\\n\\n';
+                    flagDiv.style.display = 'none';
+                    
+                    for (let id = 100; id <= 105; id++) {
+                        try {
+                            const response = await fetch('/api/example/part4/enumerate/' + id);
+                            const data = await response.json();
+                            output.textContent += '\\n--- Member ID ' + id + ' ---\\n';
+                            output.textContent += JSON.stringify(data, null, 2) + '\\n';
+                            
+                            if (data.flag) {
+                                flagDiv.textContent = '🎉 ' + data.flag;
+                                flagDiv.style.display = 'block';
+                            }
+                            
+                            // Scroll to bottom
+                            output.scrollTop = output.scrollHeight;
+                            
+                            // Small delay between requests
+                            await new Promise(resolve => setTimeout(resolve, 300));
+                        } catch (error) {
+                            output.textContent += 'Error for ID ' + id + ': ' + error.message + '\\n';
+                        }
+                    }
+                    
+                    btn.disabled = false;
+                    btn.textContent = '⚡ Auto-Enumerate (100-105)';
+                }
+            </script>
         </body>
         </html>
     `);
@@ -378,6 +678,21 @@ app.get('/lab1', (req, res) => {
                     font-size: 1em;
                     margin-top: 10px;
                 }
+                .search-button {
+                    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-size: 1em;
+                    margin-top: 10px;
+                    width: 100%;
+                }
+                .search-button:hover {
+                    background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+                }
                 .member-card {
                     background: white;
                     padding: 20px;
@@ -395,6 +710,7 @@ app.get('/lab1', (req, res) => {
                 .member-info {
                     color: #666;
                     font-size: 0.95em;
+                    line-height: 1.6;
                 }
                 .tip-box {
                     background: #fff3e0;
@@ -402,6 +718,27 @@ app.get('/lab1', (req, res) => {
                     padding: 15px;
                     margin: 20px 0;
                     border-radius: 5px;
+                }
+                .flag-reveal {
+                    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 1.2em;
+                }
+                .results-container {
+                    margin-top: 20px;
+                }
+                .error-box {
+                    background: #ffebee;
+                    border-left: 4px solid #d32f2f;
+                    padding: 15px;
+                    margin: 20px 0;
+                    border-radius: 5px;
+                    color: #c62828;
                 }
                 .back-link {
                     text-align: center;
@@ -434,26 +771,19 @@ app.get('/lab1', (req, res) => {
                     
                     <div class="search-box">
                         <strong>🔍 Search for Members</strong>
-                        <input type="text" class="search-input" placeholder="Enter member ID (e.g., 1, 2, 3...)" id="searchInput">
+                        <input type="number" class="search-input" placeholder="Enter member ID (e.g., 1, 2, 3, 4...)" id="searchInput" value="1">
+                        <button onclick="searchMember()" class="search-button">Search Member</button>
                         <p style="margin-top: 10px; font-size: 0.9em; color: #666;">
-                            Try searching by member ID to view their public profile. You can find member IDs through class rosters or community events.
+                            Try searching by member ID to view their public profile. Use your browser's DevTools (F12 → Network tab) to see the API calls!
                         </p>
+                    </div>
+
+                    <div class="tip-box">
+                        <strong>💡 Challenge Tip:</strong> Try different member IDs! What information can you discover about other members? Is there anyone with special privileges?
                     </div>
                 </div>
 
-                <div class="info-section">
-                    <h2>Featured Members</h2>
-                    
-                    <div class="member-card">
-                        <div class="member-name">Sarah Martinez (You)</div>
-                        <div class="member-info">
-                            📧 sarah.martinez@email.com<br>
-                            🎫 Basic Membership<br>
-                            💫 Favorite Class: Hatha Yoga
-                        </div>
-                    </div>
-                    
-                </div>
+                <div id="resultsContainer" class="results-container"></div>
 
                 <div class="back-link">
                     <a href="/">← Back to Member Portal</a>
@@ -461,12 +791,78 @@ app.get('/lab1', (req, res) => {
             </div>
             
             <script>
+                async function searchMember() {
+                    const id = document.getElementById('searchInput').value.trim();
+                    const resultsContainer = document.getElementById('resultsContainer');
+                    
+                    if (!id) {
+                        resultsContainer.innerHTML = '<div class="error-box">Please enter a member ID</div>';
+                        return;
+                    }
+                    
+                    resultsContainer.innerHTML = '<div class="info-section"><p>🔍 Searching member database...</p></div>';
+                    
+                    try {
+                        const response = await fetch('/api/members/user/' + id);
+                        const data = await response.json();
+                        
+                        if (response.status === 404) {
+                            resultsContainer.innerHTML = '<div class="error-box">' + 
+                                '<strong>Member Not Found</strong><br>' + 
+                                data.message + 
+                                '</div>';
+                            return;
+                        }
+                        
+                        let html = '<div class="info-section"><h2>Member Profile</h2>';
+                        
+                        html += '<div class="member-card">';
+                        html += '<div class="member-name">' + data.username + '</div>';
+                        html += '<div class="member-info">';
+                        html += '👤 <strong>ID:</strong> ' + data.id + '<br>';
+                        html += '📧 <strong>Email:</strong> ' + data.email + '<br>';
+                        html += '🎭 <strong>Role:</strong> ' + data.role + '<br>';
+                        html += '🎫 <strong>Membership:</strong> ' + data.membership + '<br>';
+                        
+                        if (data.joinDate) {
+                            html += '📅 <strong>Joined:</strong> ' + data.joinDate + '<br>';
+                        }
+                        if (data.favoriteClass) {
+                            html += '💫 <strong>Favorite Class:</strong> ' + data.favoriteClass + '<br>';
+                        }
+                        if (data.specialization) {
+                            html += '🧘 <strong>Specialization:</strong> ' + data.specialization + '<br>';
+                        }
+                        if (data.yearsTeaching) {
+                            html += '📚 <strong>Years Teaching:</strong> ' + data.yearsTeaching + '<br>';
+                        }
+                        
+                        html += '</div></div>';
+                        
+                        if (data.flag) {
+                            html += '<div class="flag-reveal">🎉 ' + data.flag + '<br><br>' + data.message + '</div>';
+                            if (data.stats) {
+                                html += '<div class="tip-box">';
+                                html += '<strong>📊 Community Stats:</strong><br>';
+                                html += 'Total Members: ' + data.stats.totalMembers + '<br>';
+                                html += 'Regular Members: ' + data.stats.members + '<br>';
+                                html += 'Instructors: ' + data.stats.instructors;
+                                html += '</div>';
+                            }
+                        }
+                        
+                        html += '</div>';
+                        resultsContainer.innerHTML = html;
+                        
+                    } catch (error) {
+                        resultsContainer.innerHTML = '<div class="error-box"><strong>Error:</strong> ' + error.message + '</div>';
+                    }
+                }
+
+                // Allow Enter key to trigger search
                 document.getElementById('searchInput').addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {
-                        const id = this.value.trim();
-                        if (id) {
-                            window.location.href = '/api/members/user/' + id;
-                        }
+                        searchMember();
                     }
                 });
             </script>
@@ -607,6 +1003,23 @@ app.get('/lab2', (req, res) => {
                     color: #555;
                     font-size: 0.95em;
                 }
+                .tip-box {
+                    background: #fff3e0;
+                    border-left: 4px solid #fb8c00;
+                    padding: 15px;
+                    margin: 20px 0;
+                    border-radius: 5px;
+                }
+                .flag-reveal {
+                    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 1.2em;
+                }
                 code {
                     background: #f5f5f5;
                     padding: 2px 6px;
@@ -634,6 +1047,24 @@ app.get('/lab2', (req, res) => {
                     cursor: pointer;
                     margin-top: 15px;
                 }
+                .btn:hover {
+                    background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+                }
+                .load-profile-section {
+                    background: #e3f2fd;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                    border-left: 3px solid #2196f3;
+                }
+                .profile-input {
+                    width: 100%;
+                    padding: 12px;
+                    border: 2px solid #66bb6a;
+                    border-radius: 8px;
+                    font-size: 1em;
+                    margin: 10px 0;
+                }
             </style>
         </head>
         <body>
@@ -644,62 +1075,109 @@ app.get('/lab2', (req, res) => {
                 </div>
 
                 <div class="profile-section">
-                    <h2>📋 Account Information</h2>
-                    
-                    <div class="profile-field">
-                        <div class="field-label">Member ID:</div>
-                        <div class="field-value">#${CURRENT_USER_ID}</div>
+                    <h2>📋 Current Session</h2>
+                    <div class="info-box">
+                        <p>You are currently logged in as <strong>sarah_m</strong> (Member #${CURRENT_USER_ID})</p>
+                        <p style="margin-top: 10px; font-size: 0.9em;">Your profile data is loaded from the API. Use DevTools (F12 → Network tab) to see the API requests!</p>
                     </div>
-                    <div class="profile-field">
-                        <div class="field-label">Username:</div>
-                        <div class="field-value">sarah_m</div>
+
+                    <div class="load-profile-section">
+                        <strong>🔍 Load Profile Data</strong>
+                        <p style="margin-top: 10px; font-size: 0.9em;">Enter a member ID to view their profile information:</p>
+                        <input type="number" id="profileId" class="profile-input" placeholder="Enter member ID (e.g., 1, 2, 3, 4...)" value="${CURRENT_USER_ID}">
+                        <button onclick="loadProfile()" class="btn">Load Profile</button>
                     </div>
-                    <div class="profile-field">
-                        <div class="field-label">Email:</div>
-                        <div class="field-value">sarah.martinez@email.com</div>
-                    </div>
-                    <div class="profile-field">
-                        <div class="field-label">Member Since:</div>
-                        <div class="field-value">June 2024</div>
+
+                    <div class="tip-box">
+                        <strong>💡 Challenge Tip:</strong> The URL parameter determines which profile to load. What happens if you change it? Can you access other members' private data?
                     </div>
                 </div>
 
-                <div class="profile-section">
-                    <h2>🎫 Membership Details</h2>
-                    
-                    <div class="profile-field">
-                        <div class="field-label">Plan:</div>
-                        <div class="field-value">Basic Membership</div>
-                    </div>
-                    <div class="profile-field">
-                        <div class="field-label">Renewal Date:</div>
-                        <div class="field-value">February 28, 2025</div>
-                    </div>
-                    <div class="profile-field">
-                        <div class="field-label">Favorite Class:</div>
-                        <div class="field-value">Hatha Yoga</div>
-                    </div>
-                    
-                    <button class="btn">Upgrade to Premium</button>
-                </div>
-
-                <div class="profile-section">
-                    <h2>💳 Payment Information</h2>
-                    
-                    <div class="profile-field">
-                        <div class="field-label">Payment Method:</div>
-                        <div class="field-value">Credit Card ending in 7821</div>
-                    </div>
-                    <div class="profile-field">
-                        <div class="field-label">Billing Status:</div>
-                        <div class="field-value">✅ Active</div>
-                    </div>
-                </div>
+                <div id="profileData"></div>
 
                 <div class="back-link">
                     <a href="/">← Back to Member Portal</a>
                 </div>
             </div>
+            
+            <script>
+                // Load profile on page load
+                window.addEventListener('DOMContentLoaded', function() {
+                    loadProfile();
+                });
+
+                async function loadProfile() {
+                    const profileId = document.getElementById('profileId').value || ${CURRENT_USER_ID};
+                    const profileContainer = document.getElementById('profileData');
+                    
+                    profileContainer.innerHTML = '<div class="profile-section"><p>🔍 Loading profile data...</p></div>';
+                    
+                    try {
+                        const response = await fetch('/api/profile/user/' + profileId);
+                        const data = await response.json();
+                        
+                        if (response.status !== 200) {
+                            profileContainer.innerHTML = '<div class="profile-section" style="border-left-color: #d32f2f;"><p style="color: #d32f2f;">❌ ' + data.message + '</p></div>';
+                            return;
+                        }
+                        
+                        let html = '';
+                        
+                        // Flag reveal if present
+                        if (data.flag) {
+                            html += '<div class="flag-reveal">🎉 ' + data.flag;
+                            if (data._vuln_note) {
+                                html += '<br><br><small>' + data._vuln_note + '</small>';
+                            }
+                            html += '</div>';
+                        }
+                        
+                        // Account Information
+                        html += '<div class="profile-section">';
+                        html += '<h2>📋 Account Information</h2>';
+                        html += '<div class="profile-field"><div class="field-label">Member ID:</div><div class="field-value">#' + data.id + '</div></div>';
+                        html += '<div class="profile-field"><div class="field-label">Username:</div><div class="field-value">' + data.username + '</div></div>';
+                        html += '<div class="profile-field"><div class="field-label">Email:</div><div class="field-value">' + data.email + '</div></div>';
+                        html += '<div class="profile-field"><div class="field-label">Role:</div><div class="field-value">' + data.role + '</div></div>';
+                        
+                        if (data.joinDate) {
+                            html += '<div class="profile-field"><div class="field-label">Member Since:</div><div class="field-value">' + data.joinDate + '</div></div>';
+                        }
+                        html += '</div>';
+                        
+                        // Membership Details
+                        html += '<div class="profile-section">';
+                        html += '<h2>🎫 Membership Details</h2>';
+                        html += '<div class="profile-field"><div class="field-label">Plan:</div><div class="field-value">' + data.membership + '</div></div>';
+                        html += '<div class="profile-field"><div class="field-label">Renewal Date:</div><div class="field-value">' + data.renewalDate + '</div></div>';
+                        
+                        if (data.favoriteClass) {
+                            html += '<div class="profile-field"><div class="field-label">Favorite Class:</div><div class="field-value">' + data.favoriteClass + '</div></div>';
+                        }
+                        if (data.specialization) {
+                            html += '<div class="profile-field"><div class="field-label">Specialization:</div><div class="field-value">' + data.specialization + '</div></div>';
+                        }
+                        if (data.yearsTeaching) {
+                            html += '<div class="profile-field"><div class="field-label">Years Teaching:</div><div class="field-value">' + data.yearsTeaching + '</div></div>';
+                        }
+                        
+                        html += '<button class="btn">Upgrade to Premium</button>';
+                        html += '</div>';
+                        
+                        // Payment Information
+                        html += '<div class="profile-section">';
+                        html += '<h2>💳 Payment Information</h2>';
+                        html += '<div class="profile-field"><div class="field-label">Payment Method:</div><div class="field-value">Credit Card ending in ' + data.creditCard.substr(-4) + '</div></div>';
+                        html += '<div class="profile-field"><div class="field-label">Billing Status:</div><div class="field-value">✅ Active</div></div>';
+                        html += '</div>';
+                        
+                        profileContainer.innerHTML = html;
+                        
+                    } catch (error) {
+                        profileContainer.innerHTML = '<div class="profile-section" style="border-left-color: #d32f2f;"><p style="color: #d32f2f;">❌ Error: ' + error.message + '</p></div>';
+                    }
+                }
+            </script>
         </body>
         </html>
     `);
@@ -756,6 +1234,12 @@ app.get('/api/profile/user/:id', (req, res) => {
 
 // Lab 3 - Instructor Dashboard
 app.get('/lab3', (req, res) => {
+    // Check if user has instructor cookie
+    const userRole = req.headers.cookie?.match(/userRole=([^;]+)/)?.[1] || 'member';
+    const userId = req.headers.cookie?.match(/userId=([^;]+)/)?.[1] || String(CURRENT_USER_ID);
+    
+    const isInstructor = userRole === 'instructor';
+    
     res.send(`
         <!DOCTYPE html>
         <html>
@@ -805,6 +1289,17 @@ app.get('/lab3', (req, res) => {
                 .alert-box p {
                     color: #666;
                 }
+                .success-box {
+                    background: #e8f5e9;
+                    border-left: 4px solid #4caf50;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                }
+                .success-box h2 {
+                    color: #2e7d32;
+                    margin-bottom: 10px;
+                }
                 .info-section {
                     background: white;
                     padding: 30px;
@@ -832,6 +1327,43 @@ app.get('/lab3', (req, res) => {
                     color: #555;
                     margin: 8px 0;
                 }
+                .dashboard-card {
+                    background: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+                    border-left: 3px solid #66bb6a;
+                }
+                .dashboard-card h3 {
+                    color: #2e7d32;
+                    margin-bottom: 10px;
+                }
+                .class-item {
+                    background: #f9f9f9;
+                    padding: 12px;
+                    margin: 8px 0;
+                    border-radius: 5px;
+                    border-left: 2px solid #66bb6a;
+                }
+                .flag-reveal {
+                    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+                    color: white;
+                    padding: 30px;
+                    border-radius: 15px;
+                    margin: 20px 0;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 1.3em;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                }
+                .tip-box {
+                    background: #fff3e0;
+                    border-left: 4px solid #fb8c00;
+                    padding: 15px;
+                    margin: 20px 0;
+                    border-radius: 5px;
+                }
                 code {
                     background: #f5f5f5;
                     padding: 2px 6px;
@@ -849,6 +1381,15 @@ app.get('/lab3', (req, res) => {
                     text-decoration: none;
                     font-weight: 600;
                 }
+                .cookie-info {
+                    background: #e3f2fd;
+                    border-left: 4px solid #2196f3;
+                    padding: 15px;
+                    margin: 20px 0;
+                    border-radius: 5px;
+                    font-family: 'Courier New', monospace;
+                    font-size: 0.85em;
+                }
             </style>
         </head>
         <body>
@@ -858,6 +1399,7 @@ app.get('/lab3', (req, res) => {
                     <p class="subtitle">Manage classes, bookings, and teaching resources</p>
                 </div>
 
+                ${!isInstructor ? `
                 <div class="alert-box">
                     <h2>🔒 Staff Access Required</h2>
                     <p>You are currently logged in as <strong>sarah_m</strong> (Basic Member).</p>
@@ -876,6 +1418,73 @@ app.get('/lab3', (req, res) => {
                         <li><strong>Performance Analytics:</strong> Track class attendance and student feedback</li>
                     </ul>
                 </div>
+
+                <div class="tip-box">
+                    <strong>💡 Challenge Tip:</strong> The application uses cookies to track your role. Open DevTools (F12 → Application/Storage → Cookies) to inspect the authentication cookies. Can you modify them to gain access?
+                </div>
+
+                <div class="cookie-info">
+                    <strong>🍪 Current Cookies:</strong><br>
+                    userRole=${userRole}<br>
+                    userId=${userId}
+                </div>
+                ` : `
+                <div class="success-box">
+                    <h2>✅ Welcome to the Instructor Dashboard!</h2>
+                    <p>Access granted. You are now viewing the instructor-only area.</p>
+                </div>
+
+                <div class="flag-reveal">
+                    🎉 FLAG{PR1V1L3G3_3SC4L4T10N_C00K13_M4N1PUL4T10N} 🎉
+                    <br><br>
+                    <div style="font-size: 0.7em; font-weight: normal; margin-top: 15px;">
+                        Congratulations! You successfully escalated your privileges by modifying the authentication cookie!
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h2>📊 Your Teaching Dashboard</h2>
+                    
+                    <div class="dashboard-card">
+                        <h3>📅 Upcoming Classes</h3>
+                        <div class="class-item">
+                            <strong>Monday, Jan 20 - 9:00 AM</strong><br>
+                            Vinyasa Flow • 12 students enrolled • Studio A
+                        </div>
+                        <div class="class-item">
+                            <strong>Wednesday, Jan 22 - 6:00 PM</strong><br>
+                            Meditation Session • 8 students enrolled • Zen Room
+                        </div>
+                        <div class="class-item">
+                            <strong>Saturday, Jan 25 - 10:00 AM</strong><br>
+                            Power Yoga • 15 students enrolled • Studio B
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <h3>📈 Performance Metrics</h3>
+                        <p><strong>Total Students:</strong> 45 active students</p>
+                        <p><strong>Average Attendance:</strong> 87%</p>
+                        <p><strong>Student Rating:</strong> 4.8/5.0 ⭐</p>
+                        <p><strong>Classes This Month:</strong> 24</p>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <h3>📚 Teaching Resources</h3>
+                        <ul class="feature-list">
+                            <li>Lesson Plans Library</li>
+                            <li>Studio Guidelines & Policies</li>
+                            <li>Attendance Reports</li>
+                            <li>Student Feedback Forms</li>
+                            <li>Professional Development Materials</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="tip-box">
+                    <strong>🎓 What You Learned:</strong> By modifying the cookie, you bypassed the application's access control. This demonstrates why authentication must be validated server-side, not just by checking cookies. Cookies can be easily manipulated by attackers!
+                </div>
+                `}
 
                 <div class="info-section">
                     <h2>🎓 Becoming an Instructor</h2>
