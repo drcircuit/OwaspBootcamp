@@ -891,7 +891,7 @@ app.get('/lab2', (req, res) => {
                         
                         // Check if flag is in content
                         if (text.includes('FLAG{')) {
-                            const flagMatch = text.match(/FLAG\\\\{[^}]+\\\\}/);
+                            const flagMatch = text.match(/FLAG\\{[^}]+\\}/);
                             if (flagMatch) {
                                 html += '<div class="flag-reveal">🎉 ' + flagMatch[0] + '<br><br>Configuration file exposed!</div>';
                             }
@@ -1169,7 +1169,7 @@ app.get('/lab3', (req, res) => {
                             
                             // Check if flag is in content
                             if (text.includes('FLAG{')) {
-                                const flagMatch = text.match(/FLAG\\\\{[^}]+\\\\}/);
+                                const flagMatch = text.match(/FLAG\\{[^}]+\\}/);
                                 if (flagMatch) {
                                     html += '<div class="flag-reveal">🎉 ' + flagMatch[0] + '<br><br>Directory listing vulnerability exploited!</div>';
                                 }
@@ -1178,7 +1178,7 @@ app.get('/lab3', (req, res) => {
                             // If it looks like HTML directory listing, render it
                             if (text.includes('<table>') && text.includes('<tr>')) {
                                 const tableMatch = text.match(/<table>.*<\\\\/table>/s);
-                                if (tableMatch) {
+                                if (tableMatch && tableMatch[0]) {
                                     html += '<div class="dir-listing">' + tableMatch[0] + '</div>';
                                 }
                             } else {
