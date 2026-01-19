@@ -576,10 +576,9 @@ app.get('/api/members/user/:id', (req, res) => {
     }
     
     // Vulnerable: Returns user info without proper access control
-    // Only show flag when ALL users have been discovered
-    const foundUsers = users.filter(u => u.id <= userId).length;
+    // Flag only shown when accessing the last user (ID 4) after enumeration
     
-    if (foundUsers === 4 && userId === 4) {
+    if (userId === 4) {
         return res.json({
             id: user.id,
             username: user.username,
@@ -1017,9 +1016,13 @@ app.get('/api/instructor/user/:id/dashboard', (req, res) => {
         });
     }
     
-    // Vulnerable: Checks the role of the REQUESTED user ID, not the CURRENT user
-    // Should verify: currentSessionUser.role === 'instructor'
-    // Instead checks: requestedUser.role === 'instructor'
+    // Vulnerable: No session management or authentication
+    // Should have: 
+    //   1. Session management to track current logged-in user
+    //   2. Check if req.session.userId exists and is valid
+    //   3. Verify req.session.user.role === 'instructor'
+    // Instead: Checks the role of the requested user ID (from URL parameter)
+    // This allows privilege escalation by requesting instructor IDs
     
     if (user.role !== 'instructor') {
         return res.status(403).json({ 
