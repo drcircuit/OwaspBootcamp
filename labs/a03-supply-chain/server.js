@@ -175,13 +175,13 @@ app.get('/', (req, res) => {
 });
 
 
-// Example page - Tutorial
+// Example page - Help & Info
 app.get('/example', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Tutorial - PageTurner Books</title>
+            <title>Help Center - PageTurner Books</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
@@ -208,28 +208,13 @@ app.get('/example', (req, res) => {
                     border: 2px solid #A1887F;
                 }
                 .section h2 { color: #5D4E37; margin-bottom: 15px; }
-                .section h3 { color: #5D4037; margin: 15px 0 10px; }
                 .section p, .section li { color: #5D4037; line-height: 1.7; margin: 8px 0; }
-                .tip-box {
+                .info-box {
                     background: #FFF3E0;
                     border-left: 4px solid #FF9800;
                     padding: 15px;
                     margin: 15px 0;
                     border-radius: 5px;
-                }
-                code {
-                    background: #F5E6D3;
-                    padding: 3px 8px;
-                    border-radius: 4px;
-                    font-family: monospace;
-                    color: #5D4E37;
-                }
-                pre {
-                    background: #F5E6D3;
-                    padding: 15px;
-                    border-radius: 8px;
-                    overflow-x: auto;
-                    margin: 10px 0;
                 }
                 a { color: #5D4037; font-weight: 600; text-decoration: none; }
                 a:hover { text-decoration: underline; }
@@ -239,42 +224,33 @@ app.get('/example', (req, res) => {
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>🎓 BeanScene Management Tutorial</h1>
-                    <p style="color: #5D4037;">Learn about the portal and working with the API</p>
+                    <h1>📚 PageTurner Help Center</h1>
+                    <p style="color: #5D4037;">Your guide to the management portal</p>
                 </div>
 
                 <div class="section">
-                    <h2>Part 1: Store System Information</h2>
-                    <p>Learn how to retrieve information about store systems and equipment.</p>
-                    <h3>Try It:</h3>
-                    <p>Access the systems endpoint to see store equipment:</p>
-                    <pre>curl http://localhost:3002/api/example/systems/100</pre>
-                    <p>Try different system IDs (100-103) to explore all equipment.</p>
-                    <div class="tip-box">
-                        💡 <strong>Learning Goal:</strong> Understand how APIs expose equipment data through simple ID-based endpoints.
+                    <h2>About the Portal</h2>
+                    <p>The PageTurner Books Management Portal provides comprehensive tools for managing bookstore operations. Access staff information, review system settings, and monitor store performance from one central location.</p>
+                    
+                    <div class="info-box">
+                        <strong>Getting Started:</strong> Use the navigation cards on the home page to access different areas of the portal. Each section provides specific management capabilities for different aspects of the business.
                     </div>
                 </div>
 
                 <div class="section">
-                    <h2>Part 2: Configuration Access</h2>
-                    <p>Some systems expose configuration information for management purposes.</p>
-                    <h3>Try It:</h3>
-                    <p>Check if there's a diagnostic endpoint:</p>
-                    <pre>curl http://localhost:3002/api/example/diagnostic</pre>
-                    <div class="tip-box">
-                        💡 <strong>Learning Goal:</strong> Discover how diagnostic endpoints can reveal system information.
-                    </div>
+                    <h2>Portal Features</h2>
+                    <ul>
+                        <li><strong>Staff Dashboard:</strong> View team schedules, shift assignments, and contact information</li>
+                        <li><strong>Store Settings:</strong> Configure operational parameters and integration settings</li>
+                        <li><strong>Manager Portal:</strong> Access administrative controls and financial reports</li>
+                    </ul>
                 </div>
 
                 <div class="section">
-                    <h2>Part 3: Authentication Systems</h2>
-                    <p>Learn about authentication endpoints and how credentials are verified.</p>
-                    <h3>Try It:</h3>
-                    <p>Test the auth check endpoint:</p>
-                    <pre>curl http://localhost:3002/api/example/auth-check</pre>
-                    <div class="tip-box">
-                        💡 <strong>Learning Goal:</strong> Understand how authentication systems verify access.
-                    </div>
+                    <h2>Need Help?</h2>
+                    <p>For technical support or questions about the management portal, contact the IT help desk or your store manager.</p>
+                    <p><strong>Email:</strong> support@pageturner.com</p>
+                    <p><strong>Phone:</strong> (555) 234-5678</p>
                 </div>
 
                 <div class="back-link">
@@ -409,12 +385,8 @@ app.get('/lab1', (req, res) => {
                 </div>
 
                 <div class="section">
-                    <h2>📊 System Information</h2>
-                    <p>Technical teams can access system diagnostics via our API:</p>
-                    <p><code>GET /api/staff/system-info</code></p>
-                    <div class="info-box">
-                        <strong>For IT Use:</strong> System diagnostics provide operational metrics for troubleshooting.
-                    </div>
+                    <h2>📊 Team Resources</h2>
+                    <p>Access training materials, shift swap requests, and team announcements through the portal.</p>
                 </div>
 
                 <div class="back-link">
@@ -522,10 +494,8 @@ app.get('/lab2', (req, res) => {
                 </div>
 
                 <div class="section">
-                    <h2>🔧 Technical Configuration</h2>
-                    <p>IT staff can access configuration via API:</p>
-                    <p><code>GET /api/settings/config</code></p>
-                    <p style="margin-top: 10px; font-size: 0.9em;">For technical support and integration setup.</p>
+                    <h2>🔧 Settings Overview</h2>
+                    <p>Store configuration settings are managed through the administrative interface. Contact your manager for assistance with any configuration changes.</p>
                 </div>
 
                 <div class="back-link">
@@ -631,12 +601,9 @@ app.get('/lab3', (req, res) => {
                 </div>
 
                 <div class="section">
-                    <h2>🔑 Access Instructions</h2>
-                    <p>Authenticate via the admin API:</p>
-                    <pre>curl -X POST http://localhost:3002/api/manager/login \\
-  -H "Content-Type: application/json" \\
-  -d '{"username":"admin","password":"your_password"}'</pre>
-                    <p style="margin-top: 10px; font-size: 0.9em; color: #666;">Manager credentials are provided during onboarding.</p>
+                    <h2>🔑 Administrative Access</h2>
+                    <p>Manager portal access is restricted to authorized personnel. Contact the store owner for access credentials if you are a manager.</p>
+                    <p style="margin-top: 15px;">Authorized managers have access to financial reports, staff management, inventory ordering, and system configuration tools.</p>
                 </div>
 
                 <div class="back-link">

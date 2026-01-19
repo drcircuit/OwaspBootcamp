@@ -254,179 +254,60 @@ app.get('/', (req, res) => {
   `);
 });
 
-// Example page - Educational walkthrough
+// Example page - About Page
 app.get('/example', (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html>
     <head>
-      <title>FreshBlend - SQL & Security Education</title>
+      <title>About FreshBlend - SQL & Security</title>
       ${styles}
     </head>
     <body>
       <div class="container">
         <div class="header">
-          <h1>📚 SQL Security Education</h1>
-          <p class="tagline">Understanding Database Security for Web Applications</p>
+          <h1>📚 About FreshBlend</h1>
+          <p class="tagline">Fresh ingredients, secure systems</p>
         </div>
         <div class="nav-links">
           <a href="/">🏠 Home</a>
         </div>
 
         <div class="section">
-          <h2>What is SQL Injection?</h2>
-          <p>SQL Injection is a code injection technique that exploits security vulnerabilities in an application's database layer. As a smoothie shop with an online ordering system, we take database security seriously. Here's what attackers could potentially do:</p>
-          <ul>
-            <li>Bypass customer authentication systems</li>
-            <li>Access customer data including emails and order history</li>
-            <li>Modify or delete menu items and pricing</li>
-            <li>Retrieve business-sensitive information</li>
-          </ul>
+          <h2>Our Commitment to Security</h2>
+          <p>At FreshBlend Smoothie Bar, we take customer data security seriously. Our online ordering system is designed with robust security measures to protect your personal information and payment details.</p>
+          
+          <div class="lab-info">
+            <h3>🔒 Security Measures</h3>
+            <ul>
+              <li>Secure database architecture</li>
+              <li>Encrypted customer data storage</li>
+              <li>Regular security audits and updates</li>
+              <li>PCI-compliant payment processing</li>
+            </ul>
+          </div>
         </div>
 
-        <div class="section danger">
-          <h3>❌ VULNERABLE: String Concatenation</h3>
-          <p>A common vulnerability in web applications occurs when customer input is directly concatenated into SQL queries:</p>
-          <pre>
-// Vulnerable Node.js code (smoothie search example)
-app.get('/search', (req, res) => {
-  const searchTerm = req.query.q;
-  const sql = "SELECT * FROM smoothies WHERE name LIKE '%" + searchTerm + "%'";
-  db.query(sql, (err, results) => {
-    res.json(results);
-  });
-});</pre>
-          <p><strong>Problem:</strong> Customer input is directly inserted into the SQL query without sanitization.</p>
-          
-          <h3>Common Attack Patterns:</h3>
-          <pre>
-1. OR 1=1 Attack (Always True):
-   Input: ' OR '1'='1
-   Result: SELECT * FROM smoothies WHERE name LIKE '%' OR '1'='1%'
-   Effect: Returns all menu items instead of search results
-
-2. UNION SELECT Attack (Data Extraction):
-   Input: ' UNION SELECT email, password, rewards_points FROM customers--
-   Result: Combines smoothie data with customer information
-   Effect: Exposes customer accounts and personal data
-
-3. Comment-based Bypass (Authentication):
-   Input: admin@freshblend.com'--
-   Result: SELECT * FROM customers WHERE email='admin@freshblend.com'--' AND password='...'
-   Effect: Logs in without knowing the password
-
-4. Stacked Queries (Dangerous):
-   Input: '; DROP TABLE orders--
-   Result: Executes multiple SQL commands
-   Effect: Could delete entire order history</pre>
+        <div class="section">
+          <h2>About Our Technology</h2>
+          <p>FreshBlend uses modern web technologies to provide a seamless ordering experience. Our platform is built with industry-standard security practices to ensure your data remains safe.</p>
         </div>
 
-        <div class="section safe">
-          <h3>✅ SECURE: Parameterized Queries</h3>
-          <p>The proper defense is using parameterized queries (prepared statements):</p>
-          <pre>
-// Secure Node.js code
-app.get('/search', (req, res) => {
-  const searchTerm = req.query.q;
-  const sql = "SELECT * FROM smoothies WHERE name LIKE ?";
-  db.query(sql, ['%' + searchTerm + '%'], (err, results) => {
-    res.json(results);
-  });
-});</pre>
-          <p><strong>Why this is safe:</strong> The database engine treats customer input as data, not as SQL code. Special characters are automatically escaped.</p>
-          
-          <h3>Other Defense Mechanisms:</h3>
+        <div class="section">
+          <h2>Database Security Best Practices</h2>
+          <p>We implement security best practices in all our systems:</p>
           <ul>
-            <li><strong>Input Validation:</strong> Whitelist allowed characters for search terms</li>
-            <li><strong>Least Privilege:</strong> Database accounts should have minimal permissions</li>
-            <li><strong>Error Handling:</strong> Don't expose database errors to customers</li>
-            <li><strong>Web Application Firewall (WAF):</strong> Filter malicious requests</li>
-            <li><strong>Regular Security Audits:</strong> Test systems for vulnerabilities</li>
+            <li>Input validation and sanitization</li>
+            <li>Parameterized database queries</li>
+            <li>Principle of least privilege for database access</li>
+            <li>Proper error handling without information leakage</li>
+            <li>Regular security testing and monitoring</li>
           </ul>
         </div>
 
         <div class="section">
-          <h2>🛠️ Testing Tools for Security Professionals</h2>
-          
-          <h3>1. sqlmap (Automated SQL Injection Tool)</h3>
-          <pre>
-# Test a smoothie search endpoint
-sqlmap -u "http://freshblend.com/search?q=berry"
-
-# Test login form with POST data
-sqlmap -u "http://freshblend.com/login" --data="email=test&password=test"
-
-# Extract database information
-sqlmap -u "http://freshblend.com/search?q=berry" --dump</pre>
-          
-          <h3>2. Burp Suite (Manual Testing)</h3>
-          <ul>
-            <li>Intercept customer requests using Burp Proxy</li>
-            <li>Send to Repeater for manual manipulation of search terms</li>
-            <li>Test different payloads on menu search and login forms</li>
-            <li>Use Intruder for automated payload testing</li>
-            <li>Analyze response times and error messages</li>
-          </ul>
-          
-          <h3>3. Manual Testing Techniques</h3>
-          <pre>
-# Step 1: Identify injection points
-Test search with: berry'
-Look for: SQL errors, unexpected behavior
-
-# Step 2: Confirm vulnerability
-Test with: ' OR '1'='1
-Result: Should return unexpected data
-
-# Step 3: Extract information
-' UNION SELECT email, password, NULL FROM customers--
-
-# Step 4: Boolean-based testing
-' AND 1=1--  (should work normally)
-' AND 1=2--  (should behave differently)</pre>
-        </div>
-
-        <div class="section">
-          <h2>🎯 Real-World Example: E-commerce Authentication</h2>
-          
-          <h3>Customer Login Bypass</h3>
-          <pre>
-Vulnerable login query:
-SELECT * FROM customers WHERE email='USER_INPUT' AND password='USER_INPUT'
-
-Attack payload for email field:
-admin@freshblend.com'--
-
-Result:
-SELECT * FROM customers WHERE email='admin@freshblend.com'--' AND password='...'
-(Password check is commented out, granting access)</pre>
-
-          <h3>Menu Search Exploitation</h3>
-          <pre>
-Vulnerable search query:
-SELECT * FROM smoothies WHERE name LIKE '%USER_INPUT%'
-
-Attack payload:
-' UNION SELECT email, password, rewards_points FROM customers--
-
-Result:
-Combines smoothie menu with customer credentials in search results</pre>
-        </div>
-
-        <div class="lab-info">
-          <h3>📝 Key Takeaways for Developers</h3>
-          <ul>
-            <li>Never trust user input - always validate and sanitize</li>
-            <li>Use parameterized queries for all database interactions</li>
-            <li>Apply principle of least privilege to database accounts</li>
-            <li>Implement proper error handling that doesn't leak information</li>
-            <li>Regular penetration testing identifies vulnerabilities before attackers do</li>
-            <li>Protect customer data - it's both a legal and ethical responsibility</li>
-          </ul>
-        </div>
-
-        <div class="section">
-          <p><strong>Note:</strong> This educational resource is provided alongside FreshBlend's ordering portal to help demonstrate secure coding practices. The examples shown here are for training purposes only.</p>
+          <h2>Customer Privacy</h2>
+          <p>Your privacy matters to us. We only collect necessary information for order processing and never share your data with third parties without consent. For questions about data privacy, contact privacy@freshblend.com.</p>
         </div>
       </div>
     </body>
