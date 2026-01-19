@@ -182,7 +182,7 @@ app.get('/', (req, res) => {
     <html>
     <head>
       <title>PawSpa Grooming �� - Appointment System - Navigation</title>
-      <style>${cyberpunkStyles}</style>
+      <style>${pawspaStyles}</style>
     </head>
     <body>
       <div class="container">
@@ -241,7 +241,7 @@ app.get('/example', (req, res) => {
     <html>
     <head>
       <title>PawSpa Grooming �� - Appointment System - Example</title>
-      <style>${cyberpunkStyles}</style>
+      <style>${pawspaStyles}</style>
     </head>
     <body>
       <div class="container">
@@ -505,7 +505,7 @@ app.get('/lab1', (req, res) => {
     <html>
     <head>
       <title>A07: Lab 1 - Login Portal</title>
-      <style>${cyberpunkStyles}</style>
+      <style>${pawspaStyles}</style>
     </head>
     <body>
       <div class="container">
@@ -650,7 +650,7 @@ app.get('/lab2', (req, res) => {
     <html>
     <head>
       <title>A07: Lab 2 - My Appointments</title>
-      <style>${cyberpunkStyles}</style>
+      <style>${pawspaStyles}</style>
     </head>
     <body>
       <div class="container">
@@ -828,7 +828,7 @@ app.get('/lab3', (req, res) => {
     <html>
     <head>
       <title>A07: Lab 3 - Account Recovery</title>
-      <style>${cyberpunkStyles}</style>
+      <style>${pawspaStyles}</style>
     </head>
     <body>
       <div class="container">

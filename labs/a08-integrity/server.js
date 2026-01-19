@@ -13,7 +13,7 @@ const upload = multer({
   }
 });
 
-const cyberpunkStyles = `
+const harvestStyles = `
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -195,7 +195,7 @@ app.get('/', (req, res) => {
     <head>
       <title>FreshHarvest Market 🌱 - Vendor Portal</title>
       <meta charset="UTF-8">
-      ${cyberpunkStyles}
+      ${harvestStyles}
     </head>
     <body>
       <div class="container">
@@ -246,7 +246,7 @@ app.get('/example', (req, res) => {
     <head>
       <title>A08: Integrity Failures - Examples</title>
       <meta charset="UTF-8">
-      ${cyberpunkStyles}
+      ${harvestStyles}
     </head>
     <body>
       <div class="container">
@@ -418,7 +418,7 @@ app.get('/lab1', (req, res) => {
     <head>
       <title>Lab 1 - Product Updates</title>
       <meta charset="UTF-8">
-      ${cyberpunkStyles}
+      ${harvestStyles}
     </head>
     <body>
       <div class="container">
@@ -497,7 +497,7 @@ app.get('/lab2', (req, res) => {
     <head>
       <title>Lab 2 - Vendor Portal</title>
       <meta charset="UTF-8">
-      ${cyberpunkStyles}
+      ${harvestStyles}
     </head>
     <body>
       <div class="container">
@@ -572,7 +572,7 @@ app.get('/lab3', (req, res) => {
     <head>
       <title>Lab 3 - File Manager</title>
       <meta charset="UTF-8">
-      ${cyberpunkStyles}
+      ${harvestStyles}
     </head>
     <body>
       <div class="container">
