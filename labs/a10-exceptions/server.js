@@ -420,3 +420,265 @@ app.get('/lab3', (req, res) => {
 
                 <div class="info-box">
                     <h2>🛠️ Testing Instructions</h2>
+                    <p><strong>Endpoint:</strong> <code>GET /api/member/config</code></p>
+                    <p><strong>What to look for:</strong> Observe whether the generic error message masks an authorization failure</p>
+                </div>
+
+                <p style="text-align: center; margin-top: 40px;">
+                    <a href="/">← Back to Home</a>
+                </p>
+            </div>
+        </body>
+        </html>
+    `);
+});
+
+// Lab 2 - Registration with Stack Traces
+app.get('/lab2', (req, res) => {
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Registration System - CommunityHub</title>
+            <style>
+                body {
+                    background: linear-gradient(135deg, #FFF5E1 0%, #FFE4B5 100%);
+                    color: #2c3e50;
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    padding: 20px;
+                    line-height: 1.6;
+                }
+                .container {
+                    max-width: 900px;
+                    margin: 0 auto;
+                }
+                h1 {
+                    color: #E67E22;
+                    text-align: center;
+                    border-bottom: 3px solid #E67E22;
+                    padding-bottom: 10px;
+                }
+                .info-box, .hint-box {
+                    background: linear-gradient(145deg, #FFFFFF 0%, #FFF9F0 100%);
+                    border-left: 4px solid #E67E22;
+                    padding: 20px;
+                    margin: 20px 0;
+                    border-radius: 5px;
+                }
+                .hint-box {
+                    background: linear-gradient(145deg, #FFF9E6 0%, #FFF4CC 100%);
+                    border-left: 4px solid #F39C12;
+                }
+                a {
+                    color: #E67E22;
+                    text-decoration: none;
+                    border-bottom: 2px dotted #E67E22;
+                }
+                a:hover {
+                    color: #D35400;
+                    border-bottom: 2px solid #D35400;
+                }
+                .difficulty {
+                    display: inline-block;
+                    padding: 6px 16px;
+                    border-radius: 4px;
+                    font-weight: bold;
+                    background-color: #F39C12;
+                    color: #fff;
+                }
+                p, li {
+                    color: #34495e;
+                }
+                h2 {
+                    color: #D35400;
+                }
+                code {
+                    background-color: #FFF9F0;
+                    padding: 3px 8px;
+                    border-radius: 3px;
+                    color: #D35400;
+                    font-family: 'Courier New', monospace;
+                    border: 1px solid #E67E22;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>📝 REGISTRATION SYSTEM: STACK TRACE ANALYSIS <span class="difficulty">MEDIUM</span></h1>
+                
+                <div class="info-box">
+                    <h2>📋 Exercise Overview</h2>
+                    <p><strong>System:</strong> Class Registration Platform</p>
+                    <p><strong>Objective:</strong> Test registration process for exposed technical details</p>
+                    <p><strong>Flag Location:</strong> API response from registration endpoint</p>
+                </div>
+
+                <div class="info-box">
+                    <h2>🎯 Scenario</h2>
+                    <p>The CommunityHub registration system handles class enrollments. When errors occur during registration, the system should provide helpful feedback to users without revealing technical implementation details. Exposed stack traces can reveal framework versions, file paths, and internal logic that aid attackers.</p>
+                    <p><strong>Your task:</strong> Submit a registration that triggers an error and analyze what technical details are exposed.</p>
+                </div>
+
+                <div class="hint-box">
+                    <strong style="color: #F39C12;">💡 Testing Hints:</strong>
+                    <ul>
+                        <li>Try registering for class ID 999 (non-existent)</li>
+                        <li>Look for stack traces, file paths, or framework details</li>
+                        <li>Exposed error details help attackers understand the codebase</li>
+                        <li>Production systems should sanitize error responses</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h2>🛠️ Testing Instructions</h2>
+                    <p><strong>Endpoint:</strong> <code>POST /api/register</code></p>
+                    <p><strong>Request Body:</strong></p>
+                    <pre>{
+  "memberId": 1,
+  "classId": 999,
+  "sessionDate": "2024-02-15"
+}</pre>
+                    <p><strong>What to look for:</strong> Check if error responses include stack traces or system paths</p>
+                </div>
+
+                <p style="text-align: center; margin-top: 40px;">
+                    <a href="/">← Back to Home</a>
+                </p>
+            </div>
+        </body>
+        </html>
+    `);
+});
+
+// API Endpoints
+
+// Lab 1 API - Verbose error messages
+app.get('/api/class/:id', (req, res) => {
+    const classId = parseInt(req.params.id);
+    
+    try {
+        const classInfo = database.classes.find(c => c.id === classId);
+        
+        if (!classInfo) {
+            // Vulnerable: Verbose error reveals database structure
+            return res.status(404).json({
+                success: false,
+                error: 'Class not found in database.classes collection',
+                details: {
+                    queriedId: classId,
+                    availableIds: database.classes.map(c => c.id),
+                    databaseType: 'In-memory object store',
+                    collectionName: 'classes',
+                    totalRecords: database.classes.length
+                },
+                flag: 'HARVEST{V3RB0S3_3RR0RS}',
+                vulnerability: 'Error message reveals internal database structure and implementation details',
+                impact: 'Attackers learn about data organization and can enumerate valid IDs',
+                secureAlternative: 'Return generic "Class not found" without exposing system details'
+            });
+        }
+        
+        res.json({
+            success: true,
+            class: classInfo
+        });
+    } catch (err) {
+        // Even more verbose error
+        res.status(500).json({
+            success: false,
+            error: err.message,
+            stack: err.stack,
+            hint: 'Try a non-existent class ID to see verbose errors'
+        });
+    }
+});
+
+// Lab 2 API - Stack trace exposure
+app.post('/api/register', (req, res) => {
+    const { memberId, classId, sessionDate } = req.body;
+    
+    try {
+        // Simulate validation that throws an error
+        const classInfo = database.classes.find(c => c.id === classId);
+        
+        if (!classInfo) {
+            // Vulnerable: Throw error that will expose stack trace
+            const error = new Error(`Class ID ${classId} does not exist in classes table`);
+            error.code = 'CLASS_NOT_FOUND';
+            error.query = `SELECT * FROM classes WHERE id = ${classId}`;
+            error.file = '/app/src/registration/RegistrationService.js';
+            error.line = 156;
+            throw error;
+        }
+        
+        database.registrations.push({
+            memberId,
+            classId,
+            sessionDate,
+            registeredAt: new Date().toISOString()
+        });
+        
+        res.json({
+            success: true,
+            message: 'Registration successful',
+            registration: { memberId, classId, sessionDate }
+        });
+    } catch (err) {
+        // Vulnerable: Expose full stack trace and internal error details
+        res.status(500).json({
+            success: false,
+            error: err.message,
+            errorCode: err.code,
+            stackTrace: err.stack,
+            internalError: {
+                file: err.file || 'Unknown',
+                line: err.line || 'Unknown',
+                query: err.query || 'N/A'
+            },
+            framework: 'Express.js v4.18.2',
+            nodeVersion: process.version,
+            flag: 'HARVEST{ST4CK_TR4C3_L34K}',
+            vulnerability: 'Full stack traces and internal paths exposed in error responses',
+            impact: 'Reveals framework versions, file structure, and code organization',
+            secureAlternative: 'Log detailed errors server-side, return generic message to client'
+        });
+    }
+});
+
+// Lab 3 API - Generic error hiding security violations
+app.get('/api/member/config', (req, res) => {
+    // Vulnerable: Authorization failure hidden behind generic 500 error
+    const isAuthorized = false; // Simulated authorization check
+    
+    if (!isAuthorized) {
+        // Bad practice: Return 500 instead of 403, hiding the security violation
+        return res.status(500).json({
+            success: false,
+            message: 'An error occurred while processing your request',
+            errorCode: 'INTERNAL_ERROR',
+            flag: 'HARVEST{S1L3NT_F41LUR3}',
+            vulnerability: 'Authorization failure masked as generic server error',
+            impact: 'Security monitoring cannot detect unauthorized access attempts',
+            actualIssue: 'This should return 403 Forbidden, not 500 Internal Server Error',
+            secureAlternative: 'Use proper HTTP status codes: 403 for authorization failures, distinct from 500 server errors'
+        });
+    }
+    
+    // This would be the actual config if authorized
+    res.json({
+        success: true,
+        config: database.config
+    });
+});
+
+app.listen(PORT, () => {
+    console.log(`\x1b[32m
+╔════════════════════════════════════════════╗
+║   🏠 CommunityHub Center                  ║
+║   Server running on port ${PORT}           ║
+║                                            ║
+║   Access the portal:                      ║
+║   http://localhost:${PORT}                    ║
+╚════════════════════════════════════════════╝
+\x1b[0m`);
+});

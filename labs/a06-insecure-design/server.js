@@ -441,3 +441,216 @@ app.get('/lab3', (req, res) => {
           <p>TacoTruck Express rewards loyal customers with account credits. Your account has a $50.00 balance that you can use for orders. The system processes payments in real-time!</p>
           <p>Your task: Try to place multiple orders at the same time. Our fast system might process them all if you're quick enough!</p>
         </div>
+
+        <div class="hint-box">
+          <strong>💡 Testing Hints:</strong>
+          <ul>
+            <li>Your account balance: $50.00 (customer123)</li>
+            <li>Each taco order costs $3.50</li>
+            <li>Try sending multiple requests at the exact same time</li>
+            <li>Race conditions occur when concurrent requests aren't synchronized</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>🔧 How to Test</h2>
+          <p><strong>Endpoint:</strong> <code>POST /api/purchase</code></p>
+          <p><strong>Request Body:</strong></p>
+          <pre>{
+  "customerId": "customer123",
+  "amount": 3.50,
+  "item": "Carne Asada Taco"
+}</pre>
+          <p><strong>Goal:</strong> Purchase more than $50 worth of tacos by exploiting the race condition!</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+          <a href="/">← Back to Home</a>
+        </div>
+      </div>
+    </body>
+    </html>
+  `);
+});
+
+// API Endpoints
+
+// Lab 1 API - Rate Limiting vulnerability
+app.post('/api/order', (req, res) => {
+  const { item, quantity } = req.body;
+  const clientIp = req.ip || 'unknown';
+  
+  // Vulnerable: No rate limiting
+  if (!orderAttempts[clientIp]) {
+    orderAttempts[clientIp] = [];
+  }
+  
+  orderAttempts[clientIp].push({ 
+    item, 
+    quantity, 
+    timestamp: Date.now() 
+  });
+  
+  // Check if user made many rapid orders
+  const recentOrders = orderAttempts[clientIp].filter(
+    order => Date.now() - order.timestamp < 10000
+  );
+  
+  if (recentOrders.length > 20) {
+    return res.json({
+      success: true,
+      orderId: Math.random().toString(36).substr(2, 9),
+      item,
+      quantity,
+      totalOrders: recentOrders.length,
+      flag: 'HARVEST{R4T3_L1M1T_M1SS1NG}',
+      message: '🎉 Flag captured! You exploited the missing rate limit!',
+      vulnerability: 'No rate limiting allows rapid-fire requests',
+      secureAlternative: 'Implement sliding window rate limit (e.g., max 10 orders per minute)'
+    });
+  }
+  
+  res.json({
+    success: true,
+    orderId: Math.random().toString(36).substr(2, 9),
+    item,
+    quantity,
+    totalOrders: recentOrders.length,
+    hint: `${recentOrders.length}/20 rapid orders made`
+  });
+});
+
+// Lab 2 API - Logic Flaw vulnerability
+app.post('/api/apply-promo', (req, res) => {
+  const { promoCodes, cartTotal } = req.body;
+  
+  // Vulnerable: Allows stacking of codes that shouldn't be combined
+  let discountPercent = 0;
+  const appliedCodes = [];
+  
+  // Available codes
+  const validCodes = {
+    'FIRST10': 10,    // First order discount
+    'SAVE15': 15,     // General discount
+    'LUNCH20': 20,    // Lunch special
+    'VIP25': 25       // VIP members only
+  };
+  
+  promoCodes.forEach(code => {
+    if (validCodes[code]) {
+      discountPercent += validCodes[code];
+      appliedCodes.push(code);
+      
+      // Track usage for each session (vulnerable: no proper validation)
+      if (!promoCodeUsage[code]) {
+        promoCodeUsage[code] = 0;
+      }
+      promoCodeUsage[code]++;
+    }
+  });
+  
+  const discountAmount = (cartTotal * discountPercent) / 100;
+  const finalTotal = Math.max(0, cartTotal - discountAmount);
+  
+  // Flag when discount exceeds 50%
+  if (discountPercent >= 50) {
+    return res.json({
+      success: true,
+      originalTotal: cartTotal,
+      discountPercent,
+      discountAmount,
+      finalTotal,
+      appliedCodes,
+      flag: 'HARVEST{ST4CK_PR0M0_FL4W}',
+      message: '🎉 Flag captured! You exploited the promo code stacking flaw!',
+      vulnerability: 'Multiple discount codes can be stacked without validation',
+      secureAlternative: 'Implement mutually exclusive discount categories'
+    });
+  }
+  
+  res.json({
+    success: true,
+    originalTotal: cartTotal,
+    discountPercent,
+    discountAmount,
+    finalTotal,
+    appliedCodes,
+    hint: `${discountPercent}% discount applied. Try combining more codes!`
+  });
+});
+
+// Lab 3 API - Race Condition vulnerability
+app.post('/api/purchase', (req, res) => {
+  const { customerId, amount, item } = req.body;
+  
+  // Vulnerable: No locking or transaction control
+  const balance = accountBalances[customerId];
+  
+  if (balance === undefined) {
+    return res.status(404).json({ 
+      success: false, 
+      message: 'Customer not found' 
+    });
+  }
+  
+  // Check balance before purchase (vulnerable to race condition)
+  if (balance >= amount) {
+    // Simulate processing delay that allows race condition
+    setTimeout(() => {
+      accountBalances[customerId] -= amount;
+      
+      orderHistory.push({
+        customerId,
+        item,
+        amount,
+        timestamp: new Date().toISOString(),
+        balanceAfter: accountBalances[customerId]
+      });
+      
+      // Check if customer went over their original balance
+      const totalSpent = 50.00 - accountBalances[customerId];
+      
+      if (accountBalances[customerId] < 0 || totalSpent > 50.00) {
+        return res.json({
+          success: true,
+          item,
+          amount,
+          newBalance: accountBalances[customerId],
+          totalSpent,
+          flag: 'HARVEST{R4C3_C0ND1T10N_W1N}',
+          message: '🎉 Flag captured! You exploited the race condition!',
+          vulnerability: 'Concurrent requests processed without locking',
+          secureAlternative: 'Use database transactions with row-level locking'
+        });
+      }
+      
+      res.json({
+        success: true,
+        item,
+        amount,
+        newBalance: accountBalances[customerId],
+        totalSpent,
+        hint: 'Try sending multiple requests at the exact same time'
+      });
+    }, 10); // Small delay to make race condition easier to exploit
+  } else {
+    res.status(400).json({
+      success: false,
+      message: 'Insufficient balance',
+      balance,
+      required: amount
+    });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`\x1b[32m
+╔════════════════════════════════════════════╗
+║   🌮 TacoTruck Express                    ║
+║   Server running on port ${PORT}           ║
+║                                            ║
+║   Access the portal:                      ║
+║   http://localhost:${PORT}                    ║
+╚════════════════════════════════════════════╝
+\x1b[0m`);
+});
