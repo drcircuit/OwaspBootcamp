@@ -626,13 +626,12 @@ app.get('/lab2', (req, res) => {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>My Profile - ZenFlow Yoga</title>
+            <title>Lab 2 - Profile Access</title>
             <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-                    background: linear-gradient(135deg, #e8f5e9 0%, #c5e1a5 100%);
-                    min-height: 100vh;
+                    background-color: #1a1a1a;
+                    color: #00ff00;
+                    font-family: 'Courier New', monospace;
                     padding: 20px;
                     line-height: 1.6;
                 }
@@ -640,159 +639,108 @@ app.get('/lab2', (req, res) => {
                     max-width: 900px;
                     margin: 0 auto;
                 }
-                .header {
-                    background: white;
-                    padding: 30px;
-                    border-radius: 15px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-                    margin-bottom: 30px;
-                    text-align: center;
-                }
                 h1 {
-                    color: #2e7d32;
+                    text-align: center;
                     font-size: 2.5em;
-                    margin-bottom: 10px;
-                }
-                .subtitle {
-                    color: #666;
-                    font-size: 1.1em;
-                }
-                .profile-section {
-                    background: white;
-                    padding: 30px;
-                    border-radius: 15px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-                    margin-bottom: 25px;
-                    border-left: 4px solid #66bb6a;
-                }
-                .profile-section h2 {
-                    color: #2e7d32;
-                    margin-bottom: 20px;
-                }
-                .profile-field {
-                    display: flex;
-                    padding: 15px 0;
-                    border-bottom: 1px solid #f0f0f0;
-                }
-                .profile-field:last-child {
-                    border-bottom: none;
-                }
-                .field-label {
-                    font-weight: 600;
-                    color: #666;
-                    width: 180px;
-                }
-                .field-value {
-                    color: #333;
-                    flex: 1;
+                    text-shadow: 0 0 10px #00ff00;
+                    border-bottom: 2px solid #00ff00;
+                    padding-bottom: 10px;
                 }
                 .info-box {
-                    background: #f1f8e9;
+                    background-color: #0a0a0a;
+                    border: 2px solid #00ff00;
                     padding: 20px;
-                    border-radius: 10px;
+                    margin: 20px 0;
+                    border-radius: 5px;
+                }
+                .hint-box {
+                    background-color: #0a0a0a;
+                    border-left: 4px solid #ffaa00;
+                    padding: 15px;
                     margin: 20px 0;
                 }
-                .info-box p {
-                    color: #555;
-                    font-size: 0.95em;
+                .endpoint {
+                    background-color: #000;
+                    padding: 15px;
+                    border-radius: 5px;
+                    border-left: 4px solid #00ffff;
+                    margin: 15px 0;
+                    font-family: monospace;
                 }
                 code {
-                    background: #f5f5f5;
-                    padding: 2px 6px;
-                    border-radius: 3px;
-                    font-family: 'Courier New', monospace;
-                    color: #c62828;
-                    font-size: 0.9em;
+                    color: #00ffff;
                 }
-                .back-link {
-                    text-align: center;
-                    margin-top: 30px;
-                }
-                .back-link a {
-                    color: #2e7d32;
+                a {
+                    color: #00ffff;
                     text-decoration: none;
-                    font-weight: 600;
+                    border-bottom: 1px dotted #00ffff;
                 }
-                .btn {
-                    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
-                    color: white;
-                    padding: 10px 20px;
-                    border: none;
-                    border-radius: 8px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    margin-top: 15px;
+                a:hover {
+                    color: #00ff00;
+                    border-bottom: 1px solid #00ff00;
+                }
+                .difficulty {
+                    display: inline-block;
+                    padding: 5px 15px;
+                    border-radius: 3px;
+                    font-weight: bold;
+                    background-color: #ffaa00;
+                    color: #000;
                 }
             </style>
         </head>
         <body>
             <div class="container">
-                <div class="header">
-                    <h1>👤 My Profile</h1>
-                    <p class="subtitle">Manage your membership and personal information</p>
+                <h1>🎭 LAB 2: PROFILE ACCESS <span class="difficulty">MEDIUM</span></h1>
+                
+                <div class="info-box">
+                    <h2>📋 Mission Brief</h2>
+                    <p><strong>Stage:</strong> Initial Access</p>
+                    <p><strong>Objective:</strong> Access another user's private profile data</p>
+                    <p><strong>Current User:</strong> Bob (ID: ${CURRENT_USER_ID})</p>
+                    <p><strong>Flag:</strong> Will be revealed when you access someone else's profile</p>
                 </div>
 
-                <div class="profile-section">
-                    <h2>📋 Account Information</h2>
-                    
-                    <div class="profile-field">
-                        <div class="field-label">Member ID:</div>
-                        <div class="field-value">#${CURRENT_USER_ID}</div>
-                    </div>
-                    <div class="profile-field">
-                        <div class="field-label">Username:</div>
-                        <div class="field-value">sarah_m</div>
-                    </div>
-                    <div class="profile-field">
-                        <div class="field-label">Email:</div>
-                        <div class="field-value">sarah.martinez@email.com</div>
-                    </div>
-                    <div class="profile-field">
-                        <div class="field-label">Member Since:</div>
-                        <div class="field-value">June 2024</div>
-                    </div>
+                <div class="info-box">
+                    <h2>🎯 Challenge Description</h2>
+                    <p>Users have profile pages containing sensitive information like Social Security Numbers. The application should only allow users to view their own profile.</p>
+                    <p>You are logged in as Bob (User ID: ${CURRENT_USER_ID}). Can you access another user's private profile information?</p>
                 </div>
 
-                <div class="profile-section">
-                    <h2>🎫 Membership Details</h2>
-                    
-                    <div class="profile-field">
-                        <div class="field-label">Plan:</div>
-                        <div class="field-value">Basic Membership</div>
-                    </div>
-                    <div class="profile-field">
-                        <div class="field-label">Renewal Date:</div>
-                        <div class="field-value">February 28, 2025</div>
-                    </div>
-                    <div class="profile-field">
-                        <div class="field-label">Favorite Class:</div>
-                        <div class="field-value">Hatha Yoga</div>
-                    </div>
-                    
-                    <button class="btn">Upgrade to Premium</button>
+                <div class="endpoint">
+                    <strong>API Endpoint:</strong><br>
+                    <code>GET http://localhost:3001/api/lab2/user/:id/profile</code><br><br>
+                    <strong>Your Profile:</strong><br>
+                    <code>GET http://localhost:3001/api/lab2/user/${CURRENT_USER_ID}/profile</code><br><br>
+                    <strong>Try accessing:</strong><br>
+                    <code>GET http://localhost:3001/api/lab2/user/1/profile</code>
                 </div>
 
-                <div class="profile-section">
-                    <h2>💳 Payment Information</h2>
-                    
-                    <div class="profile-field">
-                        <div class="field-label">Payment Method:</div>
-                        <div class="field-value">Credit Card ending in 7821</div>
-                    </div>
-                    <div class="profile-field">
-                        <div class="field-label">Billing Status:</div>
-                        <div class="field-value">✅ Active</div>
-                    </div>
-                    
-                    <div class="info-box">
-                        <p><strong>🔒 Secure Profile Access</strong></p>
-                        <p style="margin-top: 10px;">Your profile information is private and accessible only through our secure API at <code>GET /api/profile/user/${CURRENT_USER_ID}</code></p>
-                        <p style="margin-top: 10px; font-size: 0.9em; color: #777;">This data is encrypted and protected by our authentication system.</p>
-                    </div>
+                <div class="hint-box">
+                    <strong>💡 Hints:</strong>
+                    <ul>
+                        <li>The endpoint checks if you're logged in (you are - as Bob)</li>
+                        <li>But does it check WHOSE profile you're accessing?</li>
+                        <li>Try accessing profiles with different user IDs</li>
+                        <li>Your goal is to view someone else's SSN</li>
+                    </ul>
                 </div>
 
-                <div class="back-link">
-                    <a href="/">← Back to Member Portal</a>
+                <div class="info-box">
+                    <h2>🛠️ Testing Instructions</h2>
+                    <p><strong>Using curl:</strong></p>
+                    <pre><code>curl http://localhost:3001/api/lab2/user/2/profile  # Your profile
+curl http://localhost:3001/api/lab2/user/1/profile  # Alice's profile?
+curl http://localhost:3001/api/lab2/user/3/profile  # Charlie's profile?</code></pre>
+                    
+                    <p><strong>Using Browser Console (F12):</strong></p>
+                    <pre><code>fetch('http://localhost:3001/api/lab2/user/1/profile')
+    .then(r => r.json())
+    .then(data => console.log(data));</code></pre>
+                </div>
+
+                <div style="text-align: center; margin-top: 40px;">
+                    <a href="/">← Back to Home</a>
                 </div>
             </div>
         </body>
@@ -801,67 +749,52 @@ app.get('/lab2', (req, res) => {
 });
 
 // Lab 2 API - Profile access endpoint (vulnerable to IDOR)
-app.get('/api/profile/user/:id', (req, res) => {
+app.get('/api/lab2/user/:id/profile', (req, res) => {
     const userId = parseInt(req.params.id);
     const user = users.find(u => u.id === userId);
     
     if (!user) {
-        return res.status(404).json({ 
-            error: 'Member not found',
-            message: 'Invalid member ID'
-        });
+        return res.status(404).json({ error: 'User not found' });
     }
     
     // Vulnerable: Checks that someone is logged in, but not WHO is accessing
-    // Should verify: req.session.userId === userId
-    // Instead: returns data for ANY valid user ID
+    // In a real app, this would check req.session.userId
+    // For this lab, we simulate that Bob (ID 2) is always logged in
     
-    // Build response with sensitive data
-    const profileData = {
+    // If accessing someone else's profile
+    if (userId !== CURRENT_USER_ID) {
+        return res.json({
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            ssn: user.ssn,
+            flag: 'NSA{1D0R_V1A_1NC3PT10N}',
+            message: `Congratulations! You accessed ${user.username}'s private profile data using IDOR.`
+        });
+    }
+    
+    // Accessing own profile
+    return res.json({
         id: user.id,
         username: user.username,
         email: user.email,
-        role: user.role,
-        membership: user.membership,
-        creditCard: user.creditCard,
-        renewalDate: user.renewalDate
-    };
-    
-    // Add member-specific data
-    if (user.role === 'member') {
-        profileData.joinDate = user.joinDate;
-        profileData.favoriteClass = user.favoriteClass;
-    }
-    
-    // Add instructor-specific data
-    if (user.role === 'instructor') {
-        profileData.specialization = user.specialization;
-        profileData.yearsTeaching = user.yearsTeaching;
-        profileData.accessLevel = user.accessLevel;
-    }
-    
-    // If accessing someone else's profile (IDOR vulnerability exploited)
-    if (userId !== CURRENT_USER_ID) {
-        profileData.flag = 'FLAG{1D0R_PR0F1L3_4CC3SS_V1OL4T10N}';
-        profileData._vuln_note = 'Unauthorized access: You accessed another member\'s private profile!';
-    }
-    
-    return res.json(profileData);
+        ssn: user.ssn,
+        message: 'This is your own profile. Try accessing another user\'s profile!'
+    });
 });
 
-// Lab 3 - Instructor Dashboard
+// Lab 3 - Privilege Escalation (Hard)
 app.get('/lab3', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Instructor Dashboard - ZenFlow Yoga</title>
+            <title>Lab 3 - Privilege Escalation</title>
             <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-                    background: linear-gradient(135deg, #e8f5e9 0%, #c5e1a5 100%);
-                    min-height: 100vh;
+                    background-color: #1a1a1a;
+                    color: #00ff00;
+                    font-family: 'Courier New', monospace;
                     padding: 20px;
                     line-height: 1.6;
                 }
@@ -869,135 +802,117 @@ app.get('/lab3', (req, res) => {
                     max-width: 900px;
                     margin: 0 auto;
                 }
-                .header {
-                    background: white;
-                    padding: 30px;
-                    border-radius: 15px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-                    margin-bottom: 30px;
-                    text-align: center;
-                }
                 h1 {
-                    color: #2e7d32;
+                    text-align: center;
                     font-size: 2.5em;
-                    margin-bottom: 10px;
+                    text-shadow: 0 0 10px #00ff00;
+                    border-bottom: 2px solid #00ff00;
+                    padding-bottom: 10px;
                 }
-                .subtitle {
-                    color: #666;
-                    font-size: 1.1em;
-                }
-                .alert-box {
-                    background: #ffebee;
-                    border-left: 4px solid #d32f2f;
+                .info-box {
+                    background-color: #0a0a0a;
+                    border: 2px solid #00ff00;
                     padding: 20px;
-                    border-radius: 10px;
+                    margin: 20px 0;
+                    border-radius: 5px;
+                }
+                .hint-box {
+                    background-color: #0a0a0a;
+                    border-left: 4px solid #ffaa00;
+                    padding: 15px;
                     margin: 20px 0;
                 }
-                .alert-box h2 {
-                    color: #c62828;
-                    margin-bottom: 10px;
-                }
-                .alert-box p {
-                    color: #666;
-                }
-                .info-section {
-                    background: white;
-                    padding: 30px;
-                    border-radius: 15px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-                    margin-bottom: 25px;
-                    border-left: 4px solid #66bb6a;
-                }
-                .info-section h2 {
-                    color: #2e7d32;
-                    margin-bottom: 15px;
-                }
-                .info-section p {
-                    color: #555;
-                    margin-bottom: 15px;
-                    line-height: 1.7;
-                }
-                .feature-list {
-                    background: #f1f8e9;
-                    padding: 20px 20px 20px 40px;
-                    border-radius: 10px;
+                .endpoint {
+                    background-color: #000;
+                    padding: 15px;
+                    border-radius: 5px;
+                    border-left: 4px solid #00ffff;
                     margin: 15px 0;
-                }
-                .feature-list li {
-                    color: #555;
-                    margin: 8px 0;
+                    font-family: monospace;
                 }
                 code {
-                    background: #f5f5f5;
-                    padding: 2px 6px;
-                    border-radius: 3px;
-                    font-family: 'Courier New', monospace;
-                    color: #c62828;
-                    font-size: 0.9em;
+                    color: #00ffff;
                 }
-                .back-link {
-                    text-align: center;
-                    margin-top: 30px;
-                }
-                .back-link a {
-                    color: #2e7d32;
+                a {
+                    color: #00ffff;
                     text-decoration: none;
-                    font-weight: 600;
+                    border-bottom: 1px dotted #00ffff;
+                }
+                a:hover {
+                    color: #00ff00;
+                    border-bottom: 1px solid #00ff00;
+                }
+                .difficulty {
+                    display: inline-block;
+                    padding: 5px 15px;
+                    border-radius: 3px;
+                    font-weight: bold;
+                    background-color: #ff0000;
+                    color: #fff;
+                }
+                .warning {
+                    background-color: #330000;
+                    border-left: 4px solid #ff0000;
+                    padding: 15px;
+                    margin: 15px 0;
                 }
             </style>
         </head>
         <body>
             <div class="container">
-                <div class="header">
-                    <h1>📅 Instructor Dashboard</h1>
-                    <p class="subtitle">Manage classes, bookings, and teaching resources</p>
+                <h1>👑 LAB 3: PRIVILEGE ESCALATION <span class="difficulty">HARD</span></h1>
+                
+                <div class="info-box">
+                    <h2>📋 Mission Brief</h2>
+                    <p><strong>Stage:</strong> Maintained Access</p>
+                    <p><strong>Objective:</strong> Gain administrative access</p>
+                    <p><strong>Current User:</strong> Bob (ID: ${CURRENT_USER_ID}, Role: user)</p>
+                    <p><strong>Flag:</strong> Will be revealed when you access the admin panel</p>
                 </div>
 
-                <div class="alert-box">
-                    <h2>🔒 Staff Access Required</h2>
-                    <p>You are currently logged in as <strong>sarah_m</strong> (Basic Member).</p>
-                    <p style="margin-top: 10px;">This area is restricted to ZenFlow instructors and staff members only. If you believe you should have access, please contact our admin team at staff@zenflow.yoga.</p>
+                <div class="info-box">
+                    <h2>🎯 Challenge Description</h2>
+                    <p>The application has an admin panel that should only be accessible to administrators. Regular users like Bob should receive a "Forbidden" error.</p>
+                    <p>You are logged in as Bob, a regular user. Can you find a way to access the admin panel and escalate your privileges?</p>
                 </div>
 
-                <div class="info-section">
-                    <h2>About the Instructor Dashboard</h2>
-                    <p>Our Instructor Dashboard provides teaching staff with tools to manage their classes and connect with students:</p>
+                <div class="warning">
+                    <strong>⚠️ WARNING:</strong> This is a privilege escalation challenge. You need to think about how the application determines who is an administrator.
+                </div>
+
+                <div class="endpoint">
+                    <strong>API Endpoint:</strong><br>
+                    <code>GET http://localhost:3001/api/lab3/user/:id/admin</code><br><br>
+                    <strong>Example (will fail for you):</strong><br>
+                    <code>GET http://localhost:3001/api/lab3/user/${CURRENT_USER_ID}/admin</code>
+                </div>
+
+                <div class="hint-box">
+                    <strong>💡 Hints:</strong>
+                    <ul>
+                        <li>The endpoint checks your role, but WHERE does it get that role from?</li>
+                        <li>You know from Lab 1 that there are 4 users in the system</li>
+                        <li>One of these users might have admin privileges...</li>
+                        <li>Can you access the admin panel by pretending to be someone else?</li>
+                        <li>Think IDOR, but for privilege escalation</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h2>🛠️ Testing Instructions</h2>
+                    <p><strong>Using curl:</strong></p>
+                    <pre><code>curl http://localhost:3001/api/lab3/user/2/admin  # Your attempt (will fail)
+curl http://localhost:3001/api/lab3/user/1/admin  # Try other users?
+# Keep testing different user IDs...</code></pre>
                     
-                    <ul class="feature-list">
-                        <li><strong>Class Scheduling:</strong> Create and manage your class schedule</li>
-                        <li><strong>Student Roster:</strong> View registered students for each class</li>
-                        <li><strong>Booking Management:</strong> Handle class cancellations and waitlists</li>
-                        <li><strong>Teaching Resources:</strong> Access lesson plans and studio guidelines</li>
-                        <li><strong>Performance Analytics:</strong> Track class attendance and student feedback</li>
-                    </ul>
+                    <p><strong>Using Browser Console (F12):</strong></p>
+                    <pre><code>fetch('http://localhost:3001/api/lab3/user/4/admin')
+    .then(r => r.json())
+    .then(data => console.log(data));</code></pre>
                 </div>
 
-                <div class="info-section">
-                    <h2>🎓 Becoming an Instructor</h2>
-                    <p>Interested in teaching at ZenFlow? We're always looking for passionate, certified yoga instructors to join our team.</p>
-                    <p style="margin-top: 15px;"><strong>Requirements:</strong></p>
-                    <ul class="feature-list">
-                        <li>200-hour (minimum) yoga teacher certification</li>
-                        <li>Liability insurance</li>
-                        <li>CPR/First Aid certification</li>
-                        <li>Experience teaching group classes</li>
-                    </ul>
-                    <p style="margin-top: 15px;">Contact <strong>careers@zenflow.yoga</strong> for more information about joining our teaching staff.</p>
-                </div>
-
-                <div class="info-section">
-                    <h2>🔧 Technical Information</h2>
-                    <p>The instructor dashboard is accessed through a staff-only API endpoint:</p>
-                    <p style="margin-top: 15px;">
-                        <strong>Endpoint:</strong> <code>GET /api/instructor/user/:id/dashboard</code>
-                    </p>
-                    <p style="margin-top: 10px; color: #777; font-size: 0.9em;">
-                        This endpoint verifies instructor credentials and role-based permissions before granting access to administrative features.
-                    </p>
-                </div>
-
-                <div class="back-link">
-                    <a href="/">← Back to Member Portal</a>
+                <div style="text-align: center; margin-top: 40px;">
+                    <a href="/">← Back to Home</a>
                 </div>
             </div>
         </body>
@@ -1005,75 +920,62 @@ app.get('/lab3', (req, res) => {
     `);
 });
 
-// Lab 3 API - Instructor dashboard endpoint (vulnerable to privilege escalation via IDOR)
-app.get('/api/instructor/user/:id/dashboard', (req, res) => {
+// Lab 3 API - Admin panel endpoint (vulnerable to privilege escalation via IDOR)
+app.get('/api/lab3/user/:id/admin', (req, res) => {
     const userId = parseInt(req.params.id);
     const user = users.find(u => u.id === userId);
     
     if (!user) {
-        return res.status(404).json({ 
-            error: 'Member not found',
-            message: 'Invalid member ID'
-        });
+        return res.status(404).json({ error: 'User not found' });
     }
     
-    // Vulnerable: Checks the role of the REQUESTED user ID, not the CURRENT user
-    // Should verify: currentSessionUser.role === 'instructor'
-    // Instead checks: requestedUser.role === 'instructor'
+    // Vulnerable: Checks the role of the requested user ID, not the current user
+    // Should check: if (CURRENT_USER.role !== 'admin')
+    // Instead checks: if (user.role !== 'admin') where user is from URL parameter
     
-    if (user.role !== 'instructor') {
+    if (user.role !== 'admin') {
         return res.status(403).json({ 
-            error: 'Access Denied',
-            message: 'This area is restricted to ZenFlow instructors only.',
-            yourRole: 'member',
-            requiredRole: 'instructor'
+            error: 'Forbidden',
+            message: 'Access denied. Admin privileges required.'
         });
     }
     
-    // If we get here, the requested user ID belongs to an instructor
-    // Build instructor dashboard data
-    const dashboardData = {
-        message: 'Welcome to the Instructor Dashboard',
-        instructor: {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            specialization: user.specialization,
-            yearsTeaching: user.yearsTeaching
-        },
-        upcomingClasses: [
-            { date: '2025-01-20', time: '9:00 AM', type: 'Vinyasa Flow', enrolled: 12 },
-            { date: '2025-01-22', time: '6:00 PM', type: 'Meditation', enrolled: 8 },
-            { date: '2025-01-25', time: '10:00 AM', type: 'Power Yoga', enrolled: 15 }
-        ],
-        studentStats: {
-            totalStudents: 45,
-            averageAttendance: '87%',
-            rating: 4.8
-        },
-        resources: {
-            lessonPlans: '/instructor/resources/lessons',
-            studioGuidelines: '/instructor/resources/guidelines',
-            attendanceReports: '/instructor/reports/attendance'
-        }
-    };
+    // If we get here, the user found via ID is an admin
+    const isActuallyAdmin = (userId === 4); // User ID 4 is the real admin
     
-    // If privilege escalation occurred (accessing instructor dashboard as regular member)
-    if (userId !== CURRENT_USER_ID) {
-        dashboardData.flag = 'FLAG{PR1V1L3G3_3SC4L4T10N_1NSTRUCT0R}';
-        dashboardData._vuln_note = 'Privilege escalation detected: Regular member accessed instructor dashboard!';
+    if (isActuallyAdmin && userId !== CURRENT_USER_ID) {
+        return res.json({
+            message: 'Welcome to the Admin Panel',
+            user: user.username,
+            role: user.role,
+            flag: 'NSA{R00T_4CC3SS_4CH13V3D}',
+            adminData: {
+                totalUsers: users.length,
+                systemVersion: '1.0.0',
+                secretKey: 'admin_secret_key_12345'
+            },
+            congratulations: 'You successfully escalated privileges to admin through IDOR!'
+        });
     }
     
-    return res.json(dashboardData);
+    return res.json({
+        message: 'Welcome to the Admin Panel',
+        user: user.username,
+        role: user.role,
+        adminData: {
+            totalUsers: users.length,
+            systemVersion: '1.0.0'
+        }
+    });
 });
 
 app.listen(PORT, () => {
     console.log(`\x1b[32m
 ╔════════════════════════════════════════════╗
-║   🧘 ZenFlow Yoga - Member Portal         ║
+║   A01: BROKEN ACCESS CONTROL LAB          ║
 ║   Server running on port ${PORT}           ║
 ║                                            ║
-║   Access the portal:                      ║
+║   Access the lab:                         ║
 ║   http://localhost:${PORT}                    ║
 ╚════════════════════════════════════════════╝
 \x1b[0m`);
