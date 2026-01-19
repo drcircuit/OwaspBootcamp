@@ -175,13 +175,13 @@ app.get('/', (req, res) => {
 });
 
 
-// Example page - Help & Info
+// Example page - Interactive Tutorial
 app.get('/example', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Help Center - BeanScene Coffee</title>
+            <title>Getting Started - BeanScene Coffee</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
@@ -189,8 +189,9 @@ app.get('/example', (req, res) => {
                     background: linear-gradient(135deg, #6B4423 0%, #3E2723 100%);
                     padding: 20px;
                     min-height: 100vh;
+                    line-height: 1.6;
                 }
-                .container { max-width: 900px; margin: 0 auto; }
+                .container { max-width: 1000px; margin: 0 auto; }
                 .header {
                     background: #EFEBE9;
                     padding: 30px;
@@ -199,64 +200,257 @@ app.get('/example', (req, res) => {
                     text-align: center;
                     border: 2px solid #A1887F;
                 }
-                h1 { color: #3E2723; font-size: 2.2em; margin-bottom: 10px; }
-                .section {
+                h1 { color: #3E2723; font-size: 2.5em; margin-bottom: 10px; }
+                .subtitle { color: #5D4037; font-size: 1.1em; }
+                .tutorial-section {
                     background: #EFEBE9;
-                    padding: 25px;
+                    padding: 30px;
                     border-radius: 15px;
-                    margin-bottom: 20px;
+                    margin-bottom: 25px;
                     border: 2px solid #A1887F;
                 }
-                .section h2 { color: #3E2723; margin-bottom: 15px; }
-                .section p, .section li { color: #5D4037; line-height: 1.7; margin: 8px 0; }
-                .info-box {
+                .tutorial-section h2 {
+                    color: #3E2723;
+                    margin-bottom: 15px;
+                    font-size: 1.8em;
+                }
+                .tutorial-section p { color: #5D4037; margin-bottom: 15px; line-height: 1.7; }
+                .tutorial-box {
+                    background: #E8F5E9;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    border-left: 3px solid #4CAF50;
+                }
+                .interactive-demo {
                     background: #FFF3E0;
-                    border-left: 4px solid #FF9800;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    border-left: 3px solid #FF9800;
+                }
+                .demo-controls { margin: 15px 0; }
+                .demo-input {
+                    width: 100%;
+                    padding: 12px;
+                    border: 2px solid #8D6E63;
+                    border-radius: 8px;
+                    font-size: 1em;
+                    margin: 10px 0;
+                }
+                .demo-button {
+                    background: linear-gradient(135deg, #8D6E63 0%, #6D4C41 100%);
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-size: 1em;
+                    margin: 5px;
+                }
+                .demo-button:hover {
+                    background: linear-gradient(135deg, #6D4C41 0%, #5D4037 100%);
+                }
+                .demo-button:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+                .output-box {
+                    background: #f5f5f5;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin: 15px 0;
+                    font-family: 'Courier New', monospace;
+                    font-size: 0.9em;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                    max-height: 300px;
+                    overflow-y: auto;
+                    border: 1px solid #ddd;
+                }
+                .flag-reveal {
+                    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 1.2em;
+                    display: none;
+                }
+                .hint-box {
+                    background: #E3F2FD;
+                    border-left: 4px solid #2196F3;
                     padding: 15px;
                     margin: 15px 0;
                     border-radius: 5px;
                 }
-                a { color: #5D4037; font-weight: 600; text-decoration: none; }
-                a:hover { text-decoration: underline; }
+                code {
+                    background: #D7CCC8;
+                    padding: 2px 6px;
+                    border-radius: 3px;
+                    font-family: 'Courier New', monospace;
+                    color: #c62828;
+                }
                 .back-link { text-align: center; margin-top: 30px; }
+                .back-link a { color: #5D4037; text-decoration: none; font-weight: 600; }
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>☕ BeanScene Help Center</h1>
-                    <p style="color: #5D4037;">Your guide to the management portal</p>
+                    <h1>📚 Getting Started Guide</h1>
+                    <p class="subtitle">Learn to explore the BeanScene management system with interactive examples</p>
                 </div>
 
-                <div class="section">
-                    <h2>About the Portal</h2>
-                    <p>The BeanScene Management Portal provides comprehensive tools for managing shop operations. Access staff information, review system settings, and monitor store performance from one central location.</p>
+                <!-- Part 1: System Enumeration -->
+                <div class="tutorial-section">
+                    <h2>Part 1: System Discovery 🔍</h2>
+                    <p>BeanScene uses multiple systems for operations. Learn how to enumerate systems by ID to discover all available resources.</p>
                     
-                    <div class="info-box">
-                        <strong>Getting Started:</strong> Use the navigation cards on the home page to access different areas of the portal. Each section provides specific management capabilities for different aspects of the business.
+                    <div class="tutorial-box">
+                        <h3>🎯 Your Mission</h3>
+                        <p>The system directory allows you to search by ID. Try different IDs to discover all systems, including a hidden maintenance system at ID 103!</p>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>Interactive Demo</h3>
+                        <p>Enter a system ID to view its information. Open DevTools (F12) to watch the network requests!</p>
+                        <div class="demo-controls">
+                            <input type="number" id="part1-id" class="demo-input" placeholder="Enter system ID (try 100-105)" value="100">
+                            <button onclick="part1Search()" class="demo-button">🔍 Search System</button>
+                        </div>
+                        <div id="part1-output" class="output-box"></div>
+                        <div id="part1-flag" class="flag-reveal"></div>
+                    </div>
+
+                    <div class="hint-box">
+                        <strong>💡 Tip:</strong> Press F12 to open DevTools, go to the Network tab, and watch what happens when you search!
                     </div>
                 </div>
 
-                <div class="section">
-                    <h2>Portal Features</h2>
-                    <ul>
-                        <li><strong>Staff Dashboard:</strong> View team schedules, shift assignments, and contact information</li>
-                        <li><strong>Store Settings:</strong> Configure operational parameters and integration settings</li>
-                        <li><strong>Manager Portal:</strong> Access administrative controls and financial reports</li>
-                    </ul>
+                <!-- Part 2: Diagnostic Endpoint -->
+                <div class="tutorial-section">
+                    <h2>Part 2: Diagnostic Access 💻</h2>
+                    <p>Many applications expose diagnostic endpoints for troubleshooting. These can reveal sensitive system information.</p>
+                    
+                    <div class="tutorial-box">
+                        <h3>🎯 Your Mission</h3>
+                        <p>Access the diagnostic endpoint to retrieve system health information and discover what data is exposed.</p>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>Try it yourself</h3>
+                        <p>Click to access the diagnostic endpoint:</p>
+                        <button onclick="part2Test()" class="demo-button">🌐 Access Diagnostics</button>
+                        <div id="part2-output" class="output-box" style="display:none;"></div>
+                        <div id="part2-flag" class="flag-reveal"></div>
+                    </div>
+
+                    <div class="hint-box">
+                        <strong>💡 Tip:</strong> Diagnostic endpoints should never be exposed in production systems!
+                    </div>
                 </div>
 
-                <div class="section">
-                    <h2>Need Help?</h2>
-                    <p>For technical support or questions about the management portal, contact the IT help desk or your store manager.</p>
-                    <p><strong>Email:</strong> support@beanscene.com</p>
-                    <p><strong>Phone:</strong> (555) 234-5678</p>
+                <!-- Part 3: Auth Check -->
+                <div class="tutorial-section">
+                    <h2>Part 3: Authentication Check 🔐</h2>
+                    <p>Learn how authentication systems can be probed to understand their configuration and security posture.</p>
+                    
+                    <div class="tutorial-box">
+                        <h3>🎯 Your Mission</h3>
+                        <p>Check the authentication system endpoint to see what information it reveals about the auth configuration.</p>
+                    </div>
+
+                    <div class="interactive-demo">
+                        <h3>Interactive Demo</h3>
+                        <p>Click to check the authentication system:</p>
+                        <button onclick="part3Test()" class="demo-button">🔓 Check Auth System</button>
+                        <div id="part3-output" class="output-box"></div>
+                        <div id="part3-flag" class="flag-reveal"></div>
+                    </div>
+
+                    <div class="hint-box">
+                        <strong>💡 Tip:</strong> Open DevTools Network tab to see the endpoint URL and response data!
+                    </div>
                 </div>
 
                 <div class="back-link">
                     <a href="/">← Back to Portal</a>
                 </div>
             </div>
+
+            <script>
+                // Part 1: System Enumeration
+                async function part1Search() {
+                    const id = document.getElementById('part1-id').value;
+                    const output = document.getElementById('part1-output');
+                    const flagDiv = document.getElementById('part1-flag');
+                    
+                    output.textContent = 'Loading...';
+                    flagDiv.style.display = 'none';
+                    
+                    try {
+                        const response = await fetch('/api/example/systems/' + id);
+                        const data = await response.json();
+                        output.textContent = JSON.stringify(data, null, 2);
+                        
+                        if (data.flag) {
+                            flagDiv.textContent = '🎉 ' + data.flag + ' - ' + data.message;
+                            flagDiv.style.display = 'block';
+                        }
+                    } catch (error) {
+                        output.textContent = 'Error: ' + error.message;
+                    }
+                }
+
+                // Part 2: Diagnostic Endpoint
+                async function part2Test() {
+                    const output = document.getElementById('part2-output');
+                    const flagDiv = document.getElementById('part2-flag');
+                    
+                    output.style.display = 'block';
+                    output.textContent = 'Loading...';
+                    flagDiv.style.display = 'none';
+                    
+                    try {
+                        const response = await fetch('/api/example/diagnostic');
+                        const data = await response.json();
+                        output.textContent = JSON.stringify(data, null, 2);
+                        
+                        if (data.flag) {
+                            flagDiv.textContent = '🎉 ' + data.flag + ' - ' + data.message;
+                            flagDiv.style.display = 'block';
+                        }
+                    } catch (error) {
+                        output.textContent = 'Error: ' + error.message;
+                    }
+                }
+
+                // Part 3: Auth Check
+                async function part3Test() {
+                    const output = document.getElementById('part3-output');
+                    const flagDiv = document.getElementById('part3-flag');
+                    
+                    output.textContent = 'Loading...';
+                    flagDiv.style.display = 'none';
+                    
+                    try {
+                        const response = await fetch('/api/example/auth-check');
+                        const data = await response.json();
+                        output.textContent = JSON.stringify(data, null, 2);
+                        
+                        if (data.flag) {
+                            flagDiv.textContent = '🎉 ' + data.flag + ' - ' + data.message;
+                            flagDiv.style.display = 'block';
+                        }
+                    } catch (error) {
+                        output.textContent = 'Error: ' + error.message;
+                    }
+                }
+            </script>
         </body>
         </html>
     `);
@@ -320,6 +514,7 @@ app.get('/lab1', (req, res) => {
                     background: linear-gradient(135deg, #6B4423 0%, #3E2723 100%);
                     padding: 20px;
                     min-height: 100vh;
+                    line-height: 1.6;
                 }
                 .container { max-width: 900px; margin: 0 auto; }
                 .header {
@@ -331,6 +526,7 @@ app.get('/lab1', (req, res) => {
                     border: 2px solid #A1887F;
                 }
                 h1 { color: #3E2723; font-size: 2em; margin-bottom: 8px; }
+                .subtitle { color: #5D4037; font-size: 1.1em; }
                 .section {
                     background: #EFEBE9;
                     padding: 25px;
@@ -339,7 +535,7 @@ app.get('/lab1', (req, res) => {
                     border: 2px solid #A1887F;
                 }
                 .section h2 { color: #3E2723; margin-bottom: 15px; }
-                .section p, .section li { color: #5D4037; line-height: 1.7; margin: 8px 0; }
+                .section p { color: #5D4037; line-height: 1.7; margin: 8px 0; }
                 .staff-card {
                     background: #FFF8E7;
                     padding: 15px;
@@ -347,28 +543,74 @@ app.get('/lab1', (req, res) => {
                     border-radius: 8px;
                     border-left: 4px solid #8D6E63;
                 }
+                .search-box {
+                    background: #E8F5E9;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                    border-left: 3px solid #4CAF50;
+                }
+                .demo-button {
+                    background: linear-gradient(135deg, #8D6E63 0%, #6D4C41 100%);
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-size: 1em;
+                    margin-top: 10px;
+                    width: 100%;
+                }
+                .demo-button:hover {
+                    background: linear-gradient(135deg, #6D4C41 0%, #5D4037 100%);
+                }
+                .output-box {
+                    background: #f5f5f5;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin: 15px 0;
+                    font-family: 'Courier New', monospace;
+                    font-size: 0.9em;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                    max-height: 400px;
+                    overflow-y: auto;
+                    border: 1px solid #ddd;
+                }
+                .flag-reveal {
+                    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 1.2em;
+                }
+                .tip-box {
+                    background: #FFF3E0;
+                    border-left: 4px solid #FF9800;
+                    padding: 15px;
+                    margin: 20px 0;
+                    border-radius: 5px;
+                }
                 code {
                     background: #D7CCC8;
                     padding: 3px 8px;
                     border-radius: 4px;
                     font-family: monospace;
+                    color: #c62828;
                 }
-                .info-box {
-                    background: #E3F2FD;
-                    border-left: 4px solid #2196F3;
-                    padding: 15px;
-                    margin: 15px 0;
-                    border-radius: 5px;
-                }
-                a { color: #5D4037; font-weight: 600; text-decoration: none; }
                 .back-link { text-align: center; margin-top: 30px; }
+                .back-link a { color: #5D4037; text-decoration: none; font-weight: 600; }
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
                     <h1>👥 Staff Dashboard</h1>
-                    <p style="color: #5D4037;">View team schedules and information</p>
+                    <p class="subtitle">View team schedules and system information</p>
                 </div>
 
                 <div class="section">
@@ -385,14 +627,62 @@ app.get('/lab1', (req, res) => {
                 </div>
 
                 <div class="section">
-                    <h2>📊 Team Resources</h2>
-                    <p>Access training materials, shift swap requests, and team announcements through the portal.</p>
+                    <h2>🔍 System Information</h2>
+                    <p>Access system diagnostics and configuration details for troubleshooting.</p>
+                    
+                    <div class="search-box">
+                        <strong>🛠️ Check System Info</strong>
+                        <p style="margin-top: 10px; font-size: 0.95em; color: #555;">
+                            View system diagnostics and health status. Use DevTools (F12 → Network tab) to see the API calls!
+                        </p>
+                        <button onclick="loadSystemInfo()" class="demo-button">Load System Information</button>
+                    </div>
+
+                    <div class="tip-box">
+                        <strong>💡 Challenge Tip:</strong> Debug endpoints can expose sensitive system information. What data can you discover? Look at the network request in DevTools to see the endpoint URL.
+                    </div>
                 </div>
+
+                <div id="resultsContainer"></div>
 
                 <div class="back-link">
                     <a href="/">← Back to Portal</a>
                 </div>
             </div>
+            
+            <script>
+                async function loadSystemInfo() {
+                    const resultsContainer = document.getElementById('resultsContainer');
+                    
+                    resultsContainer.innerHTML = '<div class="section"><p>🔍 Loading system information...</p></div>';
+                    
+                    try {
+                        const response = await fetch('/api/staff/system-info');
+                        const data = await response.json();
+                        
+                        let html = '<div class="section"><h2>System Diagnostics</h2>';
+                        
+                        if (data.flag) {
+                            html += '<div class="flag-reveal">🎉 ' + data.flag + '<br><br>' + data.message + '</div>';
+                        }
+                        
+                        html += '<div class="output-box">' + JSON.stringify(data, null, 2) + '</div>';
+                        
+                        if (data.vulnerability) {
+                            html += '<div class="tip-box">';
+                            html += '<strong>⚠️ Security Issue:</strong> ' + data.vulnerability + '<br>';
+                            html += data.warning || '';
+                            html += '</div>';
+                        }
+                        
+                        html += '</div>';
+                        resultsContainer.innerHTML = html;
+                        
+                    } catch (error) {
+                        resultsContainer.innerHTML = '<div class="section"><p style="color: #d32f2f;">❌ Error: ' + error.message + '</p></div>';
+                    }
+                }
+            </script>
         </body>
         </html>
     `);
@@ -432,6 +722,7 @@ app.get('/lab2', (req, res) => {
                     background: linear-gradient(135deg, #6B4423 0%, #3E2723 100%);
                     padding: 20px;
                     min-height: 100vh;
+                    line-height: 1.6;
                 }
                 .container { max-width: 900px; margin: 0 auto; }
                 .header {
@@ -443,6 +734,7 @@ app.get('/lab2', (req, res) => {
                     border: 2px solid #A1887F;
                 }
                 h1 { color: #3E2723; font-size: 2em; }
+                .subtitle { color: #5D4037; font-size: 1.1em; }
                 .section {
                     background: #EFEBE9;
                     padding: 25px;
@@ -451,29 +743,90 @@ app.get('/lab2', (req, res) => {
                     border: 2px solid #A1887F;
                 }
                 .section h2 { color: #3E2723; margin-bottom: 15px; }
-                .section p, .section li { color: #5D4037; line-height: 1.7; margin: 8px 0; }
+                .section p { color: #5D4037; line-height: 1.7; margin: 8px 0; }
+                .search-box {
+                    background: #E8F5E9;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                    border-left: 3px solid #4CAF50;
+                }
+                .demo-input {
+                    width: 100%;
+                    padding: 12px;
+                    border: 2px solid #8D6E63;
+                    border-radius: 8px;
+                    font-size: 1em;
+                    margin: 10px 0;
+                }
+                .demo-button {
+                    background: linear-gradient(135deg, #8D6E63 0%, #6D4C41 100%);
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-size: 1em;
+                    margin: 5px;
+                    width: 100%;
+                }
+                .demo-button:hover {
+                    background: linear-gradient(135deg, #6D4C41 0%, #5D4037 100%);
+                }
+                .output-box {
+                    background: #f5f5f5;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin: 15px 0;
+                    font-family: 'Courier New', monospace;
+                    font-size: 0.9em;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                    max-height: 400px;
+                    overflow-y: auto;
+                    border: 1px solid #ddd;
+                }
+                .flag-reveal {
+                    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 1.2em;
+                }
+                .tip-box {
+                    background: #FFF3E0;
+                    border-left: 4px solid #FF9800;
+                    padding: 15px;
+                    margin: 20px 0;
+                    border-radius: 5px;
+                }
+                .warning-box {
+                    background: #FFEBEE;
+                    border-left: 4px solid #D32F2F;
+                    padding: 15px;
+                    margin: 15px 0;
+                    border-radius: 5px;
+                }
                 code {
                     background: #D7CCC8;
                     padding: 3px 8px;
                     border-radius: 4px;
                     font-family: monospace;
+                    color: #c62828;
                 }
-                .warning-box {
-                    background: #FFF3E0;
-                    border-left: 4px solid #FF9800;
-                    padding: 15px;
-                    margin: 15px 0;
-                    border-radius: 5px;
-                }
-                a { color: #5D4037; font-weight: 600; text-decoration: none; }
                 .back-link { text-align: center; margin-top: 30px; }
+                .back-link a { color: #5D4037; text-decoration: none; font-weight: 600; }
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
                     <h1>⚙️ Store Settings</h1>
-                    <p style="color: #5D4037;">Configure store operations and integrations</p>
+                    <p class="subtitle">Configure store operations and integrations</p>
                 </div>
 
                 <div class="section">
@@ -484,8 +837,8 @@ app.get('/lab2', (req, res) => {
                         <strong>⚠️ Manager Access:</strong> Configuration changes require manager approval.
                     </div>
                     
-                    <h3>Quick Settings:</h3>
-                    <ul>
+                    <h3 style="margin-top: 20px; color: #3E2723;">Quick Settings:</h3>
+                    <ul style="color: #5D4037; line-height: 1.7; margin-left: 20px; margin-top: 10px;">
                         <li>Store hours configuration</li>
                         <li>Payment gateway settings</li>
                         <li>Inventory thresholds</li>
@@ -494,14 +847,71 @@ app.get('/lab2', (req, res) => {
                 </div>
 
                 <div class="section">
-                    <h2>🔧 Settings Overview</h2>
-                    <p>Store configuration settings are managed through the administrative interface. Contact your manager for assistance with any configuration changes.</p>
+                    <h2>🔍 Configuration Files</h2>
+                    <p>Access configuration and environment files for troubleshooting and setup.</p>
+                    
+                    <div class="search-box">
+                        <strong>📄 Check Configuration Files</strong>
+                        <p style="margin-top: 10px; font-size: 0.95em; color: #555;">
+                            Enter a file path to view its contents. Try common configuration files like <code>.env</code> or <code>.env.backup</code>
+                        </p>
+                        <input type="text" id="filePath" class="demo-input" placeholder="e.g., .env or .env.backup" value=".env">
+                        <button onclick="loadConfigFile()" class="demo-button">Load Configuration File</button>
+                    </div>
+
+                    <div class="tip-box">
+                        <strong>💡 Challenge Tip:</strong> Configuration files often contain sensitive data. What happens if they're exposed via web access? Environment files like <code>.env</code> should never be web-accessible!
+                    </div>
                 </div>
+
+                <div id="resultsContainer"></div>
 
                 <div class="back-link">
                     <a href="/">← Back to Portal</a>
                 </div>
             </div>
+            
+            <script>
+                async function loadConfigFile() {
+                    const filePath = document.getElementById('filePath').value.trim();
+                    const resultsContainer = document.getElementById('resultsContainer');
+                    
+                    if (!filePath) {
+                        resultsContainer.innerHTML = '<div class="section"><p style="color: #d32f2f;">Please enter a file path</p></div>';
+                        return;
+                    }
+                    
+                    resultsContainer.innerHTML = '<div class="section"><p>🔍 Loading configuration file...</p></div>';
+                    
+                    try {
+                        const response = await fetch('/' + filePath);
+                        const text = await response.text();
+                        
+                        let html = '<div class="section"><h2>Configuration File: ' + filePath + '</h2>';
+                        
+                        // Check if flag is in content
+                        if (text.includes('FLAG{')) {
+                            const flagMatch = text.match(/FLAG\\{[^}]+\\}/);
+                            if (flagMatch) {
+                                html += '<div class="flag-reveal">🎉 ' + flagMatch[0] + '<br><br>Configuration file exposed!</div>';
+                            }
+                        }
+                        
+                        html += '<div class="output-box">' + text.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
+                        
+                        html += '<div class="warning-box">';
+                        html += '<strong>⚠️ Security Issue:</strong> This file is web-accessible! Configuration files containing secrets, passwords, and API keys should never be accessible via HTTP.<br><br>';
+                        html += '<strong>Impact:</strong> Attackers can steal database credentials, API keys, and other sensitive information.';
+                        html += '</div>';
+                        
+                        html += '</div>';
+                        resultsContainer.innerHTML = html;
+                        
+                    } catch (error) {
+                        resultsContainer.innerHTML = '<div class="section"><p style="color: #d32f2f;">❌ Error loading file: ' + error.message + '</p></div>';
+                    }
+                }
+            </script>
         </body>
         </html>
     `);
@@ -567,6 +977,7 @@ app.get('/lab3', (req, res) => {
                     background: linear-gradient(135deg, #6B4423 0%, #3E2723 100%);
                     padding: 20px;
                     min-height: 100vh;
+                    line-height: 1.6;
                 }
                 .container { max-width: 900px; margin: 0 auto; }
                 .header {
@@ -578,6 +989,7 @@ app.get('/lab3', (req, res) => {
                     border: 2px solid #A1887F;
                 }
                 h1 { color: #3E2723; font-size: 2em; }
+                .subtitle { color: #5D4037; font-size: 1.1em; }
                 .section {
                     background: #EFEBE9;
                     padding: 25px;
@@ -586,19 +998,65 @@ app.get('/lab3', (req, res) => {
                     border: 2px solid #A1887F;
                 }
                 .section h2 { color: #3E2723; margin-bottom: 15px; }
-                .section p, .section li { color: #5D4037; line-height: 1.7; margin: 8px 0; }
-                code {
-                    background: #D7CCC8;
-                    padding: 3px 8px;
-                    border-radius: 4px;
-                    font-family: monospace;
+                .section p { color: #5D4037; line-height: 1.7; margin: 8px 0; }
+                .search-box {
+                    background: #E8F5E9;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                    border-left: 3px solid #4CAF50;
                 }
-                pre {
-                    background: #D7CCC8;
+                .demo-input {
+                    width: 100%;
+                    padding: 12px;
+                    border: 2px solid #8D6E63;
+                    border-radius: 8px;
+                    font-size: 1em;
+                    margin: 10px 0;
+                }
+                .demo-button {
+                    background: linear-gradient(135deg, #8D6E63 0%, #6D4C41 100%);
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-size: 1em;
+                    margin: 5px;
+                }
+                .demo-button:hover {
+                    background: linear-gradient(135deg, #6D4C41 0%, #5D4037 100%);
+                }
+                .output-box {
+                    background: #f5f5f5;
                     padding: 15px;
                     border-radius: 8px;
-                    overflow-x: auto;
-                    margin: 10px 0;
+                    margin: 15px 0;
+                    font-family: 'Courier New', monospace;
+                    font-size: 0.9em;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                    max-height: 400px;
+                    overflow-y: auto;
+                    border: 1px solid #ddd;
+                }
+                .flag-reveal {
+                    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 1.2em;
+                }
+                .tip-box {
+                    background: #FFF3E0;
+                    border-left: 4px solid #FF9800;
+                    padding: 15px;
+                    margin: 20px 0;
+                    border-radius: 5px;
                 }
                 .restricted {
                     background: #FFEBEE;
@@ -607,26 +1065,52 @@ app.get('/lab3', (req, res) => {
                     margin: 15px 0;
                     border-radius: 5px;
                 }
-                a { color: #5D4037; font-weight: 600; text-decoration: none; }
+                .dir-listing {
+                    background: white;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    margin: 15px 0;
+                    overflow: hidden;
+                }
+                .dir-item {
+                    padding: 12px;
+                    border-bottom: 1px solid #eee;
+                    cursor: pointer;
+                    transition: background 0.2s;
+                }
+                .dir-item:hover {
+                    background: #f5f5f5;
+                }
+                .dir-item:last-child {
+                    border-bottom: none;
+                }
+                code {
+                    background: #D7CCC8;
+                    padding: 3px 8px;
+                    border-radius: 4px;
+                    font-family: monospace;
+                    color: #c62828;
+                }
                 .back-link { text-align: center; margin-top: 30px; }
+                .back-link a { color: #5D4037; text-decoration: none; font-weight: 600; }
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
                     <h1>🔐 Manager Portal</h1>
-                    <p style="color: #5D4037;">Administrative controls and reporting</p>
+                    <p class="subtitle">Administrative controls and reporting</p>
                 </div>
 
                 <div class="restricted">
                     <strong>🔒 Authentication Required</strong><br>
-                    This area requires manager credentials. Please contact your store manager for access.
+                    This area requires manager credentials. Administrative files may be accessible via direct URL access.
                 </div>
 
                 <div class="section">
                     <h2>Manager Features</h2>
                     <p>The manager portal provides access to:</p>
-                    <ul>
+                    <ul style="color: #5D4037; line-height: 1.7; margin-left: 20px; margin-top: 10px;">
                         <li>Financial reports and sales analytics</li>
                         <li>Staff management and scheduling</li>
                         <li>Inventory ordering and management</li>
@@ -635,15 +1119,86 @@ app.get('/lab3', (req, res) => {
                 </div>
 
                 <div class="section">
-                    <h2>🔑 Administrative Access</h2>
-                    <p>Manager portal access is restricted to authorized personnel. Contact the store owner for access credentials if you are a manager.</p>
-                    <p style="margin-top: 15px;">Authorized managers have access to financial reports, staff management, inventory ordering, and system configuration tools.</p>
+                    <h2>🗂️ Administrative Files</h2>
+                    <p>Administrative configuration files and directories are stored on the server.</p>
+                    
+                    <div class="search-box">
+                        <strong>📂 Browse Admin Directory</strong>
+                        <p style="margin-top: 10px; font-size: 0.95em; color: #555;">
+                            Check for administrative files and directories. Try paths like <code>/admin</code> or <code>/admin/credentials.txt</code>
+                        </p>
+                        <input type="text" id="adminPath" class="demo-input" placeholder="e.g., /admin or /admin/credentials.txt" value="/admin">
+                        <button onclick="loadAdminPath()" class="demo-button">Browse Path</button>
+                    </div>
+
+                    <div class="tip-box">
+                        <strong>💡 Challenge Tip:</strong> Directory listing exposes file structures. Configuration files and credentials should never be web-accessible! Look for sensitive files like <code>config.json</code> or <code>credentials.txt</code>.
+                    </div>
                 </div>
+
+                <div id="resultsContainer"></div>
 
                 <div class="back-link">
                     <a href="/">← Back to Portal</a>
                 </div>
             </div>
+            
+            <script>
+                async function loadAdminPath() {
+                    const adminPath = document.getElementById('adminPath').value.trim();
+                    const resultsContainer = document.getElementById('resultsContainer');
+                    
+                    if (!adminPath) {
+                        resultsContainer.innerHTML = '<div class="section"><p style="color: #d32f2f;">Please enter a path</p></div>';
+                        return;
+                    }
+                    
+                    resultsContainer.innerHTML = '<div class="section"><p>🔍 Loading path...</p></div>';
+                    
+                    try {
+                        const response = await fetch(adminPath);
+                        const contentType = response.headers.get('content-type');
+                        
+                        let html = '<div class="section"><h2>Path: ' + adminPath + '</h2>';
+                        
+                        if (contentType && contentType.includes('application/json')) {
+                            const data = await response.json();
+                            html += '<div class="output-box">' + JSON.stringify(data, null, 2) + '</div>';
+                        } else {
+                            const text = await response.text();
+                            
+                            // Check if flag is in content
+                            if (text.includes('FLAG{')) {
+                                const flagMatch = text.match(/FLAG\\{[^}]+\\}/);
+                                if (flagMatch) {
+                                    html += '<div class="flag-reveal">🎉 ' + flagMatch[0] + '<br><br>Directory listing vulnerability exploited!</div>';
+                                }
+                            }
+                            
+                            // If it looks like HTML directory listing, render it
+                            if (text.includes('<table>') && text.includes('<tr>')) {
+                                const tableMatch = text.match(/<table>.*<\\/table>/s);
+                                if (tableMatch && tableMatch[0]) {
+                                    html += '<div class="dir-listing">' + tableMatch[0] + '</div>';
+                                }
+                            } else {
+                                html += '<div class="output-box">' + text.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
+                            }
+                        }
+                        
+                        html += '<div class="tip-box">';
+                        html += '<strong>⚠️ Security Issue:</strong> Directory listing is enabled! This allows attackers to browse server directories and discover sensitive files.<br><br>';
+                        html += '<strong>Impact:</strong> Credentials, configuration files, backups, and other sensitive data can be accessed.';
+                        html += '</div>';
+                        
+                        html += '</div>';
+                        resultsContainer.innerHTML = html;
+                        
+                    } catch (error) {
+                        resultsContainer.innerHTML = '<div class="section"><p style="color: #d32f2f;">❌ Error loading path: ' + error.message + '</p></div>';
+                    }
+                }
+            </script>
         </body>
         </html>
     `);
