@@ -654,7 +654,7 @@ app.get('/api/files/download', (req, res) => {
         // Path traversal detected
         return res.json({
             success: true,
-            flag: 'FLAG{P4TH_TR4V3RS4L_VUL N_D3P}',
+            flag: 'FLAG{P4TH_TR4V3RS4L_VULN_D3P}',
             vulnerability: 'Path traversal via vulnerable dependency',
             message: 'File download processed with directory traversal',
             warning: 'Vulnerable package allows accessing files outside intended directory!',
