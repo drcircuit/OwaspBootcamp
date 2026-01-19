@@ -1,649 +1,687 @@
 const express = require('express');
-const crypto = require('crypto');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// Simulated database for Lab 2 - users with MD5 hashed passwords
-const lab2Users = [
-  { username: 'user1', passwordHash: '5f4dcc3b5aa765d61d8327deb882cf99' }, // password
-  { username: 'user2', passwordHash: 'e10adc3949ba59abbe56e057f20f883e' }, // 123456
-  { username: 'admin', passwordHash: '21232f297a57a5a743894a0e4a801fc3' }  // admin
+// PowerFit Gym data
+const gymMenu = [
+    { id: 1, name: 'Espresso', price: 2.99, category: 'hot', description: 'Bold gym shot' },
+    { id: 2, name: 'Cappuccino', price: 4.49, category: 'hot', description: 'Espresso with steamed milk' },
+    { id: 3, name: 'Cold Brew', price: 4.99, category: 'cold', description: 'Smooth cold gym' },
+    { id: 4, name: 'Caramel Macchiato', price: 5.99, category: 'hot', description: 'Layered espresso drink' }
 ];
 
-// Simulated database for Lab 3 - plaintext passwords
-const lab3Admin = {
-  username: 'admin',
-  password: 'SuperSecret123!', // Plaintext password
-  role: 'administrator'
+const staff = [
+    { id: 1, name: 'Emma Rodriguez', role: 'manager', email: 'emma@beanscene.local', shift: 'morning' },
+    { id: 2, name: 'Marcus Chen', role: 'barista', email: 'marcus@beanscene.local', shift: 'morning' },
+    { id: 3, name: 'Sofia Martinez', role: 'barista', email: 'sofia@beanscene.local', shift: 'afternoon' }
+];
+
+// VULNERABLE configuration data
+const configData = {
+    database: {
+        host: 'db.beanscene.local',
+        username: 'gym_admin',
+        password: 'Bean\$cene2024!',
+        database: 'beanscene_prod'
+    },
+    payment_gateway: {
+        square_token: 'sq0atp-BeanScene_Live_Token_xyz789',
+        merchant_id: 'MLHV6GRVNB4XQ'
+    },
+    secrets: {
+        jwt_secret: 'beanscene_jwt_secret_key',
+        session_key: 'gym-shop-session-2024'
+    }
 };
 
-// Cyberpunk theme CSS
-const cyberpunkStyles = `
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Courier New', monospace;
-      background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 100%);
-      color: #0ff;
-      line-height: 1.6;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-      background: rgba(0, 0, 0, 0.8);
-      border: 2px solid #0ff;
-      border-radius: 10px;
-      padding: 30px;
-      box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
-    }
-    h1 {
-      color: #f0f;
-      text-align: center;
-      font-size: 2.5em;
-      text-shadow: 0 0 10px #f0f, 0 0 20px #f0f;
-      margin-bottom: 20px;
-      border-bottom: 2px solid #f0f;
-      padding-bottom: 15px;
-    }
-    h2 {
-      color: #0ff;
-      font-size: 1.8em;
-      margin: 30px 0 15px 0;
-      text-shadow: 0 0 5px #0ff;
-    }
-    h3 {
-      color: #ff0;
-      font-size: 1.3em;
-      margin: 20px 0 10px 0;
-    }
-    .section {
-      background: rgba(0, 20, 40, 0.6);
-      border: 1px solid #0ff;
-      border-radius: 5px;
-      padding: 20px;
-      margin: 20px 0;
-    }
-    .vulnerable {
-      border-color: #f00;
-      background: rgba(40, 0, 0, 0.6);
-    }
-    .vulnerable h3 { color: #f00; }
-    .secure {
-      border-color: #0f0;
-      background: rgba(0, 40, 0, 0.6);
-    }
-    .secure h3 { color: #0f0; }
-    .info {
-      border-color: #ff0;
-      background: rgba(40, 40, 0, 0.6);
-    }
-    pre {
-      background: #000;
-      border: 1px solid #0ff;
-      border-radius: 3px;
-      padding: 15px;
-      overflow-x: auto;
-      color: #0f0;
-      font-size: 0.9em;
-      margin: 10px 0;
-    }
-    code {
-      background: #000;
-      color: #0f0;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-family: 'Courier New', monospace;
-    }
-    ul, ol {
-      margin-left: 30px;
-      margin-top: 10px;
-    }
-    li {
-      margin: 8px 0;
-      color: #0ff;
-    }
-    a {
-      color: #f0f;
-      text-decoration: none;
-      text-shadow: 0 0 5px #f0f;
-      transition: all 0.3s;
-    }
-    a:hover {
-      color: #0ff;
-      text-shadow: 0 0 10px #0ff;
-    }
-    .nav-links {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      margin: 30px 0;
-      flex-wrap: wrap;
-    }
-    .nav-link {
-      background: rgba(255, 0, 255, 0.2);
-      border: 2px solid #f0f;
-      padding: 15px 30px;
-      border-radius: 5px;
-      font-size: 1.1em;
-      transition: all 0.3s;
-    }
-    .nav-link:hover {
-      background: rgba(0, 255, 255, 0.2);
-      border-color: #0ff;
-      transform: scale(1.05);
-    }
-    .difficulty {
-      display: inline-block;
-      padding: 5px 10px;
-      border-radius: 3px;
-      font-size: 0.9em;
-      font-weight: bold;
-      margin-left: 10px;
-    }
-    .difficulty.easy { background: #0f0; color: #000; }
-    .difficulty.medium { background: #ff0; color: #000; }
-    .difficulty.hard { background: #f00; color: #fff; }
-    .stage {
-      display: inline-block;
-      padding: 5px 10px;
-      border-radius: 3px;
-      font-size: 0.9em;
-      background: #f0f;
-      color: #000;
-      font-weight: bold;
-      margin-left: 10px;
-    }
-    .endpoint {
-      background: rgba(0, 255, 255, 0.1);
-      border-left: 3px solid #0ff;
-      padding: 10px;
-      margin: 10px 0;
-      font-family: 'Courier New', monospace;
-    }
-    .flag {
-      background: rgba(255, 0, 255, 0.2);
-      border: 2px solid #f0f;
-      padding: 10px;
-      margin: 10px 0;
-      font-weight: bold;
-      text-align: center;
-    }
-    .warning {
-      color: #ff0;
-      font-weight: bold;
-    }
-  </style>
-`;
+// VULNERABLE default credentials
+const adminCredentials = {
+    username: 'admin',
+    password: 'beanscene'
+};
 
-// Home page - Navigation
-app.get('/', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>A04: Cryptographic Failures</title>
-      ${cyberpunkStyles}
-    </head>
-    <body>
-      <div class="container">
-        <h1>🔐 A04: CRYPTOGRAPHIC FAILURES</h1>
-        
-        <div class="section info">
-          <h2>Mission Briefing</h2>
-          <p>Welcome, Agent. Your mission is to identify and exploit cryptographic vulnerabilities in legacy systems. These systems use outdated hashing algorithms, store passwords insecurely, and have weak encryption implementations.</p>
-        </div>
-
-        <div class="nav-links">
-          <a href="/example" class="nav-link">📚 EXAMPLE</a>
-          <a href="/lab1" class="nav-link">🎯 LAB 1</a>
-          <a href="/lab2" class="nav-link">🎯 LAB 2</a>
-          <a href="/lab3" class="nav-link">🎯 LAB 3</a>
-        </div>
-
-        <div class="section">
-          <h2>Lab Overview</h2>
-          <ul>
-            <li><strong>Example:</strong> Educational walkthrough of cryptographic failures</li>
-            <li><strong>Lab 1:</strong> Reconnaissance - Detect weak hashing algorithms <span class="difficulty easy">EASY</span></li>
-            <li><strong>Lab 2:</strong> Scanning - Crack weak password hashes <span class="difficulty medium">MEDIUM</span></li>
-            <li><strong>Lab 3:</strong> Initial Access - Extract plaintext credentials <span class="difficulty hard">HARD</span></li>
-          </ul>
-        </div>
-      </div>
-    </body>
-    </html>
-  `);
-});
-
-// Example page - Educational walkthrough
-app.get('/example', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Example - Cryptographic Failures</title>
-      ${cyberpunkStyles}
-    </head>
-    <body>
-      <div class="container">
-        <h1>📚 EXAMPLE: CRYPTOGRAPHIC FAILURES</h1>
-        <p><a href="/">← Back to Home</a></p>
-
-        <div class="section info">
-          <h2>What are Cryptographic Failures?</h2>
-          <p>Cryptographic failures occur when applications fail to properly protect sensitive data through encryption, hashing, or other cryptographic means. This is one of the most critical security risks in modern applications.</p>
-        </div>
-
-        <div class="section vulnerable">
-          <h2>❌ Common Cryptographic Failures</h2>
-          
-          <h3>1. Plaintext Password Storage</h3>
-          <p>Storing passwords without any protection is the worst possible approach.</p>
-          <pre>// VULNERABLE CODE
-const users = [
-  { username: 'alice', password: 'mypassword123' },
-  { username: 'bob', password: 'qwerty' }
+// Example store systems
+const storeSystemsExamples = [
+    { id: 100, system: 'POS Terminal 1', status: 'online', version: '2.4.1', ip: '192.168.1.10' },
+    { id: 101, system: 'POS Terminal 2', status: 'online', version: '2.4.1', ip: '192.168.1.11' },
+    { id: 102, system: 'Inventory Scanner', status: 'online', version: '1.8.3', ip: '192.168.1.20' },
+    { id: 103, system: 'Back Office', status: 'maintenance', version: '3.1.0', ip: '192.168.1.30' }
 ];
 
-// If database is compromised, all passwords are exposed!</pre>
-          <p class="warning">⚠️ Impact: Complete account compromise if database is breached</p>
 
-          <h3>2. Weak Hashing Algorithms (MD5/SHA1)</h3>
-          <p>MD5 and SHA1 are cryptographically broken and vulnerable to rainbow table attacks.</p>
-          <pre>// VULNERABLE CODE
-const crypto = require('crypto');
-const passwordHash = crypto.createHash('md5')
-  .update('password123')
-  .digest('hex');
-// Result: 482c811da5d5b4bc6d497ffa98491e38
+// Home page
+app.get('/', (req, res) => {
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>PowerFit Gym - Management Portal</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: 'Georgia', serif;
+                    background: linear-gradient(135deg, #D32F2F 0%, #1976D2 100%);
+                    min-height: 100vh;
+                    padding: 20px;
+                }
+                .container { max-width: 1200px; margin: 0 auto; }
+                .header {
+                    background: linear-gradient(135deg, #FFCDD2 0%, #BCAAA4 100%);
+                    padding: 30px;
+                    border-radius: 15px;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+                    margin-bottom: 30px;
+                    text-align: center;
+                    border: 3px solid #8D6E63;
+                }
+                .logo {
+                    font-size: 2.5em;
+                    font-weight: 700;
+                    color: #1976D2;
+                    text-shadow: 2px 2px 4px rgba(255,255,255,0.3);
+                }
+                .tagline { color: #5D4037; font-size: 1.1em; font-style: italic; margin-top: 10px; }
+                .welcome-section {
+                    background: #FFF3E0;
+                    padding: 30px;
+                    border-radius: 15px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+                    margin-bottom: 25px;
+                    border: 2px solid #A1887F;
+                }
+                .welcome-section h2 { color: #1976D2; margin-bottom: 15px; }
+                .welcome-section p { color: #5D4037; line-height: 1.7; }
+                .nav-cards {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                    gap: 20px;
+                }
+                .card {
+                    background: linear-gradient(135deg, #FFF3E0 0%, #FFCDD2 100%);
+                    padding: 25px;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                    transition: transform 0.3s;
+                    text-decoration: none;
+                    color: inherit;
+                    display: block;
+                    border: 2px solid #A1887F;
+                }
+                .card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+                .card h3 { color: #1976D2; margin-bottom: 12px; font-size: 1.4em; }
+                .card p { color: #5D4037; line-height: 1.6; margin-bottom: 12px; }
+                .card-badge {
+                    display: inline-block;
+                    padding: 6px 14px;
+                    border-radius: 20px;
+                    font-size: 0.75em;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                }
+                .badge-tutorial { background: #BBDEFB; color: #0D47A1; }
+                .badge-easy { background: #C8E6C9; color: #1B5E20; }
+                .badge-medium { background: #FFE0B2; color: #E65100; }
+                .badge-hard { background: #FFCDD2; color: #B71C1C; }
+                .footer { text-align: center; color: #FFCDD2; margin-top: 40px; padding: 20px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <div class="logo">🏋️ PowerFit Gym</div>
+                    <div class="tagline">Management Portal • Transform Your Fitness Journey</div>
+                </div>
 
-// Attackers can easily reverse this with rainbow tables!</pre>
-          <p class="warning">⚠️ Rainbow Tables: Precomputed tables of hash values for common passwords</p>
-          <p>Example MD5 hash: <code>5f4dcc3b5aa765d61d8327deb882cf99</code> = "password"</p>
+                <div class="welcome-section">
+                    <h2>Welcome to BeanScene Management Portal</h2>
+                    <p>Manage shop operations, track inventory, review sales data, and configure store settings.</p>
+                </div>
 
-          <h3>3. Hard-coded Encryption Keys</h3>
-          <p>Embedding encryption keys directly in source code exposes them to anyone with code access.</p>
-          <pre>// VULNERABLE CODE
-const ENCRYPTION_KEY = 'my-secret-key-123'; // ❌ Hard-coded!
+                <div class="nav-cards">
+                    <a href="/example" class="card">
+                        <h3>📚 Getting Started</h3>
+                        <p>Learn how to navigate the management system and access reports.</p>
+                        <span class="card-badge badge-tutorial">Tutorial</span>
+                    </a>
 
-function encrypt(data) {
-  return crypto.encrypt(data, ENCRYPTION_KEY);
-}</pre>
-          <p class="warning">⚠️ Impact: All encrypted data can be decrypted if key is discovered</p>
+                    <a href="/lab1" class="card">
+                        <h3>👥 Staff Dashboard</h3>
+                        <p>View staff schedules, performance metrics, and team information.</p>
+                        <span class="card-badge badge-easy">Staff</span>
+                    </a>
 
-          <h3>4. Missing TLS/HTTPS</h3>
-          <p>Transmitting sensitive data over unencrypted HTTP connections.</p>
-          <pre>// VULNERABLE - Sending credentials over HTTP
-fetch('http://api.example.com/login', {
-  method: 'POST',
-  body: JSON.stringify({ username, password })
-});</pre>
-          <p class="warning">⚠️ Impact: Credentials can be intercepted via man-in-the-middle attacks</p>
-        </div>
+                    <a href="/lab2" class="card">
+                        <h3>⚙️ Store Settings</h3>
+                        <p>Configure operations, payment systems, and integration settings.</p>
+                        <span class="card-badge badge-medium">Settings</span>
+                    </a>
 
-        <div class="section secure">
-          <h2>✅ Secure Implementation: Password Storage</h2>
-          
-          <h3>Using bcrypt (Recommended)</h3>
-          <p>bcrypt is a purpose-built password hashing function that includes:</p>
-          <ul>
-            <li><strong>Salt:</strong> Random data added to password before hashing</li>
-            <li><strong>Cost Factor:</strong> Makes hashing intentionally slow to resist brute force</li>
-            <li><strong>Adaptive:</strong> Can increase cost factor as hardware improves</li>
-          </ul>
-          
-          <pre>// SECURE CODE
-const bcrypt = require('bcrypt');
+                    <a href="/lab3" class="card">
+                        <h3>🔐 Manager Portal</h3>
+                        <p>Access financial reports, system configuration, and admin controls.</p>
+                        <span class="card-badge badge-hard">Admin</span>
+                    </a>
+                </div>
 
-// Hash password during registration
-async function registerUser(username, password) {
-  const saltRounds = 10; // Cost factor
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
-  
-  // Store hashedPassword in database
-  // Example hash: $2b$10$N9qo8uLOickgx2ZMRZoMye...
-  return { username, passwordHash: hashedPassword };
-}
-
-// Verify password during login
-async function loginUser(username, password) {
-  const user = await getUserFromDB(username);
-  const isValid = await bcrypt.compare(password, user.passwordHash);
-  return isValid;
-}</pre>
-
-          <h3>How bcrypt Protects Against Attacks</h3>
-          <ul>
-            <li><strong>Rainbow Tables:</strong> Each password has unique salt, making precomputed tables useless</li>
-            <li><strong>Brute Force:</strong> Cost factor makes each attempt slow (10-12 rounds = ~100ms per hash)</li>
-            <li><strong>GPU Attacks:</strong> Memory-hard algorithm resists GPU acceleration</li>
-          </ul>
-        </div>
-
-        <div class="section secure">
-          <h2>✅ Best Practices</h2>
-          <ul>
-            <li><strong>Password Hashing:</strong> Use bcrypt, scrypt, or Argon2 (winner of Password Hashing Competition)</li>
-            <li><strong>Data Encryption:</strong> Use AES-256-GCM for encrypting data at rest</li>
-            <li><strong>Key Management:</strong> Store keys in environment variables, AWS KMS, or HashiCorp Vault</li>
-            <li><strong>Transport Security:</strong> Always use TLS 1.3 or TLS 1.2 minimum</li>
-            <li><strong>Key Rotation:</strong> Regularly rotate encryption keys and re-encrypt data</li>
-            <li><strong>Never Roll Your Own:</strong> Use established cryptographic libraries, don't implement your own algorithms</li>
-          </ul>
-        </div>
-
-        <div class="section info">
-          <h2>📚 Key Concepts</h2>
-          
-          <h3>Hashing vs Encryption</h3>
-          <ul>
-            <li><strong>Hashing:</strong> One-way function, cannot be reversed (use for passwords)</li>
-            <li><strong>Encryption:</strong> Two-way function, can be decrypted with key (use for data)</li>
-          </ul>
-
-          <h3>Salt</h3>
-          <p>Random data added to password before hashing to ensure identical passwords produce different hashes.</p>
-          <pre>// Without salt
-hash("password") = "5f4dcc3b5aa765d61d8327deb882cf99"
-hash("password") = "5f4dcc3b5aa765d61d8327deb882cf99" // Same!
-
-// With salt
-hash("password" + "randomsalt1") = "a1b2c3d4..."
-hash("password" + "randomsalt2") = "e5f6g7h8..." // Different!</pre>
-
-          <h3>Rainbow Tables</h3>
-          <p>Precomputed lookup tables of password hashes. Attackers can instantly reverse common password hashes without computing them.</p>
-          <pre>// Rainbow table lookup
-MD5("password") = "5f4dcc3b5aa765d61d8327deb882cf99"
-MD5("123456")  = "e10adc3949ba59abbe56e057f20f883e"
-MD5("admin")   = "21232f297a57a5a743894a0e4a801fc3"
-
-// Salting defeats rainbow tables because each hash is unique!</pre>
-        </div>
-
-        <div class="section">
-          <h2>🎯 Ready for the Labs?</h2>
-          <p>Now that you understand cryptographic failures, proceed to the labs to practice identifying and exploiting these vulnerabilities.</p>
-          <div class="nav-links">
-            <a href="/lab1" class="nav-link">Start Lab 1 →</a>
-          </div>
-        </div>
-      </div>
-    </body>
-    </html>
-  `);
+                <div class="footer">
+                    <p>🏋️ PowerFit Gym • 456 Brew Street • (555) 234-5678</p>
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
 });
 
-// Lab 1 - Easy: Reconnaissance - Find weak hashing algorithm
+
+// Example page - Tutorial
+app.get('/example', (req, res) => {
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Tutorial - PowerFit Gym</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: 'Georgia', serif;
+                    background: linear-gradient(135deg, #D32F2F 0%, #1976D2 100%);
+                    padding: 20px;
+                    min-height: 100vh;
+                }
+                .container { max-width: 900px; margin: 0 auto; }
+                .header {
+                    background: #FFF3E0;
+                    padding: 30px;
+                    border-radius: 15px;
+                    margin-bottom: 30px;
+                    text-align: center;
+                    border: 2px solid #A1887F;
+                }
+                h1 { color: #1976D2; font-size: 2.2em; margin-bottom: 10px; }
+                .section {
+                    background: #FFF3E0;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 20px;
+                    border: 2px solid #A1887F;
+                }
+                .section h2 { color: #1976D2; margin-bottom: 15px; }
+                .section h3 { color: #5D4037; margin: 15px 0 10px; }
+                .section p, .section li { color: #5D4037; line-height: 1.7; margin: 8px 0; }
+                .tip-box {
+                    background: #FFF3E0;
+                    border-left: 4px solid #FF9800;
+                    padding: 15px;
+                    margin: 15px 0;
+                    border-radius: 5px;
+                }
+                code {
+                    background: #FFCDD2;
+                    padding: 3px 8px;
+                    border-radius: 4px;
+                    font-family: monospace;
+                    color: #1976D2;
+                }
+                pre {
+                    background: #FFCDD2;
+                    padding: 15px;
+                    border-radius: 8px;
+                    overflow-x: auto;
+                    margin: 10px 0;
+                }
+                a { color: #5D4037; font-weight: 600; text-decoration: none; }
+                a:hover { text-decoration: underline; }
+                .back-link { text-align: center; margin-top: 30px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🎓 BeanScene Management Tutorial</h1>
+                    <p style="color: #5D4037;">Learn about the portal and working with the API</p>
+                </div>
+
+                <div class="section">
+                    <h2>Part 1: Store System Information</h2>
+                    <p>Learn how to retrieve information about store systems and equipment.</p>
+                    <h3>Try It:</h3>
+                    <p>Access the systems endpoint to see store equipment:</p>
+                    <pre>curl http://localhost:3002/api/example/systems/100</pre>
+                    <p>Try different system IDs (100-103) to explore all equipment.</p>
+                    <div class="tip-box">
+                        💡 <strong>Learning Goal:</strong> Understand how APIs expose equipment data through simple ID-based endpoints.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Part 2: Configuration Access</h2>
+                    <p>Some systems expose configuration information for management purposes.</p>
+                    <h3>Try It:</h3>
+                    <p>Check if there's a diagnostic endpoint:</p>
+                    <pre>curl http://localhost:3002/api/example/diagnostic</pre>
+                    <div class="tip-box">
+                        💡 <strong>Learning Goal:</strong> Discover how diagnostic endpoints can reveal system information.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Part 3: Authentication Systems</h2>
+                    <p>Learn about authentication endpoints and how credentials are verified.</p>
+                    <h3>Try It:</h3>
+                    <p>Test the auth check endpoint:</p>
+                    <pre>curl http://localhost:3002/api/example/auth-check</pre>
+                    <div class="tip-box">
+                        💡 <strong>Learning Goal:</strong> Understand how authentication systems verify access.
+                    </div>
+                </div>
+
+                <div class="back-link">
+                    <a href="/">← Back to Portal</a>
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
+});
+
+// Example API endpoints
+app.get('/api/example/systems/:id', (req, res) => {
+    const systemId = parseInt(req.params.id);
+    const system = storeSystemsExamples.find(s => s.id === systemId);
+    
+    if (!system) {
+        return res.status(404).json({ error: 'System not found', hint: 'Try IDs 100-103' });
+    }
+    
+    if (systemId === 103) {
+        return res.json({
+            ...system,
+            flag: 'FLAG{ST0R3_SYST3M_3NUM3R4T3D}',
+            message: 'You found the maintenance system!',
+            admin_note: 'System in maintenance mode - full access available'
+        });
+    }
+    
+    res.json(system);
+});
+
+app.get('/api/example/diagnostic', (req, res) => {
+    res.json({
+        status: 'operational',
+        flag: 'FLAG{D14GN0ST1C_4CC3SS3D}',
+        message: 'Diagnostic endpoint accessed successfully!',
+        store_health: {
+            pos_systems: 'online',
+            inventory: 'synced',
+            payment_gateway: 'connected'
+        }
+    });
+});
+
+app.get('/api/example/auth-check', (req, res) => {
+    res.json({
+        authenticated: false,
+        flag: 'FLAG{4UTH_SYST3M_CH3CK3D}',
+        message: 'Auth check completed!',
+        hint: 'Authentication would normally validate credentials here'
+    });
+});
+
+
+// Lab 1 - Staff Dashboard
 app.get('/lab1', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Lab 1 - Cryptographic Failures</title>
-      ${cyberpunkStyles}
-    </head>
-    <body>
-      <div class="container">
-        <h1>🎯 LAB 1: WEAK HASHING DETECTION</h1>
-        <p><a href="/">← Back to Home</a></p>
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Staff Dashboard - BeanScene</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: 'Georgia', serif;
+                    background: linear-gradient(135deg, #D32F2F 0%, #1976D2 100%);
+                    padding: 20px;
+                    min-height: 100vh;
+                }
+                .container { max-width: 900px; margin: 0 auto; }
+                .header {
+                    background: #FFF3E0;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 25px;
+                    text-align: center;
+                    border: 2px solid #A1887F;
+                }
+                h1 { color: #1976D2; font-size: 2em; margin-bottom: 8px; }
+                .section {
+                    background: #FFF3E0;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 20px;
+                    border: 2px solid #A1887F;
+                }
+                .section h2 { color: #1976D2; margin-bottom: 15px; }
+                .section p, .section li { color: #5D4037; line-height: 1.7; margin: 8px 0; }
+                .staff-card {
+                    background: #FFF8E7;
+                    padding: 15px;
+                    margin: 10px 0;
+                    border-radius: 8px;
+                    border-left: 4px solid #8D6E63;
+                }
+                code {
+                    background: #FFCDD2;
+                    padding: 3px 8px;
+                    border-radius: 4px;
+                    font-family: monospace;
+                }
+                .info-box {
+                    background: #E3F2FD;
+                    border-left: 4px solid #2196F3;
+                    padding: 15px;
+                    margin: 15px 0;
+                    border-radius: 5px;
+                }
+                a { color: #5D4037; font-weight: 600; text-decoration: none; }
+                .back-link { text-align: center; margin-top: 30px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>👥 Staff Dashboard</h1>
+                    <p style="color: #5D4037;">View team schedules and information</p>
+                </div>
 
-        <div class="section info">
-          <h2>Mission Objective</h2>
-          <p><span class="difficulty easy">EASY</span> <span class="stage">RECONNAISSANCE</span></p>
-          <p>You've discovered a password hashing API endpoint. Your mission is to identify the weak hashing algorithm being used.</p>
-        </div>
+                <div class="section">
+                    <h2>Team Overview</h2>
+                    <p>Access staff information and shift schedules. Our team keeps BeanScene running smoothly.</p>
+                    
+                    ${staff.map(s => `
+                        <div class="staff-card">
+                            <strong>${s.name}</strong> - ${s.role}<br>
+                            Email: ${s.email}<br>
+                            Shift: ${s.shift}
+                        </div>
+                    `).join('')}
+                </div>
 
-        <div class="section">
-          <h2>📋 Instructions</h2>
-          <ol>
-            <li>Test the password hashing endpoint with a known password</li>
-            <li>Analyze the hash output to identify the algorithm</li>
-            <li>Determine if the algorithm is cryptographically weak</li>
-            <li>Retrieve the flag by confirming the weak algorithm</li>
-          </ol>
-        </div>
+                <div class="section">
+                    <h2>📊 System Information</h2>
+                    <p>Technical teams can access system diagnostics via our API:</p>
+                    <p><code>GET /api/staff/system-info</code></p>
+                    <div class="info-box">
+                        <strong>For IT Use:</strong> System diagnostics provide operational metrics for troubleshooting.
+                    </div>
+                </div>
 
-        <div class="section">
-          <h2>🔍 Target Endpoint</h2>
-          <div class="endpoint">
-            <strong>GET</strong> /api/lab1/hash?password=<em>test</em>
-          </div>
-          <p>Test with different passwords and observe the hash output format.</p>
-        </div>
-
-        <div class="section">
-          <h2>💡 Hints</h2>
-          <ul>
-            <li>Try hashing a common password like "password" or "test"</li>
-            <li>Observe the length and format of the hash</li>
-            <li>MD5 hashes are 32 hexadecimal characters</li>
-            <li>You can look up common password hashes online to identify the algorithm</li>
-          </ul>
-        </div>
-
-        <div class="section">
-          <h2>🚩 Success Criteria</h2>
-          <p>You'll receive the flag <span class="flag">NSA{W3AK_H4SH_F0UND}</span> when you correctly identify the weak hashing algorithm.</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `);
+                <div class="back-link">
+                    <a href="/">← Back to Portal</a>
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
 });
 
-// Lab 1 API - Returns MD5 hash
-app.get('/api/lab1/hash', (req, res) => {
-  const { password } = req.query;
-  
-  if (!password) {
-    return res.status(400).json({ error: 'Password parameter required' });
-  }
-
-  const hash = crypto.createHash('md5').update(password).digest('hex');
-  
-  res.json({
-    password: password,
-    hash: hash,
-    algorithm: 'MD5',
-    flag: 'NSA{W3AK_H4SH_F0UND}',
-    message: 'You successfully identified the weak MD5 hashing algorithm!',
-    vulnerability: 'MD5 is cryptographically broken and vulnerable to collision attacks and rainbow table lookups.'
-  });
+// Lab 1 API - VULNERABLE debug endpoint
+app.get('/api/staff/system-info', (req, res) => {
+    // VULNERABLE: Debug info exposed in production
+    res.json({
+        flag: 'FLAG{D3BUG_1NF0_3XP0S3D}',
+        message: 'System information retrieved successfully!',
+        vulnerability: 'Debug endpoint exposed - reveals system details',
+        system_info: {
+            node_version: process.version,
+            platform: process.platform,
+            uptime_seconds: Math.floor(process.uptime()),
+            memory_mb: Math.floor(process.memoryUsage().heapUsed / 1024 / 1024),
+            environment: process.env.NODE_ENV || 'production'
+        },
+        database_host: configData.database.host,
+        warning: 'This endpoint should not be accessible in production!'
+    });
 });
 
-// Lab 2 - Medium: Scanning - Crack weak password hashes
+
+// Lab 2 - Store Settings
 app.get('/lab2', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Lab 2 - Cryptographic Failures</title>
-      ${cyberpunkStyles}
-    </head>
-    <body>
-      <div class="container">
-        <h1>🎯 LAB 2: PASSWORD CRACKING</h1>
-        <p><a href="/">← Back to Home</a></p>
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Store Settings - BeanScene</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: 'Georgia', serif;
+                    background: linear-gradient(135deg, #D32F2F 0%, #1976D2 100%);
+                    padding: 20px;
+                    min-height: 100vh;
+                }
+                .container { max-width: 900px; margin: 0 auto; }
+                .header {
+                    background: #FFF3E0;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 25px;
+                    text-align: center;
+                    border: 2px solid #A1887F;
+                }
+                h1 { color: #1976D2; font-size: 2em; }
+                .section {
+                    background: #FFF3E0;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 20px;
+                    border: 2px solid #A1887F;
+                }
+                .section h2 { color: #1976D2; margin-bottom: 15px; }
+                .section p, .section li { color: #5D4037; line-height: 1.7; margin: 8px 0; }
+                code {
+                    background: #FFCDD2;
+                    padding: 3px 8px;
+                    border-radius: 4px;
+                    font-family: monospace;
+                }
+                .warning-box {
+                    background: #FFF3E0;
+                    border-left: 4px solid #FF9800;
+                    padding: 15px;
+                    margin: 15px 0;
+                    border-radius: 5px;
+                }
+                a { color: #5D4037; font-weight: 600; text-decoration: none; }
+                .back-link { text-align: center; margin-top: 30px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>⚙️ Store Settings</h1>
+                    <p style="color: #5D4037;">Configure store operations and integrations</p>
+                </div>
 
-        <div class="section info">
-          <h2>Mission Objective</h2>
-          <p><span class="difficulty medium">MEDIUM</span> <span class="stage">SCANNING</span></p>
-          <p>You've obtained a database dump containing weakly hashed passwords. Your mission is to crack the hashes and gain access to user accounts.</p>
-        </div>
+                <div class="section">
+                    <h2>Configuration Management</h2>
+                    <p>Manage store settings, payment integrations, and operational parameters.</p>
+                    
+                    <div class="warning-box">
+                        <strong>⚠️ Manager Access:</strong> Configuration changes require manager approval.
+                    </div>
+                    
+                    <h3>Quick Settings:</h3>
+                    <ul>
+                        <li>Store hours configuration</li>
+                        <li>Payment gateway settings</li>
+                        <li>Inventory thresholds</li>
+                        <li>Email notification preferences</li>
+                    </ul>
+                </div>
 
-        <div class="section">
-          <h2>📋 Instructions</h2>
-          <ol>
-            <li>Retrieve the user database with hashed passwords</li>
-            <li>Identify the hashing algorithm (MD5)</li>
-            <li>Use online rainbow tables or brute force to crack the hashes</li>
-            <li>Verify the cracked password to obtain the flag</li>
-          </ol>
-        </div>
+                <div class="section">
+                    <h2>🔧 Technical Configuration</h2>
+                    <p>IT staff can access configuration via API:</p>
+                    <p><code>GET /api/settings/config</code></p>
+                    <p style="margin-top: 10px; font-size: 0.9em;">For technical support and integration setup.</p>
+                </div>
 
-        <div class="section">
-          <h2>🔍 Target Endpoints</h2>
-          <div class="endpoint">
-            <strong>GET</strong> /api/lab2/users
-          </div>
-          <p>Retrieves the user database with MD5 hashed passwords.</p>
-          
-          <div class="endpoint">
-            <strong>POST</strong> /api/lab2/verify<br>
-            <strong>Body:</strong> { "username": "user1", "password": "cracked_password" }
-          </div>
-          <p>Verify a cracked password to get the flag.</p>
-        </div>
-
-        <div class="section">
-          <h2>💡 Hints</h2>
-          <ul>
-            <li>The passwords are common and likely found in rainbow tables</li>
-            <li>Try online MD5 decryption services like md5decrypt.net or crackstation.net</li>
-            <li>User "user1" has a very common password</li>
-            <li>The hash <code>5f4dcc3b5aa765d61d8327deb882cf99</code> is a well-known MD5 hash</li>
-          </ul>
-        </div>
-
-        <div class="section">
-          <h2>🚩 Success Criteria</h2>
-          <p>You'll receive the flag <span class="flag">NSA{P4SSW0RD_CR4CK3D}</span> when you successfully crack a password and verify it.</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `);
+                <div class="back-link">
+                    <a href="/">← Back to Portal</a>
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
 });
 
-// Lab 2 API - Get users with MD5 hashed passwords
-app.get('/api/lab2/users', (req, res) => {
-  res.json({
-    users: lab2Users,
-    note: 'Password hashes are MD5. Common passwords can be reversed using rainbow tables.',
-    hint: 'Try looking up these hashes on crackstation.net or md5decrypt.net'
-  });
-});
-
-// Lab 2 API - Verify cracked password
-app.post('/api/lab2/verify', (req, res) => {
-  const { username, password } = req.body;
-
-  if (!username || !password) {
-    return res.status(400).json({ error: 'Username and password required' });
-  }
-
-  const user = lab2Users.find(u => u.username === username);
-  
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
-  }
-
-  const hash = crypto.createHash('md5').update(password).digest('hex');
-  
-  if (hash === user.passwordHash) {
-    return res.json({
-      success: true,
-      flag: 'NSA{P4SSW0RD_CR4CK3D}',
-      message: `Successfully cracked password for ${username}!`,
-      vulnerability: 'MD5 hashes can be easily reversed using rainbow tables, exposing all user passwords.',
-      crackedPassword: password
+// Lab 2 API - VULNERABLE config exposure
+app.get('/api/settings/config', (req, res) => {
+    // VULNERABLE: Configuration exposed without authentication
+    res.json({
+        flag: 'FLAG{C0NF1G_L34K3D}',
+        message: 'Configuration data retrieved!',
+        vulnerability: 'Configuration endpoint accessible without authentication',
+        configuration: configData,
+        warning: 'Sensitive credentials exposed - database password, API keys, secrets!'
     });
-  } else {
-    return res.status(401).json({
-      success: false,
-      error: 'Incorrect password',
-      hint: 'The hash suggests this is a very common password. Try popular password lists.'
-    });
-  }
 });
 
-// Lab 3 - Hard: Initial Access - Extract plaintext credentials
+// Lab 3 - Manager Portal
 app.get('/lab3', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Lab 3 - Cryptographic Failures</title>
-      ${cyberpunkStyles}
-    </head>
-    <body>
-      <div class="container">
-        <h1>🎯 LAB 3: PLAINTEXT CREDENTIAL EXTRACTION</h1>
-        <p><a href="/">← Back to Home</a></p>
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Manager Portal - BeanScene</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: 'Georgia', serif;
+                    background: linear-gradient(135deg, #D32F2F 0%, #1976D2 100%);
+                    padding: 20px;
+                    min-height: 100vh;
+                }
+                .container { max-width: 900px; margin: 0 auto; }
+                .header {
+                    background: #FFF3E0;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 25px;
+                    text-align: center;
+                    border: 2px solid #A1887F;
+                }
+                h1 { color: #1976D2; font-size: 2em; }
+                .section {
+                    background: #FFF3E0;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 20px;
+                    border: 2px solid #A1887F;
+                }
+                .section h2 { color: #1976D2; margin-bottom: 15px; }
+                .section p, .section li { color: #5D4037; line-height: 1.7; margin: 8px 0; }
+                code {
+                    background: #FFCDD2;
+                    padding: 3px 8px;
+                    border-radius: 4px;
+                    font-family: monospace;
+                }
+                pre {
+                    background: #FFCDD2;
+                    padding: 15px;
+                    border-radius: 8px;
+                    overflow-x: auto;
+                    margin: 10px 0;
+                }
+                .restricted {
+                    background: #FFEBEE;
+                    border-left: 4px solid #D32F2F;
+                    padding: 15px;
+                    margin: 15px 0;
+                    border-radius: 5px;
+                }
+                a { color: #5D4037; font-weight: 600; text-decoration: none; }
+                .back-link { text-align: center; margin-top: 30px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🔐 Manager Portal</h1>
+                    <p style="color: #5D4037;">Administrative controls and reporting</p>
+                </div>
 
-        <div class="section info">
-          <h2>Mission Objective</h2>
-          <p><span class="difficulty hard">HARD</span> <span class="stage">INITIAL ACCESS</span></p>
-          <p>Intelligence suggests a legacy admin system stores credentials in plaintext. Your mission is to locate and extract these credentials from the database.</p>
-        </div>
+                <div class="restricted">
+                    <strong>🔒 Authentication Required</strong><br>
+                    This area requires manager credentials. Please contact your store manager for access.
+                </div>
 
-        <div class="section">
-          <h2>📋 Instructions</h2>
-          <ol>
-            <li>Enumerate the API endpoints to find the admin database</li>
-            <li>Access the admin user record</li>
-            <li>Extract the plaintext password</li>
-            <li>Retrieve the flag from the response</li>
-          </ol>
-        </div>
+                <div class="section">
+                    <h2>Manager Features</h2>
+                    <p>The manager portal provides access to:</p>
+                    <ul>
+                        <li>Financial reports and sales analytics</li>
+                        <li>Staff management and scheduling</li>
+                        <li>Inventory ordering and management</li>
+                        <li>System configuration and settings</li>
+                    </ul>
+                </div>
 
-        <div class="section">
-          <h2>🔍 Target Endpoint</h2>
-          <div class="endpoint">
-            <strong>GET</strong> /api/lab3/admin
-          </div>
-          <p>Access the admin user database. This endpoint returns sensitive information.</p>
-        </div>
+                <div class="section">
+                    <h2>🔑 Access Instructions</h2>
+                    <p>Authenticate via the admin API:</p>
+                    <pre>curl -X POST http://localhost:3002/api/manager/login \\
+  -H "Content-Type: application/json" \\
+  -d '{"username":"admin","password":"your_password"}'</pre>
+                    <p style="margin-top: 10px; font-size: 0.9em; color: #666;">Manager credentials are provided during onboarding.</p>
+                </div>
 
-        <div class="section">
-          <h2>💡 Hints</h2>
-          <ul>
-            <li>Legacy systems often store passwords in plaintext for "convenience"</li>
-            <li>Admin endpoints might not have proper access controls</li>
-            <li>The endpoint path follows RESTful conventions</li>
-            <li>Simply accessing the endpoint might be enough</li>
-          </ul>
-        </div>
-
-        <div class="section">
-          <h2>🚩 Success Criteria</h2>
-          <p>You'll receive the flag <span class="flag">NSA{PL41N_T3XT_P4SSW0RDS}</span> when you successfully access the plaintext password.</p>
-        </div>
-
-        <div class="section vulnerable">
-          <h2>⚠️ Real-World Impact</h2>
-          <p>Storing passwords in plaintext is one of the worst security practices. If the database is compromised:</p>
-          <ul>
-            <li>All user passwords are immediately exposed</li>
-            <li>Users who reuse passwords across sites are at risk</li>
-            <li>No computational work required for attackers</li>
-            <li>Compliance violations (GDPR, PCI-DSS, etc.)</li>
-            <li>Complete loss of user trust and potential legal liability</li>
-          </ul>
-        </div>
-      </div>
-    </body>
-    </html>
-  `);
+                <div class="back-link">
+                    <a href="/">← Back to Portal</a>
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
 });
 
-// Lab 3 API - Returns admin with plaintext password
-app.get('/api/lab3/admin', (req, res) => {
-  res.json({
-    user: lab3Admin,
-    flag: 'NSA{PL41N_T3XT_P4SSW0RDS}',
-    message: 'Successfully extracted plaintext credentials from database!',
-    vulnerability: 'CRITICAL: Admin password stored in plaintext. Zero encryption or hashing protection.',
-    impact: 'Complete account compromise. If database is breached, all credentials are immediately exposed.',
-    remediation: 'Immediately implement bcrypt or Argon2 password hashing with proper salt and cost factors.'
-  });
+// Lab 3 API - VULNERABLE default credentials
+app.post('/api/manager/login', (req, res) => {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+        return res.status(400).json({ error: 'Username and password required' });
+    }
+    
+    // VULNERABLE: Using default credentials
+    if (username === adminCredentials.username && password === adminCredentials.password) {
+        return res.json({
+            success: true,
+            flag: 'FLAG{D3F4ULT_CR3DS_US3D}',
+            message: 'Authentication successful with default credentials!',
+            vulnerability: 'Default admin credentials never changed',
+            credentials_used: { username, password },
+            token: 'manager_access_token_' + Date.now(),
+            warning: 'Default credentials should always be changed after setup!'
+        });
+    }
+    
+    res.status(401).json({
+        error: 'Invalid credentials',
+        hint: 'Try common default credentials'
+    });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`A04 Cryptographic Failures Lab running on port ${PORT}`);
+app.listen(PORT, () => {
+    console.log(`\x1b[33m
+╔════════════════════════════════════════════╗
+║   🏋️ PowerFit Gym Management Portal   ║
+║   Server running on port ${PORT}           ║
+║                                            ║
+║   Access: http://localhost:${PORT}            ║
+╚════════════════════════════════════════════╝
+\x1b[0m`);
 });
