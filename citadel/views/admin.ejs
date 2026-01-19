@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Evil Capitalistic Corp</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
+            <h1>⚙️ Admin Control Panel</h1>
+            <nav>
+                <a href="/">🏠 Home</a>
+                <a href="/dashboard">📊 Dashboard</a>
+                <a href="/admin">⚙️ Admin</a>
+                <a href="/logout">🚪 Logout</a>
+            </nav>
+        </header>
+        
+        <main style="padding: 3rem 2rem;">
+            <div style="background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem;">
+                <h2 style="margin-bottom: 1rem;">🎉 Access Granted!</h2>
+                <p>Logged in as: <strong><%= user.username %></strong> (<%= user.role %>)</p>
+                <p>You have successfully accessed the admin panel!</p>
+            </div>
+            
+            <% if (user.notes && user.notes.includes('NSA{')) { %>
+                <div style="background: #d4edda; border: 3px solid #28a745; padding: 2rem; border-radius: 8px; margin-bottom: 2rem;">
+                    <h3 style="color: #155724; margin-bottom: 1rem;">🏴 FLAG CAPTURED!</h3>
+                    <p style="color: #155724;"><%= user.notes %></p>
+                </div>
+            <% } %>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem;">
+                <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <h3 style="color: #1a1a2e; margin-bottom: 1.5rem;">👥 User Management</h3>
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                                    <th style="padding: 0.75rem; text-align: left;">ID</th>
+                                    <th style="padding: 0.75rem; text-align: left;">Username</th>
+                                    <th style="padding: 0.75rem; text-align: left;">Role</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% allUsers.forEach(u => { %>
+                                    <tr style="border-bottom: 1px solid #dee2e6;">
+                                        <td style="padding: 0.75rem;"><%= u.id %></td>
+                                        <td style="padding: 0.75rem;"><%= u.username %></td>
+                                        <td style="padding: 0.75rem;"><span style="background: #ffd700; padding: 0.25rem 0.5rem; border-radius: 3px; font-weight: 600;"><%= u.role %></span></td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <h3 style="color: #1a1a2e; margin-bottom: 1.5rem;">💻 System Commands</h3>
+                    <p style="color: #666; margin-bottom: 1.5rem;">Execute administrative commands on the server:</p>
+                    
+                    <div style="margin-bottom: 2rem;">
+                        <h4 style="color: #1a1a2e; margin-bottom: 1rem;">Predefined Commands:</h4>
+                        <% commands.forEach(cmd => { %>
+                            <button onclick="executeCommand(<%= cmd.id %>)" 
+                                    style="display: block; width: 100%; margin: 0.5rem 0; padding: 0.75rem; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; text-align: left; font-weight: 600;">
+                                <%= cmd.description %>
+                            </button>
+                        <% }); %>
+                    </div>
+                    
+                    <div>
+                        <h4 style="color: #1a1a2e; margin-bottom: 1rem;">Custom Command:</h4>
+                        <input type="text" id="customCommand" placeholder="Enter command..." 
+                               style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 5px; margin-bottom: 0.5rem;">
+                        <button onclick="executeCustomCommand()" 
+                                style="width: 100%; padding: 0.75rem; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">
+                            Execute Custom Command
+                        </button>
+                    </div>
+                    
+                    <div id="output" style="margin-top: 1.5rem; padding: 1rem; background: #000; color: #00ff00; border-radius: 5px; font-family: monospace; white-space: pre-wrap; min-height: 100px; max-height: 300px; overflow-y: auto;"></div>
+                </div>
+            </div>
+            
+            <div style="background: #fff3cd; border: 2px dashed #ffc107; padding: 1.5rem; margin-top: 2rem; border-radius: 8px;">
+                <p style="color: #856404; font-weight: 600;">💡 Final Challenge:</p>
+                <p style="color: #856404;">You've reached the admin panel! Now can you execute commands to get root access? Try reading /root/ckret.txt for the final flag!</p>
+                <p style="color: #856404; margin-top: 0.5rem;"><strong>Hint:</strong> Use the custom command feature with: cat /root/ckret.txt</p>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        function executeCommand(cmdId) {
+            fetch('/admin/execute', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ command_id: cmdId })
+            })
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('output').textContent = data.output || data.error || 'Command executed';
+            })
+            .catch(err => {
+                document.getElementById('output').textContent = 'Error: ' + err.message;
+            });
+        }
+        
+        function executeCustomCommand() {
+            const command = document.getElementById('customCommand').value;
+            if (!command) {
+                alert('Please enter a command');
+                return;
+            }
+            
+            fetch('/admin/execute', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ custom_command: command })
+            })
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('output').textContent = data.output || data.error || 'Command executed';
+            })
+            .catch(err => {
+                document.getElementById('output').textContent = 'Error: ' + err.message;
+            });
+        }
+    </script>
+</body>
+</html>

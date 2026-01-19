@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Challenge Hints - Evil Capitalistic Corp</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💡 Challenge Hints & Walkthrough</h1>
+            <nav>
+                <a href="/">🏠 Home</a>
+                <a href="/hints">💡 Hints</a>
+            </nav>
+        </header>
+        
+        <main style="padding: 3rem 2rem;">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 12px; margin-bottom: 2rem;">
+                <h2>🎯 Complete Vulnerability Chain</h2>
+                <p style="font-size: 1.1rem; margin-top: 1rem;">This challenge contains a chain of vulnerabilities that build on each other like an onion. Each layer gives you information needed for the next!</p>
+            </div>
+            
+            <div style="display: grid; gap: 2rem;">
+                <!-- A01 -->
+                <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 5px solid #ff6b6b;">
+                    <h3 style="color: #ff6b6b; margin-bottom: 1rem;">🔴 Step 1: A01 - Broken Access Control</h3>
+                    <h4 style="color: #1a1a2e; margin-top: 1rem;">Challenge 1: User Enumeration & IDOR</h4>
+                    <ul style="color: #666; margin-left: 1.5rem; line-height: 1.8;">
+                        <li>Go to <code>/employees</code> to see the employee directory</li>
+                        <li>Notice the user IDs in the profiles (e.g., /user/1, /user/2)</li>
+                        <li>Try incrementing IDs: /user/3, /user/4, /user/5...</li>
+                        <li>Admin user is typically at ID 4 - check their profile for flags!</li>
+                    </ul>
+                    
+                    <h4 style="color: #1a1a2e; margin-top: 1.5rem;">Challenge 2: Privilege Escalation</h4>
+                    <ul style="color: #666; margin-left: 1.5rem; line-height: 1.8;">
+                        <li>Try accessing <code>/admin</code> - you'll be denied</li>
+                        <li>Notice it checks your role... but how?</li>
+                        <li>Try: <code>/admin?user_id=4</code> (admin's user ID)</li>
+                        <li>The application checks the role of whatever user_id you provide!</li>
+                    </ul>
+                    
+                    <p style="background: #d4edda; padding: 1rem; border-radius: 5px; margin-top: 1rem; color: #155724;">
+                        <strong>🏴 Flag:</strong> Check admin user's notes in their profile or admin panel
+                    </p>
+                </div>
+                
+                <!-- A04 -->
+                <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 5px solid #ffa500;">
+                    <h3 style="color: #ffa500; margin-bottom: 1rem;">🟠 Step 2: A04 - Cryptographic Failures</h3>
+                    <h4 style="color: #1a1a2e; margin-top: 1rem;">Challenge 1: Weak Password Hashing</h4>
+                    <ul style="color: #666; margin-left: 1.5rem; line-height: 1.8;">
+                        <li>Visit the debug endpoint: <code>/debug/users</code></li>
+                        <li>Notice password hashes are exposed!</li>
+                        <li>Admin password is MD5 hash: <code>5f4dcc3b5aa765d61d8327deb882cf99</code></li>
+                        <li>Crack it using: <code>https://crackstation.net/</code> or MD5 rainbow tables</li>
+                        <li>Spoiler: The password is "password"</li>
+                    </ul>
+                    
+                    <h4 style="color: #1a1a2e; margin-top: 1.5rem;">Challenge 2: Login as Admin</h4>
+                    <ul style="color: #666; margin-left: 1.5rem; line-height: 1.8;">
+                        <li>Go to <code>/login</code></li>
+                        <li>Username: <code>admin</code></li>
+                        <li>Password: <code>password</code> (from cracked hash)</li>
+                        <li>Session cookie is just your user ID - easily manipulated!</li>
+                    </ul>
+                    
+                    <p style="background: #d4edda; padding: 1rem; border-radius: 5px; margin-top: 1rem; color: #155724;">
+                        <strong>🏴 Flag:</strong> Found in sensitive_data table or admin notes
+                    </p>
+                </div>
+                
+                <!-- A05 -->
+                <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 5px solid #4ecdc4;">
+                    <h3 style="color: #4ecdc4; margin-bottom: 1rem;">🔵 Step 3: A05 - Injection (SQL)</h3>
+                    <h4 style="color: #1a1a2e; margin-top: 1rem;">Challenge 1: Basic SQL Injection</h4>
+                    <ul style="color: #666; margin-left: 1.5rem; line-height: 1.8;">
+                        <li>Go to <code>/search</code> and try searching for products</li>
+                        <li>Try: <code>' OR '1'='1</code> to see all products</li>
+                        <li>The query is vulnerable to SQL injection!</li>
+                    </ul>
+                    
+                    <h4 style="color: #1a1a2e; margin-top: 1.5rem;">Challenge 2: UNION-based SQL Injection</h4>
+                    <ul style="color: #666; margin-left: 1.5rem; line-height: 1.8;">
+                        <li>Use API endpoint for easier testing: <code>/api/search?q=test</code></li>
+                        <li>Extract data from other tables using UNION:</li>
+                        <li><code>/api/search?q=' UNION SELECT id, data, secret_level, user_id::text FROM sensitive_data--</code></li>
+                        <li>This reveals flags and sensitive information!</li>
+                    </ul>
+                    
+                    <p style="background: #d4edda; padding: 1rem; border-radius: 5px; margin-top: 1rem; color: #155724;">
+                        <strong>🏴 Flag:</strong> Extracted from sensitive_data table via SQL injection
+                    </p>
+                </div>
+                
+                <!-- A06 -->
+                <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 5px solid #9b59b6;">
+                    <h3 style="color: #9b59b6; margin-bottom: 1rem;">🟣 Step 4: A06 - Insecure Design</h3>
+                    <h4 style="color: #1a1a2e; margin-top: 1rem;">Challenge 1: Price Manipulation</h4>
+                    <ul style="color: #666; margin-left: 1.5rem; line-height: 1.8;">
+                        <li>Use curl to test the checkout endpoint:</li>
+                        <li><code>curl -X POST http://localhost:3000/api/checkout -H "Content-Type: application/json" -d '{"product_id":1,"price":0.01,"quantity":1}'</code></li>
+                        <li>Price is client-controlled - set it to anything!</li>
+                    </ul>
+                    
+                    <h4 style="color: #1a1a2e; margin-top: 1.5rem;">Challenge 2: Race Condition</h4>
+                    <ul style="color: #666; margin-left: 1.5rem; line-height: 1.8;">
+                        <li>Test concurrent withdrawals to exploit race condition</li>
+                        <li><code>for i in {1..4}; do curl -X POST http://localhost:3000/api/withdraw -H "Content-Type: application/json" -d '{"userId":"1","amount":300}' & done</code></li>
+                        <li>Withdraw more than available balance!</li>
+                    </ul>
+                    
+                    <p style="background: #d4edda; padding: 1rem; border-radius: 5px; margin-top: 1rem; color: #155724;">
+                        <strong>🏴 Flags:</strong> Returned in API responses when exploited
+                    </p>
+                </div>
+                
+                <!-- RCE -->
+                <div style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-left: 5px solid #e74c3c;">
+                    <h3 style="color: #e74c3c; margin-bottom: 1rem;">⚫ Final Step: Remote Code Execution</h3>
+                    <h4 style="color: #1a1a2e; margin-top: 1rem;">Access Admin Panel & Execute Commands</h4>
+                    <ul style="color: #666; margin-left: 1.5rem; line-height: 1.8;">
+                        <li>You should now be logged in as admin and have access to <code>/admin</code></li>
+                        <li>The admin panel has a command execution feature</li>
+                        <li>Try predefined commands first to explore</li>
+                        <li>Then use custom command to read the flag file:</li>
+                        <li><code>cat /root/ckret.txt</code></li>
+                        <li>This reveals the final flag and completion message!</li>
+                    </ul>
+                    
+                    <p style="background: #d4edda; padding: 1rem; border-radius: 5px; margin-top: 1rem; color: #155724;">
+                        <strong>🏴 FINAL FLAG:</strong> NSA{C1T4D3L_H4S_F4LL3N_R00T_4CC3SS}
+                    </p>
+                </div>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #ffd700, #ffed4e); padding: 2rem; border-radius: 12px; margin-top: 2rem; text-align: center;">
+                <h3 style="color: #1a1a2e; margin-bottom: 1rem;">🎉 Ready to Start?</h3>
+                <p style="color: #333; margin-bottom: 1.5rem;">Begin your journey through the vulnerability chain!</p>
+                <a href="/" style="display: inline-block; padding: 1rem 2rem; background: #1a1a2e; color: white; text-decoration: none; border-radius: 8px; font-weight: 700;">Start Hacking →</a>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -4,98 +4,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Profile - Evil Capitalistic Corp</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            min-height: 100vh;
-        }
-        
-        header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-        
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin-right: 2rem;
-            font-weight: 500;
-            transition: opacity 0.3s;
-        }
-        
-        nav a:hover {
-            opacity: 0.7;
-        }
-        
-        main {
-            padding: 3rem 2rem;
-        }
-        
-        .profile {
-            background: #f8f9fa;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .profile h2 {
-            color: #1e3c72;
-            margin-bottom: 1.5rem;
-            font-size: 1.8rem;
-        }
-        
-        .profile p {
-            margin: 1rem 0;
-            font-size: 1.1rem;
-        }
-        
-        .profile strong {
-            color: #1e3c72;
-            font-weight: 600;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🏢 Evil Capitalistic Corp</h1>
+            <h1>👤 Employee Profile</h1>
             <nav>
-                <a href="/">Home</a>
+                <a href="/">🏠 Home</a>
+                <a href="/employees">👥 All Employees</a>
             </nav>
         </header>
         
-        <main>
-            <div class="profile">
-                <h2>Employee Profile</h2>
-                <p><strong>Employee ID:</strong> <%= user.id %></p>
-                <p><strong>Name:</strong> <%= user.username %></p>
-                <p><strong>Email:</strong> <%= user.email %></p>
-                <p><strong>Department:</strong> <%= user.role %></p>
+        <main style="padding: 3rem 2rem; max-width: 800px; margin: 0 auto;">
+            <div style="background: white; padding: 2.5rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                <div style="border-bottom: 3px solid #ffd700; padding-bottom: 1.5rem; margin-bottom: 2rem;">
+                    <h2 style="color: #1a1a2e; font-size: 2rem; margin-bottom: 0.5rem;"><%= user.username %></h2>
+                    <span style="background: #ffd700; color: #1a1a2e; padding: 0.4rem 1rem; border-radius: 20px; font-weight: 700; font-size: 0.9rem;">
+                        <%= user.role.toUpperCase() %>
+                    </span>
+                </div>
+                
+                <div style="display: grid; gap: 1.5rem;">
+                    <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #1a1a2e;">
+                        <p style="color: #666; font-size: 0.9rem; margin-bottom: 0.3rem;">Employee ID</p>
+                        <p style="color: #1a1a2e; font-size: 1.2rem; font-weight: 600;"><%= user.id %></p>
+                    </div>
+                    
+                    <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #1a1a2e;">
+                        <p style="color: #666; font-size: 0.9rem; margin-bottom: 0.3rem;">Email Address</p>
+                        <p style="color: #1a1a2e; font-size: 1.2rem; font-weight: 600;"><%= user.email %></p>
+                    </div>
+                    
+                    <% if (user.department) { %>
+                    <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #1a1a2e;">
+                        <p style="color: #666; font-size: 0.9rem; margin-bottom: 0.3rem;">Department</p>
+                        <p style="color: #1a1a2e; font-size: 1.2rem; font-weight: 600;"><%= user.department %></p>
+                    </div>
+                    <% } %>
+                    
+                    <% if (user.salary) { %>
+                    <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #28a745;">
+                        <p style="color: #666; font-size: 0.9rem; margin-bottom: 0.3rem;">Annual Salary</p>
+                        <p style="color: #28a745; font-size: 1.4rem; font-weight: 700;">$<%= user.salary.toLocaleString() %></p>
+                    </div>
+                    <% } %>
+                    
+                    <% if (user.ssn) { %>
+                    <div style="padding: 1rem; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                        <p style="color: #856404; font-size: 0.9rem; margin-bottom: 0.3rem;">🔒 Social Security Number (Confidential)</p>
+                        <p style="color: #856404; font-size: 1.2rem; font-weight: 600;"><%= user.ssn %></p>
+                    </div>
+                    <% } %>
+                    
+                    <% if (user.api_key) { %>
+                    <div style="padding: 1rem; background: #d1ecf1; border-radius: 8px; border-left: 4px solid #0c5460;">
+                        <p style="color: #0c5460; font-size: 0.9rem; margin-bottom: 0.3rem;">🔑 API Key</p>
+                        <p style="color: #0c5460; font-size: 1rem; font-weight: 600; font-family: monospace;"><%= user.api_key %></p>
+                    </div>
+                    <% } %>
+                    
+                    <% if (user.notes) { %>
+                    <div style="padding: 1.5rem; background: <%= user.notes.includes('NSA{') ? '#d4edda' : '#e7f3ff' %>; border-radius: 8px; border: 2px solid <%= user.notes.includes('NSA{') ? '#28a745' : '#0066cc' %>;">
+                        <p style="color: <%= user.notes.includes('NSA{') ? '#155724' : '#004085' %>; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem;">📝 Notes:</p>
+                        <p style="color: <%= user.notes.includes('NSA{') ? '#155724' : '#004085' %>; font-size: 1.05rem; line-height: 1.6;"><%= user.notes %></p>
+                        <% if (user.notes.includes('NSA{')) { %>
+                            <p style="color: #155724; font-weight: 700; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #28a745;">🏴 FLAG CAPTURED!</p>
+                        <% } %>
+                    </div>
+                    <% } %>
+                </div>
+                
+                <div style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #f0f0f0; text-align: center;">
+                    <a href="/employees" style="display: inline-block; padding: 0.75rem 2rem; background: #1a1a2e; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                        ← Back to Employee Directory
+                    </a>
+                </div>
             </div>
+            
+            <% if (user.role === 'admin' || user.role === 'superadmin') { %>
+                <div style="background: #fff3cd; border: 2px dashed #ffc107; padding: 1.5rem; margin-top: 2rem; border-radius: 8px;">
+                    <p style="color: #856404; font-weight: 600;">💡 Next Challenge:</p>
+                    <p style="color: #856404;">You found the admin account! Now try to access the admin panel at <a href="/admin" style="color: #856404; font-weight: 700;">/admin</a></p>
+                    <p style="color: #856404; margin-top: 0.5rem;"><strong>Hint:</strong> Check how the admin panel verifies user permissions...</p>
+                </div>
+            <% } %>
         </main>
     </div>
 </body>

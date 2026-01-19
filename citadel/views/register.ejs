@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Evil Capitalistic Corp</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 Register</h1>
+            <nav>
+                <a href="/">🏠 Home</a>
+                <a href="/login">🔐 Login</a>
+            </nav>
+        </header>
+        
+        <main style="padding: 3rem 2rem; max-width: 500px; margin: 0 auto;">
+            <div style="background: white; padding: 3rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                <h2 style="color: #1a1a2e; margin-bottom: 2rem; text-align: center;">Create Your Account</h2>
+                
+                <% if (error) { %>
+                    <div style="background: #f8d7da; border: 2px solid #dc3545; color: #721c24; padding: 1rem; border-radius: 5px; margin-bottom: 1.5rem;">
+                        <%= error %>
+                    </div>
+                <% } %>
+                
+                <% if (success) { %>
+                    <div style="background: #d4edda; border: 2px solid #28a745; color: #155724; padding: 1rem; border-radius: 5px; margin-bottom: 1.5rem;">
+                        <%= success %> <a href="/login" style="color: #155724; font-weight: 600;">Login now</a>
+                    </div>
+                <% } %>
+                
+                <form method="POST" action="/register">
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; color: #1a1a2e; font-weight: 600; margin-bottom: 0.5rem;">Username</label>
+                        <input type="text" name="username" required 
+                               style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 5px; font-size: 1rem;">
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; color: #1a1a2e; font-weight: 600; margin-bottom: 0.5rem;">Email</label>
+                        <input type="email" name="email" required 
+                               style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 5px; font-size: 1rem;">
+                    </div>
+                    
+                    <div style="margin-bottom: 2rem;">
+                        <label style="display: block; color: #1a1a2e; font-weight: 600; margin-bottom: 0.5rem;">Password</label>
+                        <input type="password" name="password" required 
+                               style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 5px; font-size: 1rem;">
+                    </div>
+                    
+                    <button type="submit" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #ffd700, #ffed4e); border: none; border-radius: 5px; color: #1a1a2e; font-weight: 700; font-size: 1.1rem; cursor: pointer;">
+                        Register
+                    </button>
+                </form>
+                
+                <p style="text-align: center; margin-top: 1.5rem; color: #666;">
+                    Already have an account? <a href="/login" style="color: #1a1a2e; font-weight: 600;">Login here</a>
+                </p>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

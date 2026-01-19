@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Evil Capitalistic Corp</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 Secure Login</h1>
+            <nav>
+                <a href="/">🏠 Home</a>
+                <a href="/register">📝 Register</a>
+            </nav>
+        </header>
+        
+        <main style="padding: 3rem 2rem; max-width: 500px; margin: 0 auto;">
+            <div style="background: white; padding: 3rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                <h2 style="color: #1a1a2e; margin-bottom: 2rem; text-align: center;">Login to Your Account</h2>
+                
+                <% if (error) { %>
+                    <div style="background: #f8d7da; border: 2px solid #dc3545; color: #721c24; padding: 1rem; border-radius: 5px; margin-bottom: 1.5rem;">
+                        <%= error %>
+                    </div>
+                <% } %>
+                
+                <form method="POST" action="/login">
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; color: #1a1a2e; font-weight: 600; margin-bottom: 0.5rem;">Username</label>
+                        <input type="text" name="username" required 
+                               style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 5px; font-size: 1rem;">
+                    </div>
+                    
+                    <div style="margin-bottom: 2rem;">
+                        <label style="display: block; color: #1a1a2e; font-weight: 600; margin-bottom: 0.5rem;">Password</label>
+                        <input type="password" name="password" required 
+                               style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 5px; font-size: 1rem;">
+                    </div>
+                    
+                    <button type="submit" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #ffd700, #ffed4e); border: none; border-radius: 5px; color: #1a1a2e; font-weight: 700; font-size: 1.1rem; cursor: pointer;">
+                        Login
+                    </button>
+                </form>
+                
+                <p style="text-align: center; margin-top: 1.5rem; color: #666;">
+                    Don't have an account? <a href="/register" style="color: #1a1a2e; font-weight: 600;">Register here</a>
+                </p>
+            </div>
+            
+            <div style="background: #d1ecf1; border: 2px dashed #0c5460; padding: 1.5rem; margin-top: 2rem; border-radius: 8px;">
+                <p style="color: #0c5460; font-weight: 600;">💡 Hacker Hint:</p>
+                <p style="color: #0c5460;">Try exploring other endpoints first. You might find some debug endpoints that reveal useful information about user accounts and their passwords...</p>
+                <p style="color: #0c5460; margin-top: 0.5rem;"><strong>Hint:</strong> Check /debug/users</p>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

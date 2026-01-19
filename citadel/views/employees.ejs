@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Directory - Evil Capitalistic Corp</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💼 Employee Directory</h1>
+            <nav>
+                <a href="/">🏠 Home</a>
+                <a href="/employees">👥 Employees</a>
+                <a href="/login">🔐 Login</a>
+            </nav>
+        </header>
+        
+        <main style="padding: 3rem 2rem;">
+            <h2>Our Underpaid Workforce</h2>
+            <p style="color: #666; margin-bottom: 2rem;">Browse our employee directory. Some information may be... accessible.</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem;">
+                <% employees.forEach(employee => { %>
+                    <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-left: 4px solid #1a1a2e;">
+                        <h3 style="color: #1a1a2e; margin-bottom: 0.5rem;"><%= employee.username %></h3>
+                        <p style="color: #666; margin: 0.3rem 0;"><strong>ID:</strong> <%= employee.id %></p>
+                        <p style="color: #666; margin: 0.3rem 0;"><strong>Email:</strong> <%= employee.email %></p>
+                        <p style="color: #666; margin: 0.3rem 0;"><strong>Department:</strong> <%= employee.department %></p>
+                        <a href="/user/<%= employee.id %>" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #ffd700; color: #1a1a2e; text-decoration: none; border-radius: 5px; font-weight: 600;">View Profile →</a>
+                    </div>
+                <% }); %>
+            </div>
+            
+            <div style="background: #fff3cd; border: 2px dashed #ffc107; padding: 1.5rem; margin-top: 3rem; border-radius: 8px;">
+                <p style="color: #856404; font-weight: 600;">💡 Hacker Hint:</p>
+                <p style="color: #856404;">Notice only regular employees are listed here. But what if there are more users in the system? Try incrementing the user ID in the URL...</p>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
