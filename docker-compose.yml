@@ -166,7 +166,7 @@ services:
       dockerfile: Dockerfile
     container_name: owasp-lab-a09
     ports:
-      - "3009:3009"
+      - "3009:3000"
     networks:
       - owasp-network
     restart: unless-stopped
@@ -177,7 +177,7 @@ services:
       dockerfile: Dockerfile
     container_name: owasp-lab-a10
     ports:
-      - "3010:3010"
+      - "3010:3000"
     networks:
       - owasp-network
     restart: unless-stopped
