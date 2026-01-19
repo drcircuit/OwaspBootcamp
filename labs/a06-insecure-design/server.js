@@ -253,26 +253,29 @@ app.get('/', (req, res) => {
   `);
 });
 
-// Example page - Educational walkthrough
+// Example page - Help & Info
 app.get('/example', (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html>
     <head>
-      <title>TacoTruck Express - How It Works</title>
+      <title>TacoTruck Express - About Us</title>
       ${styles}
     </head>
     <body>
       <div class="container">
-        <h1>🌮 HOW TACOTRUCK EXPRESS WORKS</h1>
+        <h1>🌮 ABOUT TACOTRUCK EXPRESS</h1>
         <div class="nav-links">
           <a href="/">🏠 Home</a>
         </div>
 
         <div class="section">
-          <h2>About Our Pre-Order System</h2>
+          <h2>Welcome to TacoTruck Express!</h2>
           <p>TacoTruck Express is a mobile food truck serving authentic Mexican street tacos. Our pre-order system lets customers place orders ahead of time, skip the line, and enjoy fresh tacos faster!</p>
-          <p>Our system handles:</p>
+        </div>
+
+        <div class="section">
+          <h2>Our Services</h2>
           <ul>
             <li><strong>Quick Orders:</strong> Place orders during lunch rush without waiting</li>
             <li><strong>Promo Codes:</strong> Various discounts for new customers, regulars, and special promotions</li>
@@ -282,140 +285,20 @@ app.get('/example', (req, res) => {
         </div>
 
         <div class="section">
-          <h2>📋 Common Design Patterns</h2>
-          
-          <h3>1. Order Rate Limiting</h3>
-          <div class="bad">
-            <strong>Vulnerable Approach:</strong> No order throttling
-            <pre><code>app.post('/api/order', (req, res) => {
-  const { items } = req.body;
-  // Process unlimited orders instantly!
-  placeOrder(items);
-  res.json({ success: true });
-});</code></pre>
-            <p><strong>Risk:</strong> System can be overwhelmed during rush hours</p>
-          </div>
-          <div class="good">
-            <strong>Secure Approach:</strong> Rate limiting for fair ordering
-            <pre><code>const rateLimit = require('express-rate-limit');
-
-const orderLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 3, // Max 3 orders per 5 minutes
-  message: 'Too many orders, please wait'
-});
-
-app.post('/api/order', orderLimiter, (req, res) => {
-  const { items } = req.body;
-  placeOrder(items);
-  res.json({ success: true });
-});</code></pre>
-          </div>
-
-          <h3>2. Discount Code Logic</h3>
-          <div class="bad">
-            <strong>Vulnerable Approach:</strong> No validation on code usage
-            <pre><code>app.post('/api/checkout', (req, res) => {
-  let total = 10.00;
-  const codes = req.body.promoCodes || [];
-  
-  // Apply all codes without checking!
-  codes.forEach(code => {
-    if (code === 'FIRST5') total -= 5;
-    if (code === 'TACO10') total *= 0.9;
-  });
-  
-  res.json({ total: total });
-});</code></pre>
-            <p><strong>Risk:</strong> Codes can be reused or stacked inappropriately</p>
-          </div>
-          <div class="good">
-            <strong>Secure Approach:</strong> Validate code usage rules
-            <pre><code>app.post('/api/checkout', (req, res) => {
-  let total = 10.00;
-  const codes = req.body.promoCodes || [];
-  const used = new Set();
-  
-  codes.forEach(code => {
-    if (!used.has(code)) {
-      if (code === 'FIRST5') total -= 5;
-      else if (code === 'TACO10') total *= 0.9;
-      used.add(code);
-      trackCodeUsage(code); // Prevent future reuse
-    }
-  });
-  
-  total = Math.max(0, total); // Never negative
-  res.json({ total: total });
-});</code></pre>
-          </div>
-
-          <h3>3. Balance Transactions</h3>
-          <div class="bad">
-            <strong>Vulnerable Approach:</strong> Check-then-act pattern
-            <pre><code>app.post('/api/pay', async (req, res) => {
-  const amount = req.body.amount;
-  const balance = await getBalance(userId);
-  
-  // Gap between check and payment!
-  if (balance >= amount) {
-    await deductBalance(userId, amount);
-    res.json({ success: true });
-  }
-});</code></pre>
-            <p><strong>Risk:</strong> Concurrent requests can overdraw balance</p>
-          </div>
-          <div class="good">
-            <strong>Secure Approach:</strong> Atomic transactions
-            <pre><code>app.post('/api/pay', async (req, res) => {
-  const amount = req.body.amount;
-  
-  try {
-    await db.transaction(async (trx) => {
-      const account = await trx('accounts')
-        .where('user_id', userId)
-        .forUpdate() // Lock during transaction
-        .first();
-      
-      if (account.balance < amount) {
-        throw new Error('Insufficient funds');
-      }
-      
-      await trx('accounts')
-        .where('user_id', userId)
-        .decrement('balance', amount);
-    });
-    res.json({ success: true });
-  } catch (e) {
-    res.json({ error: e.message });
-  }
-});</code></pre>
-          </div>
-        </div>
-
-        <div class="section">
-          <h2>✅ Best Practices for Food Ordering Systems</h2>
-          <ul>
-            <li><strong>Rate Limiting:</strong> Prevent order spam and ensure fair access</li>
-            <li><strong>Promo Code Management:</strong> Track usage and prevent abuse</li>
-            <li><strong>Transaction Safety:</strong> Use atomic operations for payments</li>
-            <li><strong>Input Validation:</strong> Verify all order data server-side</li>
-            <li><strong>Inventory Management:</strong> Real-time stock tracking</li>
-          </ul>
+          <h2>How It Works</h2>
+          <p><strong>1. Browse Menu:</strong> Check out our selection of authentic street tacos</p>
+          <p><strong>2. Place Order:</strong> Use our online system to order ahead</p>
+          <p><strong>3. Apply Rewards:</strong> Use promo codes or loyalty balance</p>
+          <p><strong>4. Pick Up:</strong> Skip the line and grab your fresh tacos!</p>
         </div>
 
         <div class="lab-info">
-          <h3>🎯 Ready to Test?</h3>
-          <p>Now that you understand how TacoTruck Express works, try the hands-on labs:</p>
-          <ul>
-            <li><strong>Lab 1:</strong> Test the order system under high volume</li>
-            <li><strong>Lab 2:</strong> Experiment with discount code combinations</li>
-            <li><strong>Lab 3:</strong> Try the loyalty rewards balance system</li>
-          </ul>
+          <h3>🎯 Ready to Order?</h3>
+          <p>Try our ordering system and see how easy it is to get delicious tacos on the go!</p>
         </div>
 
         <div class="nav-links">
-          <a href="/lab1">Start Lab 1 →</a>
+          <a href="/lab1">Start Ordering →</a>
         </div>
       </div>
     </body>
@@ -450,36 +333,16 @@ app.get('/lab1', (req, res) => {
         <div class="section">
           <h2>🌮 Challenge Description</h2>
           <p>TacoTruck Express prides itself on fast service. During lunch rush, customers can place multiple orders without waiting. Our system handles high-volume ordering!</p>
-          <p>Your task: Test the order verification system by placing orders rapidly. Try to make at least 10 order verification requests.</p>
-        </div>
-
-        <div class="endpoint">
-          <strong>API Endpoint:</strong><br>
-          <code>POST http://localhost:3006/api/lab1/verify-order</code><br>
-          <code>Content-Type: application/json</code><br><br>
-          <strong>Body:</strong><br>
-          <code>{"orderCode": "TACO123"}</code>
+          <p>Your task: Test the order verification system. See if you can place orders as quickly as our system can handle them!</p>
         </div>
 
         <div class="hint-box">
-          <strong>💡 Hints:</strong>
+          <strong>💡 Tips:</strong>
           <ul>
             <li>Our system prioritizes speed - no delays!</li>
-            <li>Try making at least 10 rapid order verifications</li>
-            <li>Use a loop or script to test the system under load</li>
-            <li>The actual order code doesn't matter for testing</li>
+            <li>Try making rapid order verifications to test system capacity</li>
+            <li>Multiple requests help test our infrastructure</li>
           </ul>
-        </div>
-
-        <div class="section">
-          <h2>🛠️ Testing Instructions</h2>
-          <p><strong>Using bash:</strong></p>
-          <pre><code>for i in {1..15}; do
-  curl -X POST http://localhost:3006/api/lab1/verify-order \\
-    -H "Content-Type: application/json" \\
-    -d '{"orderCode":"TACO123"}'
-  echo ""
-done</code></pre>
         </div>
 
         <div style="text-align: center; margin-top: 40px;">
@@ -518,15 +381,7 @@ app.get('/lab2', (req, res) => {
         <div class="section">
           <h2>🎟️ Challenge Description</h2>
           <p>TacoTruck Express loves rewarding customers with discount codes! Our checkout system allows you to apply multiple promo codes to get the best deal.</p>
-          <p>Your task: Combine discount codes creatively to get tacos for free (or even better - make the price negative and earn credit!).</p>
-        </div>
-
-        <div class="endpoint">
-          <strong>API Endpoint:</strong><br>
-          <code>POST http://localhost:3006/api/lab2/checkout</code><br>
-          <code>Content-Type: application/json</code><br><br>
-          <strong>Body:</strong><br>
-          <code>{"price": 10, "discountCodes": ["FIRST5", "TACO10"]}</code>
+          <p>Your task: Combine discount codes creatively to maximize your savings. Can you get an amazing deal on your taco order?</p>
         </div>
 
         <div class="section">
@@ -540,21 +395,12 @@ app.get('/lab2', (req, res) => {
         </div>
 
         <div class="hint-box">
-          <strong>💡 Hints:</strong>
+          <strong>💡 Tips:</strong>
           <ul>
-            <li>What if you use the same code multiple times?</li>
-            <li>Can you stack all the codes together?</li>
-            <li>Try different combinations and orders</li>
-            <li>What happens when the total goes below $0?</li>
+            <li>Try different code combinations</li>
+            <li>Experiment with applying codes in different orders</li>
+            <li>See what happens when you stack multiple discounts</li>
           </ul>
-        </div>
-
-        <div class="section">
-          <h2>🛠️ Testing Instructions</h2>
-          <p><strong>Using curl:</strong></p>
-          <pre><code>curl -X POST http://localhost:3006/api/lab2/checkout \\
-  -H "Content-Type: application/json" \\
-  -d '{"price": 10, "discountCodes": ["FIRST5"]}'</code></pre>
         </div>
 
         <div style="text-align: center; margin-top: 40px;">
@@ -595,263 +441,3 @@ app.get('/lab3', (req, res) => {
           <p>TacoTruck Express rewards loyal customers with account credits. Your account has a $50.00 balance that you can use for orders. The system processes payments in real-time!</p>
           <p>Your task: Try to place multiple orders at the same time. Our fast system might process them all if you're quick enough!</p>
         </div>
-
-        <div class="endpoint">
-          <strong>API Endpoints:</strong><br>
-          <code>GET http://localhost:3006/api/lab3/balance</code> - Check loyalty balance<br>
-          <code>POST http://localhost:3006/api/lab3/withdraw</code> - Use balance for order<br>
-          <code>Content-Type: application/json</code><br><br>
-          <strong>Order Body:</strong><br>
-          <code>{"amount": 15}</code>
-        </div>
-
-        <div class="section">
-          <h2>💳 Your Loyalty Account</h2>
-          <ul style="font-size: 1.1em;">
-            <li><strong>Available Balance:</strong> $50.00</li>
-            <li><strong>Taco Order Size:</strong> Try $15 per order</li>
-            <li><strong>Challenge:</strong> Order more than $50 worth of tacos!</li>
-          </ul>
-        </div>
-
-        <div class="hint-box">
-          <strong>💡 Hints:</strong>
-          <ul>
-            <li>Place multiple orders at the exact same moment</li>
-            <li>All orders should check the balance before any payment processes</li>
-            <li>Use concurrent requests (curl with &, or a script)</li>
-            <li>Try 4 orders of $15 simultaneously ($60 total from $50 balance!)</li>
-          </ul>
-        </div>
-
-        <div class="section">
-          <h2>🛠️ Testing Instructions</h2>
-          <p><strong>Using bash with concurrent orders:</strong></p>
-          <pre><code># Place 4 concurrent $15 orders
-for i in {1..4}; do
-  curl -X POST http://localhost:3006/api/lab3/withdraw \\
-    -H "Content-Type: application/json" \\
-    -d '{"amount": 15}' &
-done
-wait
-
-# Check your balance
-curl http://localhost:3006/api/lab3/balance</code></pre>
-
-          <p><strong>Or use Python for rapid-fire orders:</strong></p>
-          <pre><code>import requests
-import concurrent.futures
-
-def place_order():
-    return requests.post('http://localhost:3006/api/lab3/withdraw',
-                        json={'amount': 15})
-
-with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-    futures = [executor.submit(place_order) for _ in range(4)]
-    results = [f.result().json() for f in futures]
-
-for r in results:
-    print(r)</code></pre>
-        </div>
-
-        <div style="text-align: center; margin-top: 40px;">
-          <a href="/">← Back to Home</a>
-        </div>
-      </div>
-    </body>
-    </html>
-  `);
-});
-
-// LAB 1: Rate Limiting vulnerability
-app.post('/api/lab1/verify-order', (req, res) => {
-  const { orderCode } = req.body;
-  const clientIp = req.ip || 'unknown';
-  
-  // Track attempts (but don't actually limit them - that's the vulnerability!)
-  if (!orderAttempts[clientIp]) {
-    orderAttempts[clientIp] = [];
-  }
-  
-  // Clean up old attempts (older than 1 hour) to prevent memory leaks
-  const oneHourAgo = Date.now() - (60 * 60 * 1000);
-  orderAttempts[clientIp] = orderAttempts[clientIp].filter(timestamp => timestamp > oneHourAgo);
-  
-  orderAttempts[clientIp].push(Date.now());
-  const attemptCount = orderAttempts[clientIp].length;
-  
-  // VULNERABLE: No rate limiting!
-  if (attemptCount >= 10) {
-    return res.json({
-      success: true,
-      message: 'Order verified! Wow, you can really order fast!',
-      attempts: attemptCount,
-      flag: 'TACO{R4T3_L1M1T_M1SS1NG_3XTR4_GU4C}',
-      vulnerability: 'No rate limiting on order verification!',
-      explanation: 'You placed ' + attemptCount + ' rapid orders with no throttling. In a real system, this could overwhelm the kitchen!'
-    });
-  }
-  
-  res.json({
-    success: true,
-    message: 'Order code verified',
-    attempts: attemptCount,
-    hint: 'Keep ordering! No rate limiting in place. Make at least 10 rapid verification requests.'
-  });
-});
-
-// LAB 2: Business Logic Flaw
-app.post('/api/lab2/checkout', (req, res) => {
-  let { price, discountCodes } = req.body;
-  
-  if (!price || !discountCodes || !Array.isArray(discountCodes)) {
-    return res.json({
-      error: 'Invalid request',
-      example: '{"price": 10, "discountCodes": ["FIRST5", "TACO10"]}'
-    });
-  }
-  
-  const originalPrice = price;
-  const discountsApplied = [];
-  
-  // VULNERABLE: No validation that codes can't be reused!
-  discountCodes.forEach(code => {
-    if (code === 'FIRST5') {
-      price -= 5;
-      discountsApplied.push('FIRST5 (-$5)');
-    } else if (code === 'TACO10') {
-      price -= price * 0.10;
-      discountsApplied.push('TACO10 (-10%)');
-    } else if (code === 'LUNCH15') {
-      price -= price * 0.15;
-      discountsApplied.push('LUNCH15 (-15%)');
-    } else if (code === 'FREEGUAC') {
-      price -= 2.50;
-      discountsApplied.push('FREEGUAC (-$2.50)');
-    }
-  });
-  
-  const response = {
-    originalPrice: originalPrice,
-    discountsApplied: discountsApplied,
-    finalPrice: price.toFixed(2),
-    totalSaved: (originalPrice - price).toFixed(2)
-  };
-  
-  // Award flag if price is 0 or negative
-  if (price <= 0) {
-    response.flag = 'TACO{L0G1C_FL4W_FR33_GU4C4M0L3}';
-    response.vulnerability = 'Business logic flaw: Same discount code can be applied multiple times!';
-    response.explanation = 'You exploited the missing validation to stack codes and get free tacos (or even earn credit)!';
-  } else if (discountsApplied.length > 1) {
-    response.hint = 'Good job stacking codes! Can you get it to $0 or negative?';
-  } else {
-    response.hint = 'Try applying multiple discount codes. Can you use the same code more than once?';
-  }
-  
-  res.json(response);
-});
-
-// LAB 3: Race Condition - Check Balance
-app.get('/api/lab3/balance', (req, res) => {
-  res.json({
-    balance: accountBalances['customer123'],
-    orderHistory: orderHistory,
-    totalSpent: orderHistory.reduce((sum, order) => sum + order.amount, 0)
-  });
-});
-
-// LAB 3: Race Condition - Reset Balance
-app.post('/api/lab3/reset', (req, res) => {
-  accountBalances['customer123'] = 50.00;
-  orderHistory.length = 0;
-  res.json({
-    message: 'Loyalty balance reset to $50.00',
-    balance: accountBalances['customer123']
-  });
-});
-
-// LAB 3: Race Condition vulnerability
-app.post('/api/lab3/withdraw', async (req, res) => {
-  const { amount } = req.body;
-  
-  if (!amount || amount <= 0) {
-    return res.json({
-      success: false,
-      error: 'Invalid order amount'
-    });
-  }
-  
-  const customerId = 'customer123';
-  
-  // VULNERABLE: Check balance BEFORE modifying it
-  // This creates a race condition window
-  if (accountBalances[customerId] >= amount) {
-    // Simulate processing delay (makes race condition easier to exploit)
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    // VULNERABLE: Another request could have passed the check above
-    accountBalances[customerId] -= amount;
-    
-    const order = {
-      amount: amount,
-      timestamp: new Date().toISOString(),
-      balanceAfter: accountBalances[customerId]
-    };
-    
-    orderHistory.push(order);
-    
-    const totalSpent = orderHistory.reduce((sum, o) => sum + o.amount, 0);
-    
-    const response = {
-      success: true,
-      message: 'Order placed! Payment processed from loyalty balance.',
-      orderAmount: amount,
-      balanceAfter: accountBalances[customerId].toFixed(2),
-      totalSpent: totalSpent.toFixed(2)
-    };
-    
-    // Award flag if total spent exceeds initial balance
-    if (totalSpent > 50) {
-      response.flag = 'TACO{R4C3_C0ND1T10N_3XTR4_T4C0S}';
-      response.vulnerability = 'Race condition exploited!';
-      response.explanation = 'You ordered $' + totalSpent.toFixed(2) + ' worth of tacos from a $50.00 balance! The system processed simultaneous orders before updating the balance.';
-    } else if (accountBalances[customerId] < 0) {
-      response.hint = 'Balance is negative but not enough orders yet. Try more concurrent requests!';
-    }
-    
-    res.json(response);
-  } else {
-    res.json({
-      success: false,
-      error: 'Insufficient loyalty balance',
-      balance: accountBalances[customerId].toFixed(2),
-      requested: amount,
-      hint: 'Place multiple orders at the exact same time to exploit the race condition'
-    });
-  }
-});
-
-// Status endpoint
-app.get('/api/status', (req, res) => {
-  res.json({
-    service: 'TacoTruck Express - Pre-Order System',
-    port: PORT,
-    version: '1.0.0',
-    labs: {
-      lab1: 'Order System (Rate Limiting)',
-      lab2: 'Discount Codes (Logic Flaw)',
-      lab3: 'Account Balance (Race Condition)'
-    }
-  });
-});
-
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🌮 TacoTruck Express running on port ${PORT}`);
-  console.log('Available endpoints:');
-  console.log('  http://localhost:3006/ - Home');
-  console.log('  http://localhost:3006/example - Tutorial');
-  console.log('  http://localhost:3006/lab1 - Order System Lab');
-  console.log('  http://localhost:3006/lab2 - Discount Codes Lab');
-  console.log('  http://localhost:3006/lab3 - Account Balance Lab');
-});

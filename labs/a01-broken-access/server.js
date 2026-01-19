@@ -188,13 +188,13 @@ app.get('/', (req, res) => {
     `);
 });
 
-// Example page - Member Portal Guide
+// Example page - Help & Info
 app.get('/example', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Getting Started - ZenFlow Yoga</title>
+            <title>Member Portal Help - ZenFlow Yoga</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
@@ -238,11 +238,6 @@ app.get('/example', (req, res) => {
                     margin-bottom: 15px;
                     font-size: 1.8em;
                 }
-                .section h3 {
-                    color: #43a047;
-                    margin-top: 20px;
-                    margin-bottom: 10px;
-                }
                 .section p {
                     color: #555;
                     margin-bottom: 15px;
@@ -255,13 +250,6 @@ app.get('/example', (req, res) => {
                     margin: 15px 0;
                     border-left: 3px solid #66bb6a;
                 }
-                .tip-box {
-                    background: #fff3e0;
-                    border-left: 4px solid #fb8c00;
-                    padding: 15px;
-                    margin: 15px 0;
-                    border-radius: 5px;
-                }
                 ul {
                     margin-left: 20px;
                     margin-bottom: 15px;
@@ -269,20 +257,6 @@ app.get('/example', (req, res) => {
                 ul li {
                     margin: 8px 0;
                     color: #555;
-                }
-                .btn {
-                    display: inline-block;
-                    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
-                    color: white;
-                    padding: 12px 30px;
-                    border-radius: 25px;
-                    text-decoration: none;
-                    font-weight: 600;
-                    transition: transform 0.2s;
-                    margin-top: 10px;
-                }
-                .btn:hover {
-                    transform: translateY(-2px);
                 }
                 .back-link {
                     text-align: center;
@@ -298,13 +272,13 @@ app.get('/example', (req, res) => {
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>🧘 Getting Started with Your Member Portal</h1>
-                    <p class="subtitle">Everything you need to know about accessing and managing your ZenFlow membership</p>
+                    <h1>🧘 Member Portal Help</h1>
+                    <p class="subtitle">Your guide to ZenFlow membership features</p>
                 </div>
 
                 <div class="section">
                     <h2>🌟 Welcome to ZenFlow!</h2>
-                    <p>We're thrilled to have you as part of our yoga community. This guide will help you navigate your member portal and make the most of your membership.</p>
+                    <p>We're thrilled to have you as part of our yoga community. Your member portal provides easy access to all the features you need to manage your membership.</p>
                     
                     <div class="feature-box">
                         <h3>Your Member Benefits</h3>
@@ -314,101 +288,6 @@ app.get('/example', (req, res) => {
                             <li><strong>Personal Profile:</strong> Track your progress and manage your account</li>
                             <li><strong>Online Resources:</strong> Access meditation guides and yoga tutorials</li>
                         </ul>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2>🎓 Interactive Tutorials</h2>
-                    <p>Learn how to interact with our API and explore member features through these hands-on exercises:</p>
-                </div>
-
-                <div class="section">
-                    <h2>📱 Part 1: Browser DevTools - Member Discovery</h2>
-                    <p>Learn how to browse member profiles using browser developer tools:</p>
-                    
-                    <h3>Tutorial Steps:</h3>
-                    <ol style="margin-left: 20px; color: #555;">
-                        <li>Open your browser's Developer Tools (F12 or Right-click → Inspect)</li>
-                        <li>Go to the Network tab to monitor API requests</li>
-                        <li>Visit this URL in your browser: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">/api/example/part1/member/100</code></li>
-                        <li>Notice the JSON response showing member profile data</li>
-                        <li>Try different member IDs (101, 102, etc.) to browse profiles</li>
-                        <li><strong>Challenge:</strong> Find the hidden VIP member profile (ID 108)!</li>
-                    </ol>
-                    
-                    <div class="tip-box">
-                        💡 <strong>Learning Goal:</strong> Understand how web applications expose data through APIs and how sequential IDs can be enumerated to discover hidden resources.
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2>💻 Part 2: Command Line - cURL Access</h2>
-                    <p>Explore how to interact with APIs using command-line tools:</p>
-                    
-                    <h3>Tutorial Steps:</h3>
-                    <ol style="margin-left: 20px; color: #555;">
-                        <li>Open your terminal or command prompt</li>
-                        <li>Run this cURL command: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">curl http://localhost:3000/api/example/part2/test</code></li>
-                        <li>Observe the JSON response indicating successful cURL access</li>
-                        <li>Compare: Try accessing the same URL in your browser to see the difference</li>
-                    </ol>
-                    
-                    <div class="feature-box">
-                        <h3>What You'll Learn:</h3>
-                        <p>This endpoint checks the User-Agent header to determine if the request came from cURL. It demonstrates how APIs can detect and respond differently to various client types.</p>
-                    </div>
-                    
-                    <div class="tip-box">
-                        💡 <strong>Learning Goal:</strong> Discover how HTTP headers work and how command-line tools can access APIs in ways browsers typically cannot.
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2>🔍 Part 3: Request Interception - Parameter Manipulation</h2>
-                    <p>Learn how to intercept and modify HTTP requests to change application behavior:</p>
-                    
-                    <h3>Tutorial Steps (Using Browser DevTools):</h3>
-                    <ol style="margin-left: 20px; color: #555;">
-                        <li>Visit: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">/api/example/part3/intercept</code></li>
-                        <li>Notice you receive "member" level access by default</li>
-                        <li>Now modify the URL to include an access parameter: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">/api/example/part3/intercept?access=instructor</code></li>
-                        <li>Observe how changing the parameter grants instructor-level access!</li>
-                    </ol>
-                    
-                    <h3>Advanced: Using Burp Suite (Optional):</h3>
-                    <ol style="margin-left: 20px; color: #555;">
-                        <li>Configure your browser to use Burp Suite as a proxy</li>
-                        <li>Enable request interception in Burp Suite</li>
-                        <li>Make a request to <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">/api/example/part3/intercept</code></li>
-                        <li>Intercept the request and add <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">?access=instructor</code> to the URL</li>
-                        <li>Forward the modified request to gain elevated access</li>
-                    </ol>
-                    
-                    <div class="tip-box">
-                        💡 <strong>Learning Goal:</strong> Understand how URL parameters control access levels and why applications should never trust client-provided access control parameters.
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2>🔢 Part 4: Sequential Enumeration - Finding All Members</h2>
-                    <p>Practice systematic enumeration to discover all records in a system:</p>
-                    
-                    <h3>Tutorial Steps:</h3>
-                    <ol style="margin-left: 20px; color: #555;">
-                        <li>Start with member ID 100: <code style="background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; color: #c62828;">/api/example/part4/enumerate/100</code></li>
-                        <li>Notice the response includes your enumeration progress</li>
-                        <li>Continue with IDs 101, 102, 103, 104, and 105</li>
-                        <li><strong>Challenge:</strong> Find all 6 active members (IDs 100-105) to receive the flag!</li>
-                    </ol>
-                    
-                    <h3>Automation Tip (Advanced):</h3>
-                    <p style="margin-left: 20px; color: #555; margin-top: 10px;">You can automate enumeration using a bash loop:</p>
-                    <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin-left: 20px; overflow-x: auto; font-family: monospace; font-size: 0.9em; color: #333;">for i in {100..105}; do
-  curl http://localhost:3000/api/example/part4/enumerate/$i
-done</pre>
-                    
-                    <div class="tip-box">
-                        💡 <strong>Learning Goal:</strong> Learn how predictable, sequential IDs allow attackers to enumerate all records in a database, exposing sensitive information at scale.
                     </div>
                 </div>
 
@@ -574,21 +453,6 @@ app.get('/lab1', (req, res) => {
                         </div>
                     </div>
                     
-                    <div class="tip-box">
-                        💡 <strong>How to Connect:</strong> Use the member lookup API to find other members by their ID. The API returns basic contact information to help you connect with your community.
-                    </div>
-                </div>
-
-                <div class="info-section">
-                    <h2>📡 API Information</h2>
-                    <p>Developers and members can use our API to programmatically access the directory:</p>
-                    <p style="margin-top: 15px;">
-                        <strong>Endpoint:</strong> <code>GET /api/members/user/:id</code><br>
-                        <strong>Example:</strong> <code>GET /api/members/user/2</code>
-                    </p>
-                    <p style="margin-top: 15px; color: #666; font-size: 0.95em;">
-                        This endpoint returns public profile information for community members. All members can view basic contact details to facilitate connections within our yoga community.
-                    </p>
                 </div>
 
                 <div class="back-link">
@@ -830,12 +694,6 @@ app.get('/lab2', (req, res) => {
                         <div class="field-label">Billing Status:</div>
                         <div class="field-value">✅ Active</div>
                     </div>
-                    
-                    <div class="info-box">
-                        <p><strong>🔒 Secure Profile Access</strong></p>
-                        <p style="margin-top: 10px;">Your profile information is private and accessible only through our secure API at <code>GET /api/profile/user/${CURRENT_USER_ID}</code></p>
-                        <p style="margin-top: 10px; font-size: 0.9em; color: #777;">This data is encrypted and protected by our authentication system.</p>
-                    </div>
                 </div>
 
                 <div class="back-link">
@@ -1030,17 +888,6 @@ app.get('/lab3', (req, res) => {
                         <li>Experience teaching group classes</li>
                     </ul>
                     <p style="margin-top: 15px;">Contact <strong>careers@zenflow.yoga</strong> for more information about joining our teaching staff.</p>
-                </div>
-
-                <div class="info-section">
-                    <h2>🔧 Technical Information</h2>
-                    <p>The instructor dashboard is accessed through a staff-only API endpoint:</p>
-                    <p style="margin-top: 15px;">
-                        <strong>Endpoint:</strong> <code>GET /api/instructor/user/:id/dashboard</code>
-                    </p>
-                    <p style="margin-top: 10px; color: #777; font-size: 0.9em;">
-                        This endpoint verifies instructor credentials and role-based permissions before granting access to administrative features.
-                    </p>
                 </div>
 
                 <div class="back-link">

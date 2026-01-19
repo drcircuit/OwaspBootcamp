@@ -234,264 +234,51 @@ app.get('/', (req, res) => {
   `);
 });
 
-// Example page
+// Example page - Help & Info
 app.get('/example', (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html>
     <head>
-      <title>PawSpa Grooming �� - Appointment System - Example</title>
+      <title>PawSpa Grooming 🐾 - About Our System</title>
       <style>${pawspaStyles}</style>
     </head>
     <body>
       <div class="container">
-        <h1>📚 AUTHENTICATION FAILURES - EDUCATIONAL EXAMPLE</h1>
+        <h1>🐾 ABOUT PAWSPA GROOMING</h1>
         <p><a href="/">← Back to Navigation</a></p>
 
         <div class="section">
-          <h2>Understanding PawSpa Grooming</h2>
-          <p>Authentication and session management are critical for application security. When implemented incorrectly, they become prime targets for attackers.</p>
-        </div>
-
-        <div class="section vulnerable">
-          <h2>❌ Vulnerability 1: Weak Password Policies</h2>
-          <p>Many applications accept passwords that are trivial to guess or brute force.</p>
-          
-          <h3>Vulnerable Code:</h3>
-          <div class="code"><pre>// BAD: No password strength requirements
-app.post('/register', (req, res) => {
-  const { username, password } = req.body;
-  
-  // Accepts ANY password - even "123" or "a"
-  if (password.length > 0) {
-    users.push({ username, password });
-    return res.json({ success: true });
-  }
-});</pre></div>
-
-          <h3>Why It's Dangerous:</h3>
-          <ul>
-            <li>Passwords like "123", "password", or "abc" can be cracked instantly</li>
-            <li>Attackers use dictionaries of common passwords</li>
-            <li>Credential stuffing attacks use leaked passwords from other breaches</li>
-          </ul>
-        </div>
-
-        <div class="section secure">
-          <h2>✅ Secure Implementation: Strong Password Policy</h2>
-          <div class="code"><pre>// GOOD: Enforce strong password requirements
-const validatePassword = (password) => {
-  if (password.length < 12) return { valid: false, reason: 'Too short' };
-  if (!/[A-Z]/.test(password)) return { valid: false, reason: 'No uppercase' };
-  if (!/[a-z]/.test(password)) return { valid: false, reason: 'No lowercase' };
-  if (!/[0-9]/.test(password)) return { valid: false, reason: 'No numbers' };
-  if (!/[!@#$%^&*]/.test(password)) return { valid: false, reason: 'No special chars' };
-  
-  // Check against common password list
-  if (commonPasswords.includes(password)) {
-    return { valid: false, reason: 'Too common' };
-  }
-  
-  return { valid: true };
-};
-
-app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  
-  const validation = validatePassword(password);
-  if (!validation.valid) {
-    return res.status(400).json({ error: validation.reason });
-  }
-  
-  // Hash password with strong algorithm (bcrypt, argon2)
-  const hashedPassword = await bcrypt.hash(password, 12);
-  users.push({ username, password: hashedPassword });
-  
-  res.json({ success: true });
-});</pre></div>
-        </div>
-
-        <div class="section vulnerable">
-          <h2>❌ Vulnerability 2: Predictable Session IDs</h2>
-          <p>Sequential or easily guessable session identifiers allow attackers to hijack other users' sessions.</p>
-          
-          <h3>Vulnerable Code:</h3>
-          <div class="code"><pre>// BAD: Predictable sequential session IDs
-let sessionCounter = 1000;
-
-app.post('/login', (req, res) => {
-  const sessionId = sessionCounter++;  // 1000, 1001, 1002...
-  sessions[sessionId] = { username: req.body.username };
-  
-  res.json({ 
-    success: true, 
-    sessionId: sessionId  // Exposed to client!
-  });
-});</pre></div>
-
-          <h3>Why It's Dangerous:</h3>
-          <ul>
-            <li>Attacker can guess other users' session IDs (1001, 1002, 1003...)</li>
-            <li>Session IDs exposed in responses can be incremented/decremented</li>
-            <li>No entropy - deterministic pattern is trivial to predict</li>
-          </ul>
-        </div>
-
-        <div class="section secure">
-          <h2>✅ Secure Implementation: Cryptographically Random Sessions</h2>
-          <div class="code"><pre>// GOOD: Use cryptographically secure random tokens
-const crypto = require('crypto');
-
-app.post('/login', (req, res) => {
-  // Generate 32 bytes of random data = 256 bits of entropy
-  const sessionToken = crypto.randomBytes(32).toString('hex');
-  
-  sessions[sessionToken] = {
-    username: req.body.username,
-    createdAt: Date.now(),
-    expiresAt: Date.now() + (30 * 60 * 1000)  // 30 minutes
-  };
-  
-  // Set as HttpOnly, Secure, SameSite cookie
-  res.cookie('session', sessionToken, {
-    httpOnly: true,   // Prevent JavaScript access
-    secure: true,     // HTTPS only
-    sameSite: 'strict',  // CSRF protection
-    maxAge: 30 * 60 * 1000
-  });
-  
-  res.json({ success: true });
-  // Note: sessionToken NOT exposed in response
-});</pre></div>
-        </div>
-
-        <div class="section vulnerable">
-          <h2>❌ Vulnerability 3: Session Fixation</h2>
-          <p>Attacker tricks user into authenticating with a session ID controlled by the attacker.</p>
-          
-          <h3>Vulnerable Code:</h3>
-          <div class="code"><pre>// BAD: Reuses session ID after authentication
-app.post('/login', (req, res) => {
-  const sessionId = req.cookies.session || generateSession();
-  
-  // Authenticates but keeps same session ID!
-  sessions[sessionId] = { 
-    username: req.body.username,
-    authenticated: true 
-  };
-  
-  res.cookie('session', sessionId);
-  res.json({ success: true });
-});</pre></div>
-
-          <h3>Attack Scenario:</h3>
-          <div class="code"><pre>1. Attacker creates session: abc123
-2. Attacker sends victim link: example.com?session=abc123
-3. Victim logs in with that session
-4. Attacker now has authenticated session abc123</pre></div>
-        </div>
-
-        <div class="section secure">
-          <h2>✅ Secure Implementation: Regenerate Session on Login</h2>
-          <div class="code"><pre>// GOOD: Always generate NEW session after authentication
-app.post('/login', (req, res) => {
-  const oldSessionId = req.cookies.session;
-  
-  // Verify credentials first
-  const user = authenticateUser(req.body.username, req.body.password);
-  if (!user) {
-    return res.status(401).json({ error: 'Invalid credentials' });
-  }
-  
-  // Delete old session (if exists)
-  if (oldSessionId) {
-    delete sessions[oldSessionId];
-  }
-  
-  // Create NEW session after successful authentication
-  const newSessionId = crypto.randomBytes(32).toString('hex');
-  sessions[newSessionId] = {
-    username: user.username,
-    authenticatedAt: Date.now()
-  };
-  
-  res.cookie('session', newSessionId, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'strict'
-  });
-  
-  res.json({ success: true });
-});</pre></div>
-        </div>
-
-        <div class="section vulnerable">
-          <h2>❌ Vulnerability 4: No Multi-Factor Authentication (MFA)</h2>
-          <p>Single-factor authentication (password only) is vulnerable to:</p>
-          <ul>
-            <li>Phishing attacks</li>
-            <li>Password database breaches</li>
-            <li>Keyloggers and malware</li>
-            <li>Social engineering</li>
-          </ul>
-        </div>
-
-        <div class="section secure">
-          <h2>✅ Secure Implementation: Multi-Factor Authentication</h2>
-          <div class="code"><pre>// GOOD: Require second factor (TOTP, SMS, hardware key)
-app.post('/login', async (req, res) => {
-  const { username, password, totpCode } = req.body;
-  
-  // First factor: password
-  const user = await verifyPassword(username, password);
-  if (!user) {
-    return res.status(401).json({ error: 'Invalid credentials' });
-  }
-  
-  // Second factor: Time-based One-Time Password
-  const validTOTP = speakeasy.totp.verify({
-    secret: user.totpSecret,
-    encoding: 'base32',
-    token: totpCode,
-    window: 2  // Allow 60 second time drift
-  });
-  
-  if (!validTOTP) {
-    return res.status(401).json({ error: 'Invalid 2FA code' });
-  }
-  
-  // Both factors verified - create session
-  const sessionId = crypto.randomBytes(32).toString('hex');
-  sessions[sessionId] = { username: user.username };
-  
-  res.cookie('session', sessionId, { httpOnly: true, secure: true });
-  res.json({ success: true });
-});</pre></div>
+          <h2>Welcome to PawSpa Grooming!</h2>
+          <p>PawSpa Grooming provides premium pet grooming services with a convenient online appointment system. Book appointments, manage your pet profiles, and track service history all in one place.</p>
         </div>
 
         <div class="section">
-          <h2>🎯 Prevention Best Practices</h2>
+          <h2>Our Services</h2>
           <ul>
-            <li><strong>Password Policies:</strong> Minimum 12 characters, complexity requirements, check against breach databases</li>
-            <li><strong>Strong Session Management:</strong> Cryptographically random tokens, regenerate on login, implement expiration</li>
-            <li><strong>Multi-Factor Authentication:</strong> Require 2FA for sensitive operations</li>
-            <li><strong>Account Lockout:</strong> Temporarily lock accounts after failed login attempts</li>
-            <li><strong>Rate Limiting:</strong> Prevent brute force attacks on login endpoints</li>
-            <li><strong>Secure Storage:</strong> Hash passwords with bcrypt/argon2, never store plaintext</li>
-            <li><strong>Session Security:</strong> HttpOnly, Secure, SameSite cookies</li>
-            <li><strong>Monitoring:</strong> Log and alert on suspicious authentication patterns</li>
+            <li><strong>Full Grooming:</strong> Complete bath, haircut, and styling</li>
+            <li><strong>Bath & Brush:</strong> Refreshing bath with thorough brushing</li>
+            <li><strong>Nail Trim:</strong> Professional nail trimming and filing</li>
+            <li><strong>Specialty Services:</strong> De-shedding, flea treatments, and more</li>
           </ul>
         </div>
 
         <div class="section">
-          <h2>📖 Ready to Practice?</h2>
-          <p>Now that you understand authentication failures, try the labs:</p>
-          <div class="nav-links">
-            <a href="/lab1" class="nav-link">Lab 1 - Login Portal</a>
-            <a href="/lab2" class="nav-link">Lab 2 - Predictable Sessions</a>
-            <a href="/lab3" class="nav-link">Lab 3 - Account Recovery</a>
-          </div>
+          <h2>Security & Privacy</h2>
+          <p>We take the security of your account and your pet's information seriously. Our system uses industry-standard authentication and data protection measures to keep your information safe.</p>
         </div>
+
+        <div class="section">
+          <h2>Account Features</h2>
+          <ul>
+            <li>Secure login with password protection</li>
+            <li>Appointment history tracking</li>
+            <li>Multiple pet profiles</li>
+            <li>Email notifications and reminders</li>
+          </ul>
+        </div>
+
+        <p style="margin-top: 30px;"><a href="/">← Back to Navigation</a></p>
       </div>
     </body>
     </html>
@@ -912,9 +699,6 @@ app.get('/lab3', (req, res) => {
 
         <div class="section warning">
           <h2>⚠️ Advanced Challenge</h2>
-          <p>For a real exploit, use <code>curl</code> or browser DevTools to manually set the session cookie:</p>
-          <div class="code"><pre>curl http://localhost:3007/api/lab3/profile \\
-  -H "Cookie: session=5001"</pre></div>
         </div>
       </div>
 

@@ -239,178 +239,33 @@ app.get('/', (req, res) => {
 });
 
 // Example Page
+// Example page - Help & Info
 app.get('/example', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>A08: Integrity Failures - Examples</title>
-      <meta charset="UTF-8">
-      ${harvestStyles}
-    </head>
-    <body>
-      <div class="container">
-        <h1>📚 SOFTWARE AND DATA INTEGRITY FAILURES</h1>
-        <p class="subtitle">Educational Walkthrough</p>
-        
-        <div class="nav-links">
-          <a href="/">🏠 Home</a>
-        </div>
-
-        <h2>What are Integrity Failures?</h2>
-        <div class="info-box">
-          <p>Software and data integrity failures occur when code and infrastructure do not protect against integrity violations. This includes:</p>
-          <ul>
-            <li><strong>Unsigned Updates:</strong> Software updates without digital signatures</li>
-            <li><strong>No Checksums:</strong> Downloads without hash verification</li>
-            <li><strong>Insecure CI/CD:</strong> Compromised build pipelines</li>
-            <li><strong>Unsafe Deserialization:</strong> Untrusted data execution</li>
-          </ul>
-        </div>
-
-        <h2>Vulnerability Examples</h2>
-
-        <div class="vulnerable">
-          <h3>❌ Vulnerable: Update Without Signature</h3>
-          <pre>
-// Checking for updates without verification
-async function checkForUpdate() {
-  const response = await fetch('https://cdn.example.com/update-info.json');
-  const updateInfo = await response.json();
-  
-  // Download and install directly - NO SIGNATURE CHECK!
-  const update = await fetch(updateInfo.downloadUrl);
-  const blob = await update.blob();
-  installUpdate(blob);  // ❌ Attacker can inject malicious code
-}
-          </pre>
-          <p style="margin-top: 10px; color: #ff6666;">
-            <strong>Risk:</strong> An attacker performing a man-in-the-middle attack or compromising the CDN 
-            can serve malicious updates that will be installed without verification.
-          </p>
-        </div>
-
-        <div class="secure">
-          <h3>✅ Secure: Verified Update with Digital Signature</h3>
-          <pre>
-// Secure update verification with signature
-async function checkForUpdateSecure() {
-  const response = await fetch('https://cdn.example.com/update-info.json');
-  const updateInfo = await response.json();
-  
-  // Download update
-  const update = await fetch(updateInfo.downloadUrl);
-  const updateBlob = await update.blob();
-  
-  // Verify digital signature using vendor's public key
-  const isValid = await crypto.subtle.verify(
-    { name: "RSA-PSS", saltLength: 32 },
-    vendorPublicKey,
-    base64Decode(updateInfo.signature),
-    await updateBlob.arrayBuffer()
-  );
-  
-  if (!isValid) {
-    throw new Error("Invalid signature - update rejected!");
-  }
-  
-  // Verify SHA-256 checksum
-  const hash = await crypto.subtle.digest('SHA-256', await updateBlob.arrayBuffer());
-  const hashHex = Array.from(new Uint8Array(hash))
-    .map(b => b.toString(16).padStart(2, '0')).join('');
-  
-  if (hashHex !== updateInfo.sha256) {
-    throw new Error("Checksum mismatch - update rejected!");
-  }
-  
-  installUpdate(updateBlob);  // ✅ Safe to install
-}
-          </pre>
-        </div>
-
-        <div class="vulnerable">
-          <h3>❌ Vulnerable: No Checksum Verification</h3>
-          <pre>
-// Downloading dependency without checksum
-async function installDependency(packageName) {
-  const url = \`https://registry.example.com/\${packageName}/latest.tar.gz\`;
-  const response = await fetch(url);
-  const data = await response.blob();
-  
-  extractAndInstall(data);  // ❌ No integrity check
-}
-          </pre>
-        </div>
-
-        <div class="secure">
-          <h3>✅ Secure: Checksum Verification</h3>
-          <pre>
-// Secure dependency installation with checksum
-async function installDependencySecure(packageName, expectedSHA256) {
-  const url = \`https://registry.example.com/\${packageName}/latest.tar.gz\`;
-  const response = await fetch(url);
-  const data = await response.blob();
-  
-  // Calculate SHA-256 checksum
-  const buffer = await data.arrayBuffer();
-  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const calculatedHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  
-  // Verify checksum matches
-  if (calculatedHash !== expectedSHA256) {
-    throw new Error(\`Checksum mismatch! Expected: \${expectedSHA256}, Got: \${calculatedHash}\`);
-  }
-  
-  extractAndInstall(data);  // ✅ Integrity verified
-}
-          </pre>
-        </div>
-
-        <h2>Defense Mechanisms</h2>
-        <div class="info-box">
-          <h3 style="color: #059669; margin-top: 0;">Digital Signatures</h3>
-          <p>Use asymmetric cryptography (RSA, ECDSA) to sign code and verify authenticity with public keys.</p>
-          
-          <h3 style="color: #059669; margin-top: 20px;">Checksums & Hashes</h3>
-          <p>Generate and verify SHA-256/SHA-512 hashes to ensure data integrity during transmission.</p>
-          
-          <h3 style="color: #059669; margin-top: 20px;">Subresource Integrity (SRI)</h3>
-          <pre style="margin-top: 10px;">
-&lt;script src="https://cdn.example.com/library.js"
-        integrity="sha384-oqVuAfXRKap7fdgcCY5uykM6+R9GqQ8K/ux..."
-        crossorigin="anonymous"&gt;&lt;/script&gt;
-          </pre>
-          
-          <h3 style="color: #059669; margin-top: 20px;">Secure CI/CD Pipelines</h3>
-          <ul>
-            <li>Separate build environments from production</li>
-            <li>Sign all artifacts in the build pipeline</li>
-            <li>Use code signing certificates</li>
-            <li>Implement artifact repositories with access controls</li>
-            <li>Verify dependencies with lock files</li>
-          </ul>
-        </div>
-
-        <h2>Real-World Examples</h2>
-        <div class="vulnerable">
-          <ul>
-            <li><strong>SolarWinds (2020):</strong> Compromised build system led to malicious updates being signed and distributed</li>
-            <li><strong>NotPetya (2017):</strong> Malicious software update distributed through compromised update server</li>
-            <li><strong>CCleaner (2017):</strong> Legitimate software bundled with malware through compromised build process</li>
-          </ul>
-        </div>
-
-        <div class="nav-links" style="margin-top: 40px;">
-          <a href="/lab1">Start Lab 1 →</a>
-        </div>
-      </div>
-    </body>
-    </html>
-  `);
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>About FreshHarvest Market</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px;">
+            <h1>🌱 About FreshHarvest Market</h1>
+            <p><a href="/">← Back to Home</a></p>
+            
+            <h2>Welcome!</h2>
+            <p>FreshHarvest Market connects local farmers with vendors through our secure online platform.</p>
+            
+            <h2>Our Services</h2>
+            <p>We provide comprehensive services to meet your needs. Our platform is designed with security and reliability in mind.</p>
+            
+            <h2>Security & Privacy</h2>
+            <p>We take data integrity and security seriously. Our systems implement industry-standard protections to keep your information safe.</p>
+            
+            <p style="margin-top: 30px;"><a href="/">← Back to Home</a></p>
+        </body>
+        </html>
+    `);
 });
 
-// Lab 1 - Easy: Product Updates
 app.get('/lab1', (req, res) => {
   res.send(`
     <!DOCTYPE html>
@@ -437,38 +292,6 @@ app.get('/lab1', (req, res) => {
           <h3 style="margin-top: 20px;">Objective</h3>
           <p>Discover how the application checks for updates. Look for endpoints that provide update information.</p>
           
-          <div class="endpoint">
-            <strong>Hint:</strong> Try accessing /api/lab1/update-info
-          </div>
-        </div>
-
-        <div class="info-box">
-          <h3 style="color: #059669; margin-top: 0;">What to Look For</h3>
-          <ul>
-            <li>Update information endpoints</li>
-            <li>Missing digital signatures</li>
-            <li>Lack of cryptographic verification</li>
-            <li>Update URLs without HTTPS or certificates</li>
-          </ul>
-        </div>
-
-        <h3>Test the Update Mechanism</h3>
-        <pre>curl http://localhost:3008/api/lab1/update-info</pre>
-
-        <div id="result"></div>
-
-        <script>
-          // Auto-fetch on page load to show update info
-          fetch('/api/lab1/update-info')
-            .then(res => res.json())
-            .then(data => {
-              const resultDiv = document.getElementById('result');
-              resultDiv.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
-            })
-            .catch(err => {
-              document.getElementById('result').innerHTML = '<p style="color: #ff0000;">Error: ' + err.message + '</p>';
-            });
-        </script>
       </div>
     </body>
     </html>
@@ -515,124 +338,6 @@ app.get('/lab2', (req, res) => {
           
           <h3 style="margin-top: 20px;">Objective</h3>
           <p>Download files from the application and analyze whether checksums are provided or verified.</p>
-          
-          <div class="endpoint">
-            <strong>Endpoint:</strong> GET /api/lab2/download?file=update.zip
-          </div>
-        </div>
-
-        <div class="info-box">
-          <h3 style="color: #059669; margin-top: 0;">Investigation Steps</h3>
-          <ul>
-            <li>Attempt to download files</li>
-            <li>Check if checksums (MD5, SHA256) are provided</li>
-            <li>Determine if the application verifies file integrity</li>
-            <li>Look for missing validation in responses</li>
-          </ul>
-        </div>
-
-        <h3>Test File Download</h3>
-        <pre>curl http://localhost:3008/api/lab2/download?file=update.zip</pre>
-        <p style="margin-top: 10px;">Or click: <a href="/api/lab2/download?file=update.zip" style="color: #059669;">Download File</a></p>
-
-        <div id="result"></div>
-      </div>
-    </body>
-    </html>
-  `);
-});
-
-app.get('/api/lab2/download', (req, res) => {
-  const filename = req.query.file || 'unknown';
-  
-  res.json({
-    status: 'download_ready',
-    filename: filename,
-    downloadUrl: `http://cdn.example.com/files/${filename}`,
-    size: '12.8 MB',
-    contentType: 'application/zip',
-    vulnerability: 'No checksum verification provided!',
-    flag: 'HARVEST{N0_CHK5UM_0RG4N1C}',
-    message: 'Flag captured! You discovered missing checksum validation.',
-    secureAlternative: {
-      filename: filename,
-      downloadUrl: `http://cdn.example.com/files/${filename}`,
-      sha256: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-      md5: '098f6bcd4621d373cade4e832627b4f6',
-      signature: 'RSA-SHA256 digital signature would go here'
-    }
-  });
-});
-
-// Lab 3 - Hard: File Manager
-app.get('/lab3', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Lab 3 - File Manager</title>
-      <meta charset="UTF-8">
-      ${harvestStyles}
-    </head>
-    <body>
-      <div class="container">
-        <h1>🎯 LAB 3: INITIAL ACCESS</h1>
-        <div class="difficulty hard">HARD</div>
-        
-        <div class="nav-links">
-          <a href="/">🏠 Home</a>
-          <a href="/example">📚 Example</a>
-        </div>
-
-        <div class="lab-card">
-          <h3>Mission Brief</h3>
-          <p>The target has a file upload system that accepts code updates. Your objective is to exploit the lack of signature verification to upload a malicious file.</p>
-          
-          <h3 style="margin-top: 20px;">Objective</h3>
-          <p>Upload a file that would replace legitimate code. The system should reject unsigned files, but it doesn't.</p>
-          
-          <div class="endpoint">
-            <strong>Endpoint:</strong> POST /api/lab3/upload
-          </div>
-        </div>
-
-        <div class="info-box">
-          <h3 style="color: #059669; margin-top: 0;">Attack Vector</h3>
-          <ul>
-            <li>Create a malicious payload file</li>
-            <li>Upload without a valid signature</li>
-            <li>System accepts unsigned files</li>
-            <li>Malicious code could be executed</li>
-          </ul>
-        </div>
-
-        <h3>Upload Test File</h3>
-        <form id="uploadForm" enctype="multipart/form-data">
-          <input type="file" id="fileInput" name="file" required />
-          <p style="margin-top: 10px; color: #F59E0B;">Create any file to test the upload vulnerability</p>
-        </form>
-
-        <h3 style="margin-top: 20px;">Command Line Upload</h3>
-        <pre>echo "malicious code" > malicious.zip
-curl -X POST -F "file=@malicious.zip" http://localhost:3008/api/lab3/upload</pre>
-
-        <div id="result"></div>
-
-        <script>
-          document.getElementById('fileInput').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const formData = new FormData();
-            formData.append('file', file);
-
-            try {
-              const response = await fetch('/api/lab3/upload', {
-                method: 'POST',
-                body: formData
-              });
-              const data = await response.json();
-              document.getElementById('result').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
             } catch (err) {
               document.getElementById('result').innerHTML = '<p style="color: #ff0000;">Error: ' + err.message + '</p>';
             }
