@@ -275,6 +275,8 @@ app.post('/api/checkout', async (req, res) => {
 // A06: INSECURE DESIGN - Challenge 2: Race Condition in Withdrawals
 // ============================================================================
 
+// INTENTIONAL VULNERABILITY: Using global state for user balance to demonstrate race conditions
+// In a real application, this would be stored in database with proper locking mechanisms
 let userBalance = { '1': 1000, '2': 500, '3': 750 };
 
 app.get('/api/balance/:userId', (req, res) => {
