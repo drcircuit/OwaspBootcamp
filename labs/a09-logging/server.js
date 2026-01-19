@@ -286,3 +286,372 @@ app.get('/lab1', (req, res) => {
                     </ul>
                 </div>
 
+
+                <div class="info-box">
+                    <h2>🛠️ Testing Instructions</h2>
+                    <p><strong>Endpoint:</strong> <code>DELETE /api/artwork/:id</code></p>
+                    <p><strong>Example:</strong> <code>DELETE /api/artwork/1234</code></p>
+                    <p><strong>What to look for:</strong> Check if the deletion is logged in the audit trail</p>
+                </div>
+
+                <p style="text-align: center; margin-top: 30px;">
+                    <a href="/">← Back to Home</a>
+                </p>
+            </div>
+        </body>
+        </html>
+    `);
+});
+
+// Lab 2 - Visitor Tracking with PII Exposure
+app.get('/lab2', (req, res) => {
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Visitor Tracking - ArtSpace Gallery</title>
+            <style>
+                body {
+                    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+                    color: #f5f5f5;
+                    font-family: 'Georgia', serif;
+                    padding: 20px;
+                    line-height: 1.6;
+                }
+                .container {
+                    max-width: 900px;
+                    margin: 0 auto;
+                }
+                h1 {
+                    color: #d4af37;
+                    text-align: center;
+                    border-bottom: 2px solid #d4af37;
+                    padding-bottom: 10px;
+                }
+                .info-box, .hint-box {
+                    background: rgba(212, 175, 55, 0.1);
+                    border-left: 4px solid #d4af37;
+                    padding: 20px;
+                    margin: 20px 0;
+                    border-radius: 5px;
+                }
+                .hint-box {
+                    background: rgba(255, 152, 0, 0.1);
+                    border-left: 4px solid #FF9800;
+                }
+                a {
+                    color: #d4af37;
+                    text-decoration: none;
+                    border-bottom: 1px dotted #d4af37;
+                }
+                a:hover {
+                    color: #ffd700;
+                    border-bottom: 1px solid #ffd700;
+                }
+                .difficulty {
+                    display: inline-block;
+                    padding: 5px 15px;
+                    border-radius: 3px;
+                    font-weight: bold;
+                    background-color: #FF9800;
+                    color: #fff;
+                    font-family: Arial, sans-serif;
+                }
+                p, li {
+                    color: #e0e0e0;
+                }
+                h2 {
+                    color: #d4af37;
+                }
+                code {
+                    background-color: #0a0a0a;
+                    padding: 3px 8px;
+                    border-radius: 3px;
+                    color: #d4af37;
+                    font-family: 'Courier New', monospace;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>👥 VISITOR TRACKING: ACCESS MONITORING <span class="difficulty">MEDIUM</span></h1>
+                
+                <div class="info-box">
+                    <h2>📋 Exercise Overview</h2>
+                    <p><strong>System:</strong> Visitor Check-In System</p>
+                    <p><strong>Objective:</strong> Test visitor tracking logs for sensitive data exposure</p>
+                    <p><strong>Flag Location:</strong> API response from visitor access endpoint</p>
+                </div>
+
+                <div class="info-box">
+                    <h2>🎯 Scenario</h2>
+                    <p>The ArtSpace Gallery tracks visitor information for security and capacity management. The system logs visitor check-ins and access to restricted exhibition areas. However, logs that contain Personally Identifiable Information (PII) create privacy compliance risks.</p>
+                    <p><strong>Your task:</strong> Test the visitor access endpoint and analyze the logging behavior for privacy violations.</p>
+                </div>
+
+                <div class="hint-box">
+                    <strong style="color: #FF9800;">💡 Testing Hints:</strong>
+                    <ul>
+                        <li>Request visitor access for visitor ID 9999</li>
+                        <li>Observe what information appears in the logs</li>
+                        <li>Logs should NOT contain PII like SSN, credit cards, or full addresses</li>
+                        <li>GDPR and CCPA require minimizing PII in logs</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h2>🛠️ Testing Instructions</h2>
+                    <p><strong>Endpoint:</strong> <code>GET /api/visitor/:id</code></p>
+                    <p><strong>Example:</strong> <code>GET /api/visitor/9999</code></p>
+                    <p><strong>What to look for:</strong> Check if sensitive PII is logged in visitor access</p>
+                </div>
+
+                <p style="text-align: center; margin-top: 30px;">
+                    <a href="/">← Back to Home</a>
+                </p>
+            </div>
+        </body>
+        </html>
+    `);
+});
+
+// Lab 3 - Log Management Security
+app.get('/lab3', (req, res) => {
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Audit System - ArtSpace Gallery</title>
+            <style>
+                body {
+                    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+                    color: #f5f5f5;
+                    font-family: 'Georgia', serif;
+                    padding: 20px;
+                    line-height: 1.6;
+                }
+                .container {
+                    max-width: 900px;
+                    margin: 0 auto;
+                }
+                h1 {
+                    color: #d4af37;
+                    text-align: center;
+                    border-bottom: 2px solid #d4af37;
+                    padding-bottom: 10px;
+                }
+                .info-box, .hint-box, .warning {
+                    background: rgba(212, 175, 55, 0.1);
+                    border-left: 4px solid #d4af37;
+                    padding: 20px;
+                    margin: 20px 0;
+                    border-radius: 5px;
+                }
+                .hint-box {
+                    background: rgba(255, 152, 0, 0.1);
+                    border-left: 4px solid #FF9800;
+                }
+                .warning {
+                    background: rgba(220, 20, 60, 0.1);
+                    border-left: 4px solid #DC143C;
+                }
+                a {
+                    color: #d4af37;
+                    text-decoration: none;
+                    border-bottom: 1px dotted #d4af37;
+                }
+                a:hover {
+                    color: #ffd700;
+                    border-bottom: 1px solid #ffd700;
+                }
+                .difficulty {
+                    display: inline-block;
+                    padding: 5px 15px;
+                    border-radius: 3px;
+                    font-weight: bold;
+                    background-color: #DC143C;
+                    color: #fff;
+                    font-family: Arial, sans-serif;
+                }
+                p, li {
+                    color: #e0e0e0;
+                }
+                h2 {
+                    color: #d4af37;
+                }
+                code {
+                    background-color: #0a0a0a;
+                    padding: 3px 8px;
+                    border-radius: 3px;
+                    color: #d4af37;
+                    font-family: 'Courier New', monospace;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>📋 AUDIT SYSTEM: LOG MANAGEMENT <span class="difficulty">HARD</span></h1>
+                
+                <div class="info-box">
+                    <h2>📋 Exercise Overview</h2>
+                    <p><strong>System:</strong> Security Audit Platform</p>
+                    <p><strong>Objective:</strong> Test audit log management for proper access controls</p>
+                    <p><strong>Flag Location:</strong> API response from log clearing endpoint</p>
+                </div>
+
+                <div class="info-box">
+                    <h2>🎯 Scenario</h2>
+                    <p>The ArtSpace Gallery maintains security audit logs that record all administrative actions, security events, and access control decisions. These logs are critical for forensic investigations, compliance audits, and incident response. However, if audit logs can be tampered with or cleared without authorization, attackers can erase evidence of their activities.</p>
+                    <p><strong>Your task:</strong> Test the audit log management system and evaluate whether proper access controls are in place.</p>
+                </div>
+
+                <div class="warning">
+                    <strong style="color: #DC143C;">⚠️ SECURITY RISK:</strong> Audit logs must be tamper-proof. Allowing unauthorized clearing or modification of audit logs enables attackers to cover their tracks and destroys forensic evidence.
+                </div>
+
+                <div class="hint-box">
+                    <strong style="color: #FF9800;">💡 Testing Hints:</strong>
+                    <ul>
+                        <li>Try clearing the audit logs using the management endpoint</li>
+                        <li>Observe whether authentication or authorization is required</li>
+                        <li>Log deletion should require elevated privileges and itself be logged</li>
+                        <li>Consider SIEM integration for log immutability</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h2>🛠️ Testing Instructions</h2>
+                    <p><strong>Endpoint:</strong> <code>DELETE /api/audit-logs</code></p>
+                    <p><strong>What to look for:</strong> Check if logs can be cleared without proper authorization</p>
+                </div>
+
+                <p style="text-align: center; margin-top: 30px;">
+                    <a href="/">← Back to Home</a>
+                </p>
+            </div>
+        </body>
+        </html>
+    `);
+});
+
+// API Endpoints
+
+// Lab 1 API - Missing audit logs for deletions
+app.delete('/api/artwork/:id', (req, res) => {
+    const artworkId = parseInt(req.params.id);
+    
+    // Vulnerable: No audit logging for deletion
+    const artwork = artworkDatabase.find(art => art.id === artworkId);
+    
+    if (!artwork) {
+        return res.status(404).json({
+            success: false,
+            message: 'Artwork not found'
+        });
+    }
+    
+    // Remove artwork without logging
+    const index = artworkDatabase.indexOf(artwork);
+    artworkDatabase.splice(index, 1);
+    
+    // Special case: demonstrates the vulnerability
+    if (artworkId === 1234) {
+        return res.json({
+            success: true,
+            message: 'Artwork deleted successfully',
+            deletedArtwork: artwork,
+            auditLogged: false,
+            flag: 'HARVEST{N0_4UD1T_TR41L}',
+            vulnerability: 'Critical deletion operation not logged in audit trail',
+            impact: 'Insurance claims impossible without deletion records',
+            secureAlternative: 'Log all CRUD operations with timestamp, user, and action details'
+        });
+    }
+    
+    res.json({
+        success: true,
+        message: 'Artwork deleted',
+        deletedArtwork: artwork,
+        auditLogged: false,
+        hint: 'Try artwork ID 1234 to see the full vulnerability'
+    });
+});
+
+// Lab 2 API - PII exposure in logs
+app.get('/api/visitor/:id', (req, res) => {
+    const visitorId = parseInt(req.params.id);
+    
+    // Simulated visitor data with PII
+    const visitorData = {
+        id: visitorId,
+        name: 'Jane Smith',
+        email: 'jane.smith@example.com',
+        phone: '555-0123',
+        address: '123 Main St, Anytown, USA',
+        ssn: '123-45-6789',
+        creditCard: '4532-1234-5678-9010',
+        visitDate: '2024-01-15',
+        exhibition: 'Modern Art Collection'
+    };
+    
+    // Vulnerable: Log contains full PII including sensitive data
+    const logEntry = {
+        timestamp: new Date().toISOString(),
+        action: 'visitor_access',
+        visitorData: visitorData, // VULNERABLE: Logging full PII
+        ipAddress: req.ip
+    };
+    
+    visitorAccess.push(logEntry);
+    
+    // Return flag when accessing visitor 9999
+    if (visitorId === 9999) {
+        return res.json({
+            success: true,
+            visitor: visitorData,
+            logEntry: logEntry,
+            flag: 'HARVEST{P11_1N_L0GS}',
+            vulnerability: 'Sensitive PII (SSN, credit card) logged in plaintext',
+            impact: 'GDPR/CCPA violations, data breach exposure',
+            secureAlternative: 'Log only visitor ID, redact or hash sensitive fields'
+        });
+    }
+    
+    res.json({
+        success: true,
+        visitor: visitorData,
+        logEntry: logEntry,
+        hint: 'Try visitor ID 9999 to see the full vulnerability'
+    });
+});
+
+// Lab 3 API - Unauthorized log clearing
+app.delete('/api/audit-logs', (req, res) => {
+    // Vulnerable: No authentication or authorization check
+    const logCount = auditLog.length;
+    
+    // Clear all audit logs without any access control
+    auditLog.length = 0;
+    
+    return res.json({
+        success: true,
+        message: 'Audit logs cleared',
+        logsDeleted: logCount,
+        flag: 'HARVEST{L0G_T4MP3R1NG}',
+        vulnerability: 'Audit logs can be cleared without authentication or authorization',
+        impact: 'Attackers can erase forensic evidence and cover their tracks',
+        secureAlternative: 'Require admin authentication, log the clearing action itself, use immutable log storage'
+    });
+});
+
+app.listen(PORT, () => {
+    console.log(`\x1b[32m
+╔════════════════════════════════════════════╗
+║   🎨 ArtSpace Gallery                     ║
+║   Server running on port ${PORT}           ║
+║                                            ║
+║   Access the portal:                      ║
+║   http://localhost:${PORT}                    ║
+╚════════════════════════════════════════════╝
+\x1b[0m`);
+});
