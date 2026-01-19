@@ -293,9 +293,6 @@ app.get('/lab1', (req, res) => {
                     </ul>
                 </div>
 
-                <div class="info-box">
-                    <h2>🛠️ Testing Instructions</h2>
-                </div>
 
                 <div style="text-align: center; margin-top: 40px;">
                     <a href="/">← Back to Home</a>

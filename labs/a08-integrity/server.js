@@ -292,11 +292,6 @@ app.get('/lab1', (req, res) => {
           <h3 style="margin-top: 20px;">Objective</h3>
           <p>Discover how the application checks for updates. Look for endpoints that provide update information.</p>
           
-            })
-            .catch(err => {
-              document.getElementById('result').innerHTML = '<p style="color: #ff0000;">Error: ' + err.message + '</p>';
-            });
-        </script>
       </div>
     </body>
     </html>

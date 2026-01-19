@@ -286,7 +286,3 @@ app.get('/lab1', (req, res) => {
                     </ul>
                 </div>
 
-                <div class="info-box">
-                    <h2>🛠️ Testing Instructions</h2>
-                    
-                    <p><strong>Step 2 - View the access logs:</strong></p>
