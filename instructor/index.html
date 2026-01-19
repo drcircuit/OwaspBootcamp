@@ -461,7 +461,7 @@
                 
                 // Highlight code blocks
                 contentDiv.querySelectorAll('pre code').forEach((block) => {
-                    hljs.highlightBlock(block);
+                    hljs.highlightElement(block);
                 });
                 
                 loadingDiv.style.display = 'none';
