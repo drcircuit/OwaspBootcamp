@@ -253,7 +253,7 @@ app.get('/', (req, res) => {
   `);
 });
 
-// Example page - About Page
+// Example page - Help & Info
 app.get('/example', (req, res) => {
   res.send(`
     <!DOCTYPE html>

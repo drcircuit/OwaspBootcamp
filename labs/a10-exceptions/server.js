@@ -162,7 +162,7 @@ app.get('/', (req, res) => {
     `);
 });
 
-// Example page - About
+// Example page - Help & Info
 app.get('/example', (req, res) => {
     res.send(`
         <!DOCTYPE html>

@@ -188,7 +188,7 @@ app.get('/', (req, res) => {
     `);
 });
 
-// Example page - Member Portal Help (simplified, no tutorials)
+// Example page - Help & Info
 app.get('/example', (req, res) => {
     res.send(`
         <!DOCTYPE html>
