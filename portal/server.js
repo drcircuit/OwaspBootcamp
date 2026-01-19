@@ -66,6 +66,30 @@ async function runMigrations() {
         END $$;
       `);
       
+      // Add tutorial column if it doesn't exist
+      await pool.query(`
+        DO $$ 
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                           WHERE table_name='challenges' AND column_name='tutorial') THEN
+                ALTER TABLE challenges ADD COLUMN tutorial TEXT;
+                RAISE NOTICE 'Added tutorial column';
+            END IF;
+        END $$;
+      `);
+      
+      // Add mission_brief column if it doesn't exist
+      await pool.query(`
+        DO $$ 
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                           WHERE table_name='challenges' AND column_name='mission_brief') THEN
+                ALTER TABLE challenges ADD COLUMN mission_brief TEXT;
+                RAISE NOTICE 'Added mission_brief column';
+            END IF;
+        END $$;
+      `);
+      
       // Populate challenges if table is empty or missing challenges
       const countResult = await pool.query('SELECT COUNT(*)::int as count FROM challenges');
       const challengeCount = countResult.rows[0].count;
