@@ -155,199 +155,33 @@ app.get('/', (req, res) => {
     `);
 });
 
-// Example page - Educational walkthrough
+// Example page - About
 app.get('/example', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Gallery Security & Audit Logs - ArtSpace</title>
-            <style>
-                body {
-                    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-                    color: #f5f5f5;
-                    font-family: 'Georgia', serif;
-                    padding: 20px;
-                    line-height: 1.6;
-                }
-                .container {
-                    max-width: 1000px;
-                    margin: 0 auto;
-                }
-                h1 {
-                    text-align: center;
-                    font-size: 2.5em;
-                    color: #d4af37;
-                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-                    border-bottom: 3px solid #d4af37;
-                    padding-bottom: 10px;
-                }
-                h2 {
-                    color: #d4af37;
-                    margin-top: 30px;
-                    border-bottom: 2px solid #d4af37;
-                    padding-bottom: 5px;
-                }
-                .section {
-                    background: linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 100%);
-                    border: 2px solid #d4af37;
-                    padding: 25px;
-                    margin: 25px 0;
-                    border-radius: 8px;
-                }
-                .good {
-                    background-color: rgba(76, 175, 80, 0.1);
-                    border-left: 4px solid #4CAF50;
-                    padding: 15px;
-                    margin: 15px 0;
-                }
-                .bad {
-                    background-color: rgba(220, 20, 60, 0.1);
-                    border-left: 4px solid #DC143C;
-                    padding: 15px;
-                    margin: 15px 0;
-                }
-                pre {
-                    background-color: #000;
-                    padding: 15px;
-                    border-radius: 5px;
-                    overflow-x: auto;
-                    border: 1px solid #444;
-                }
-                code {
-                    color: #d4af37;
-                    font-family: 'Courier New', monospace;
-                }
-                a {
-                    color: #d4af37;
-                    text-decoration: none;
-                    border-bottom: 1px dotted #d4af37;
-                }
-                a:hover {
-                    color: #ffd700;
-                    border-bottom: 1px solid #ffd700;
-                }
-                p, li {
-                    color: #e0e0e0;
-                }
-            </style>
+            <title>About ArtSpace Gallery</title>
         </head>
-        <body>
-            <div class="container">
-                <h1>🎨 GALLERY SECURITY & AUDIT LOGS</h1>
-                
-                <div class="section">
-                    <h2>Why Security Logging Matters for Art Galleries</h2>
-                    <p>Art galleries manage valuable collections worth millions. Proper logging enables:</p>
-                    <ul>
-                        <li><strong>Detection</strong> - Identify unauthorized access to artwork records</li>
-                        <li><strong>Investigation</strong> - Track who made changes to inventory or exhibitions</li>
-                        <li><strong>Compliance</strong> - Meet insurance and regulatory requirements</li>
-                        <li><strong>Forensics</strong> - Provide evidence for insurance claims or legal matters</li>
-                    </ul>
-                </div>
-
-                <div class="section">
-                    <h2>❌ Common Logging Failures in Gallery Systems</h2>
-                    
-                    <h3>1. Missing Logs for Critical Operations</h3>
-                    <div class="bad">
-                        <strong>Problem:</strong> Artwork deletions aren't logged
-                        <pre><code>app.delete('/api/artwork/:id', (req, res) => {
-    // Delete artwork - NO LOGGING!
-    removeArtwork(req.params.id);
-    res.json({ success: true });
-});</code></pre>
-                    </div>
-                    <div class="good">
-                        <strong>Solution:</strong> Log all inventory changes
-                        <pre><code>app.delete('/api/artwork/:id', (req, res) => {
-    auditLog.warn('Artwork removal', {
-        artworkId: req.params.id,
-        removedBy: req.user.id,
-        timestamp: new Date(),
-        reason: req.body.reason
-    });
-    removeArtwork(req.params.id);
-    res.json({ success: true });
-});</code></pre>
-                    </div>
-
-                    <h3>2. Logging Sensitive Visitor Data</h3>
-                    <div class="bad">
-                        <strong>Problem:</strong> PII exposed in access logs
-                        <pre><code>logger.info('Visitor check-in', {
-    name: visitor.name,
-    creditCard: visitor.payment, // NEVER LOG THIS!
-    address: visitor.address      // Privacy violation!
-});</code></pre>
-                    </div>
-                    <div class="good">
-                        <strong>Solution:</strong> Log only necessary data
-                        <pre><code>logger.info('Visitor check-in', {
-    visitorId: visitor.id,
-    timestamp: new Date(),
-    exhibition: exhibitionName,
-    // PII intentionally omitted
-});</code></pre>
-                    </div>
-
-                    <h3>3. Unprotected Log Management</h3>
-                    <div class="bad">
-                        <strong>Problem:</strong> Anyone can clear audit logs
-                        <pre><code>app.post('/api/logs/clear', (req, res) => {
-    auditLogs.clear(); // No authorization!
-    res.json({ success: true });
-});</code></pre>
-                    </div>
-                    <div class="good">
-                        <strong>Solution:</strong> Restrict and audit log operations
-                        <pre><code>app.post('/api/logs/clear', requireGalleryAdmin, (req, res) => {
-    securityLog.critical('Audit log clearing', {
-        by: req.user.id,
-        reason: req.body.reason,
-        requiresApproval: true
-    });
-    auditLogs.clear();
-    res.json({ success: true });
-});</code></pre>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2>✅ What Gallery Systems Should Log</h2>
-                    <ul>
-                        <li>Staff authentication events (login, logout, failures)</li>
-                        <li>Artwork access and modifications (view, update, delete)</li>
-                        <li>Exhibition changes (creation, updates, status changes)</li>
-                        <li>Visitor check-ins (anonymized)</li>
-                        <li>Sales transactions (artwork purchases)</li>
-                        <li>Security system events (alarm triggers, access control)</li>
-                        <li>Administrative actions (user management, permissions)</li>
-                    </ul>
-                </div>
-
-                <div class="section">
-                    <h2>❌ What NOT to Log in Gallery Systems</h2>
-                    <ul>
-                        <li>Staff passwords or authentication tokens</li>
-                        <li>Visitor credit card numbers or payment details</li>
-                        <li>Personal addresses or contact information</li>
-                        <li>Buyer financial information</li>
-                        <li>Security system access codes</li>
-                    </ul>
-                </div>
-
-                <p style="text-align: center; margin-top: 40px;">
-                    <a href="/">← Back to Home</a>
-                </p>
-            </div>
+        <body style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px;">
+            <h1>🎨 About ArtSpace Gallery</h1>
+            <p><a href="/">← Back to Home</a></p>
+            
+            <h2>Welcome!</h2>
+            <p>ArtSpace Gallery showcases contemporary art with a secure exhibition management system.</p>
+            
+            <h2>Our Services</h2>
+            <p>We provide comprehensive services to meet your needs. Our platform is designed with security and reliability in mind.</p>
+            
+            <h2>Security & Privacy</h2>
+            <p>We take data integrity and security seriously. Our systems implement industry-standard protections to keep your information safe.</p>
+            
+            <p style="margin-top: 30px;"><a href="/">← Back to Home</a></p>
         </body>
         </html>
     `);
 });
 
-// Lab 1 page - Artwork Management
 app.get('/lab1', (req, res) => {
     res.send(`
         <!DOCTYPE html>
@@ -440,13 +274,6 @@ app.get('/lab1', (req, res) => {
                     <h2>🎯 Scenario</h2>
                     <p>The ArtSpace Gallery manages a valuable collection worth millions. Gallery administrators can add, modify, and remove artwork records from the system. Insurance policies and legal requirements mandate that all inventory changes must be logged for audit purposes.</p>
                     <p><strong>Your task:</strong> Test the artwork deletion endpoint and verify whether it properly creates audit trail entries.</p>
-                </div>
-
-                <div class="endpoint">
-                    <strong style="color: #d4af37;">API Endpoint:</strong><br>
-                    <code>DELETE http://localhost:3009/api/gallery/artwork/:id</code><br><br>
-                    <strong style="color: #d4af37;">Example Request:</strong><br>
-                    <code>DELETE http://localhost:3009/api/gallery/artwork/1234</code>
                 </div>
 
                 <div class="hint-box">
@@ -567,14 +394,6 @@ app.get('/lab2', (req, res) => {
                     <h2>🎯 Scenario</h2>
                     <p>The gallery tracks visitor check-ins for security and attendance monitoring. While logging visitor access is good practice for security, the system must comply with privacy regulations and never log personal identifiable information (PII) unnecessarily.</p>
                     <p><strong>Your task:</strong> Check in as a visitor, then review the access logs to identify any sensitive data that should not be logged.</p>
-                </div>
-
-                <div class="endpoint">
-                    <strong style="color: #d4af37;">Check-In Endpoint:</strong><br>
-                    <code>POST http://localhost:3009/api/visitor/checkin</code><br>
-                    <code>{"name": "John Doe", "email": "john@example.com"}</code><br><br>
-                    <strong style="color: #d4af37;">View Logs Endpoint:</strong><br>
-                    <code>GET http://localhost:3009/api/logs/visitors</code>
                 </div>
 
                 <div class="hint-box">
@@ -701,11 +520,6 @@ app.get('/lab3', (req, res) => {
 
                 <div class="warning">
                     <strong>⚠️ WARNING:</strong> In a secure system, log deletion should be restricted to administrators and itself be logged with full audit details.
-                </div>
-
-                <div class="endpoint">
-                    <strong>API Endpoint:</strong><br>
-                    <code>POST http://localhost:3009/api/logs/clear</code>
                 </div>
 
                 <div class="hint-box">

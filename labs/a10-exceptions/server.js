@@ -162,230 +162,33 @@ app.get('/', (req, res) => {
     `);
 });
 
-// Example page - Educational walkthrough
+// Example page - About
 app.get('/example', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Secure Error Handling - CommunityHub</title>
-            <style>
-                body {
-                    background: linear-gradient(135deg, #FFF5E1 0%, #FFE4B5 100%);
-                    color: #2c3e50;
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    padding: 20px;
-                    line-height: 1.6;
-                }
-                .container {
-                    max-width: 1000px;
-                    margin: 0 auto;
-                }
-                h1 {
-                    text-align: center;
-                    font-size: 2.5em;
-                    color: #E67E22;
-                    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-                    border-bottom: 4px solid #E67E22;
-                    padding-bottom: 10px;
-                }
-                h2 {
-                    color: #D35400;
-                    margin-top: 30px;
-                    border-bottom: 2px solid #E67E22;
-                    padding-bottom: 5px;
-                }
-                .section {
-                    background: linear-gradient(145deg, #FFFFFF 0%, #FFF9F0 100%);
-                    border: 3px solid #E67E22;
-                    padding: 25px;
-                    margin: 25px 0;
-                    border-radius: 12px;
-                }
-                .good {
-                    background-color: rgba(39, 174, 96, 0.1);
-                    border-left: 4px solid #27AE60;
-                    padding: 15px;
-                    margin: 15px 0;
-                }
-                .bad {
-                    background-color: rgba(192, 57, 43, 0.1);
-                    border-left: 4px solid #C0392B;
-                    padding: 15px;
-                    margin: 15px 0;
-                }
-                pre {
-                    background-color: #2c3e50;
-                    color: #ECF0F1;
-                    padding: 15px;
-                    border-radius: 5px;
-                    overflow-x: auto;
-                    border: 2px solid #34495e;
-                }
-                code {
-                    color: #E67E22;
-                    font-family: 'Courier New', monospace;
-                }
-                a {
-                    color: #E67E22;
-                    text-decoration: none;
-                    border-bottom: 2px dotted #E67E22;
-                }
-                a:hover {
-                    color: #D35400;
-                    border-bottom: 2px solid #D35400;
-                }
-                p, li {
-                    color: #34495e;
-                }
-            </style>
+            <title>About CommunityHub Center</title>
         </head>
-        <body>
-            <div class="container">
-                <h1>🏠 SECURE ERROR HANDLING</h1>
-                
-                <div class="section">
-                    <h2>Why Error Handling Matters for Community Centers</h2>
-                    <p>Community centers handle sensitive member information and must protect system details. Proper error handling prevents:</p>
-                    <ul>
-                        <li><strong>Information Disclosure</strong> - Revealing system architecture to attackers</li>
-                        <li><strong>Data Leaks</strong> - Exposing member or configuration data</li>
-                        <li><strong>Security Bypass</strong> - Generic errors hiding authentication failures</li>
-                        <li><strong>Reconnaissance</strong> - Attackers mapping system internals</li>
-                    </ul>
-                </div>
-
-                <div class="section">
-                    <h2>❌ Common Error Handling Mistakes</h2>
-                    
-                    <h3>1. Verbose Error Messages</h3>
-                    <div class="bad">
-                        <strong>Problem:</strong> Technical details exposed to users
-                        <pre><code>app.get('/class/:id', (req, res) => {
-    const classInfo = db.query(\`SELECT * FROM classes WHERE id = \${req.params.id}\`);
-    if (!classInfo) {
-        res.status(404).json({
-            error: 'Class not found',
-            database: 'MongoDB 5.0.3',
-            collection: 'classes',
-            query: \`db.classes.find({id: \${req.params.id}})\`
-        });
-    }
-});</code></pre>
-                    </div>
-                    <div class="good">
-                        <strong>Solution:</strong> Generic user-facing messages
-                        <pre><code>app.get('/class/:id', (req, res) => {
-    try {
-        const classInfo = db.findOne('classes', {id: req.params.id});
-        if (!classInfo) {
-            logger.warn('Class not found', { id: req.params.id });
-            return res.status(404).json({
-                error: 'Class not found'
-            });
-        }
-        res.json(classInfo);
-    } catch (error) {
-        logger.error('Database error', error);
-        res.status(500).json({ error: 'Service unavailable' });
-    }
-});</code></pre>
-                    </div>
-
-                    <h3>2. Exposed Stack Traces</h3>
-                    <div class="bad">
-                        <strong>Problem:</strong> Stack traces reveal code structure
-                        <pre><code>app.post('/register', (req, res) => {
-    try {
-        registerMember(req.body);
-    } catch (error) {
-        res.status(500).json({
-            error: error.message,
-            stack: error.stack // NEVER EXPOSE THIS!
-        });
-    }
-});</code></pre>
-                    </div>
-                    <div class="good">
-                        <strong>Solution:</strong> Log errors server-side only
-                        <pre><code>app.post('/register', (req, res) => {
-    try {
-        registerMember(req.body);
-        res.json({ success: true });
-    } catch (error) {
-        logger.error('Registration failed', {
-            error: error.message,
-            stack: error.stack,
-            requestId: req.id
-        });
-        res.status(500).json({
-            error: 'Registration failed',
-            requestId: req.id
-        });
-    }
-});</code></pre>
-                    </div>
-
-                    <h3>3. Silent Failures Hiding Security Issues</h3>
-                    <div class="bad">
-                        <strong>Problem:</strong> Generic errors hide auth failures
-                        <pre><code>app.get('/member/profile', (req, res) => {
-    try {
-        if (!req.user.isMember) {
-            throw new Error('Not authorized');
-        }
-        res.json(memberData);
-    } catch (error) {
-        // Can't distinguish auth failure from server error
-        res.status(500).json({ error: 'Internal error' });
-    }
-});</code></pre>
-                    </div>
-                    <div class="good">
-                        <strong>Solution:</strong> Appropriate HTTP status codes
-                        <pre><code>app.get('/member/profile', (req, res) => {
-    try {
-        if (!req.user.isMember) {
-            logger.warn('Unauthorized access attempt', {
-                userId: req.user.id,
-                ip: req.ip
-            });
-            return res.status(403).json({
-                error: 'Access denied'
-            });
-        }
-        res.json(memberData);
-    } catch (error) {
-        logger.error('Profile endpoint error', error);
-        res.status(500).json({ error: 'Service unavailable' });
-    }
-});</code></pre>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2>✅ Best Practices for Community Systems</h2>
-                    <ul>
-                        <li><strong>User-friendly errors</strong> for members and staff</li>
-                        <li><strong>Detailed logging</strong> server-side for administrators</li>
-                        <li><strong>Never expose</strong> stack traces, database details, or file paths</li>
-                        <li><strong>Use proper HTTP codes</strong> (400, 401, 403, 404, 500)</li>
-                        <li><strong>Disable debug mode</strong> in production</li>
-                        <li><strong>Validate inputs</strong> to prevent unexpected errors</li>
-                        <li><strong>Monitor errors</strong> for security patterns</li>
-                    </ul>
-                </div>
-
-                <p style="text-align: center; margin-top: 40px;">
-                    <a href="/">← Back to Home</a>
-                </p>
-            </div>
+        <body style="font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 40px;">
+            <h1>🏘️ About CommunityHub Center</h1>
+            <p><a href="/">← Back to Home</a></p>
+            
+            <h2>Welcome!</h2>
+            <p>CommunityHub Center offers classes and activities with an easy-to-use registration system.</p>
+            
+            <h2>Our Services</h2>
+            <p>We provide comprehensive services to meet your needs. Our platform is designed with security and reliability in mind.</p>
+            
+            <h2>Security & Privacy</h2>
+            <p>We take data integrity and security seriously. Our systems implement industry-standard protections to keep your information safe.</p>
+            
+            <p style="margin-top: 30px;"><a href="/">← Back to Home</a></p>
         </body>
         </html>
     `);
 });
 
-// Lab 1 page - Class Search
 app.get('/lab1', (req, res) => {
     res.send(`
         <!DOCTYPE html>
@@ -478,14 +281,6 @@ app.get('/lab1', (req, res) => {
                     <h2>🎯 Scenario</h2>
                     <p>The CommunityHub Center provides a class directory where members can search for available classes. The system should handle invalid searches gracefully without exposing internal system details.</p>
                     <p><strong>Your task:</strong> Search for classes using invalid IDs and examine error messages for exposed technical information.</p>
-                </div>
-
-                <div class="endpoint">
-                    <strong style="color: #E67E22;">API Endpoint:</strong><br>
-                    <code style="color: #3498DB;">GET http://localhost:3010/api/class/:id</code><br><br>
-                    <strong style="color: #E67E22;">Examples:</strong><br>
-                    <code style="color: #3498DB;">GET http://localhost:3010/api/class/1</code> (valid)<br>
-                    <code style="color: #3498DB;">GET http://localhost:3010/api/class/invalid</code> (triggers error)
                 </div>
 
                 <div class="hint-box">
@@ -606,14 +401,6 @@ app.get('/lab2', (req, res) => {
                     <h2>🎯 Scenario</h2>
                     <p>The class registration system processes member enrollments. When errors occur, the system should log them internally but never expose technical stack traces to users, as they reveal code structure and framework details.</p>
                     <p><strong>Your task:</strong> Submit malformed registration data to trigger an error and analyze the technical information exposed.</p>
-                </div>
-
-                <div class="endpoint">
-                    <strong style="color: #E67E22;">API Endpoint:</strong><br>
-                    <code style="color: #3498DB;">POST http://localhost:3010/api/register</code><br>
-                    <code style="color: #3498DB;">Content-Type: application/json</code><br><br>
-                    <strong style="color: #E67E22;">Expected Format:</strong><br>
-                    <code style="color: #3498DB;">{"member": {"name": "...", "email": "..."}, "classId": 1}</code>
                 </div>
 
                 <div class="hint-box">
@@ -746,13 +533,6 @@ app.get('/lab3', (req, res) => {
 
                 <div class="warning">
                     <strong style="color: #C0392B;">⚠️ SECURITY NOTE:</strong> While verbose errors are bad, overly generic errors that hide security violations are equally dangerous. Authorization failures should use distinct HTTP codes (403) for monitoring.
-                </div>
-
-                <div class="endpoint">
-                    <strong style="color: #E67E22;">API Endpoint:</strong><br>
-                    <code style="color: #3498DB;">GET http://localhost:3010/api/member/config</code><br><br>
-                    <strong style="color: #E67E22;">Optional Header:</strong><br>
-                    <code style="color: #3498DB;">Authorization: Bearer &lt;token&gt;</code>
                 </div>
 
                 <div class="hint-box">
