@@ -1325,242 +1325,215 @@ app.get('/lab3', (req, res) => {
           Current Balance: <span id="balance-display">$50.00</span>
         </div>
 
-        <div class="interactive-demo">
-          <h3>Withdrawal System</h3>
-          <p>Withdraw funds from your loyalty account:</p>
-          <div class="demo-controls">
-            <input type="number" id="withdraw-amount" class="demo-input" placeholder="Amount to withdraw" value="30" min="1" max="50">
-            <button onclick="singleWithdraw()" class="demo-button">💵 Single Withdrawal</button>
-            <button onclick="concurrentWithdraw()" id="concurrent-btn" class="demo-button">⚡ 3 Concurrent Withdrawals (Exploit!)</button>
-            <button onclick="checkBalance()" class="demo-button">💳 Check Balance</button>
-            <button onclick="resetBalance()" class="demo-button">🔄 Reset Balance</button>
-          </div>
-          <div id="output" class="output-box"></div>
-          <div id="flag" class="flag-reveal"></div>
-        </div>
-
         <div class="hint-box">
-          <strong>💡 DevTools Tip:</strong>
+          <strong>💡 Testing Hints:</strong>
           <ul>
-            <li>Open DevTools (F12) → Network tab before clicking "3 Concurrent Withdrawals"</li>
-            <li>You'll see 3 POST requests fire simultaneously using Promise.all()</li>
-            <li>The race condition occurs because all 3 check balance ($50) before any withdrawal is processed</li>
-            <li>Try withdrawing $30 three times—all should succeed despite only having $50!</li>
+            <li>Your account balance: $50.00 (customer123)</li>
+            <li>Each taco order costs $3.50</li>
+            <li>Try sending multiple requests at the exact same time</li>
+            <li>Race conditions occur when concurrent requests aren't synchronized</li>
           </ul>
         </div>
 
-        <div class="bad">
-          <h3>⚠️ Vulnerability: Race Condition (TOCTOU)</h3>
-          <p><strong>Issue:</strong> "Time of Check to Time of Use" flaw. Balance check and withdrawal are not atomic.</p>
-          <p><strong>Impact:</strong> Customers can overdraft accounts by sending concurrent requests that all pass the balance check before any withdrawal completes.</p>
-          <p><strong>Fix:</strong> Use database transactions with row-level locking (SELECT FOR UPDATE) or implement mutex locks to ensure atomic check-and-withdraw operations.</p>
+        <div class="section">
+          <h2>🔧 How to Test</h2>
+          <p><strong>Endpoint:</strong> <code>POST /api/purchase</code></p>
+          <p><strong>Request Body:</strong></p>
+          <pre>{
+  "customerId": "customer123",
+  "amount": 3.50,
+  "item": "Carne Asada Taco"
+}</pre>
+          <p><strong>Goal:</strong> Purchase more than $50 worth of tacos by exploiting the race condition!</p>
         </div>
 
         <div style="text-align: center; margin-top: 40px;">
-          <a href="/lab2">← Previous Lab</a> | <a href="/">Home</a>
+          <a href="/">← Back to Home</a>
         </div>
       </div>
-
-      <script>
-        async function checkBalance() {
-          const output = document.getElementById('output');
-          output.textContent = 'Checking balance...';
-          
-          try {
-            const response = await fetch('/api/lab3/balance');
-            const data = await response.json();
-            
-            document.getElementById('balance-display').textContent = \`$\${data.balance.toFixed(2)}\`;
-            output.textContent = JSON.stringify(data, null, 2);
-          } catch (error) {
-            output.textContent = 'Error: ' + error.message;
-          }
-        }
-
-        async function singleWithdraw() {
-          const amount = parseFloat(document.getElementById('withdraw-amount').value);
-          const output = document.getElementById('output');
-          const flagDiv = document.getElementById('flag');
-          
-          output.textContent = 'Processing withdrawal...';
-          flagDiv.style.display = 'none';
-          
-          try {
-            const response = await fetch('/api/lab3/withdraw', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ amount })
-            });
-            const data = await response.json();
-            
-            if (data.balance !== undefined) {
-              document.getElementById('balance-display').textContent = \`$\${data.balance.toFixed(2)}\`;
-            }
-            
-            output.textContent = JSON.stringify(data, null, 2);
-            
-            if (data.flag) {
-              flagDiv.innerHTML = '🎉 FLAG CAPTURED!<br><br>' + data.flag + '<br><br>' + data.message;
-              flagDiv.style.display = 'block';
-            }
-          } catch (error) {
-            output.textContent = 'Error: ' + error.message;
-          }
-        }
-
-        async function concurrentWithdraw() {
-          const amount = parseFloat(document.getElementById('withdraw-amount').value);
-          const output = document.getElementById('output');
-          const flagDiv = document.getElementById('flag');
-          const btn = document.getElementById('concurrent-btn');
-          
-          btn.disabled = true;
-          output.textContent = 'Sending 3 concurrent withdrawal requests...\\n\\n';
-          flagDiv.style.display = 'none';
-          
-          const requests = [
-            fetch('/api/lab3/withdraw', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ amount })
-            }),
-            fetch('/api/lab3/withdraw', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ amount })
-            }),
-            fetch('/api/lab3/withdraw', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ amount })
-            })
-          ];
-          
-          try {
-            const results = await Promise.all(requests);
-            const data = await Promise.all(results.map(r => r.json()));
-            
-            output.textContent = 'Results from 3 concurrent withdrawal requests:\\n\\n';
-            data.forEach((d, i) => {
-              output.textContent += \`Request \${i+1}:\\n\${JSON.stringify(d, null, 2)}\\n\\n\`;
-              
-              if (d.balance !== undefined && i === data.length - 1) {
-                document.getElementById('balance-display').textContent = \`$\${d.balance.toFixed(2)}\`;
-              }
-              
-              if (d.flag && !flagDiv.textContent) {
-                flagDiv.innerHTML = '🎉 FLAG CAPTURED!<br><br>' + d.flag + '<br><br>' + d.message;
-                flagDiv.style.display = 'block';
-              }
-            });
-            
-            output.textContent += \`\\nTotal attempted to withdraw: $\${(amount * 3).toFixed(2)}\\nOriginal balance: $50.00\\n\`;
-          } catch (error) {
-            output.textContent = 'Error: ' + error.message;
-          }
-          
-          btn.disabled = false;
-        }
-
-        async function resetBalance() {
-          const output = document.getElementById('output');
-          output.textContent = 'Resetting balance...';
-          
-          try {
-            const response = await fetch('/api/lab3/reset', { method: 'POST' });
-            const data = await response.json();
-            
-            document.getElementById('balance-display').textContent = \`$\${data.balance.toFixed(2)}\`;
-            output.textContent = data.message;
-            document.getElementById('flag').style.display = 'none';
-          } catch (error) {
-            output.textContent = 'Error: ' + error.message;
-          }
-        }
-      </script>
     </body>
     </html>
   `);
 });
 
-// Lab 3 API endpoints
-app.get('/api/lab3/balance', (req, res) => {
-  res.json({
-    balance: lab3Balance,
-    message: 'Current balance retrieved'
-  });
-});
+// API Endpoints
 
-app.post('/api/lab3/withdraw', async (req, res) => {
-  const { amount } = req.body;
+// Lab 1 API - Rate Limiting vulnerability
+app.post('/api/order', (req, res) => {
+  const { item, quantity } = req.body;
+  const clientIp = req.ip || 'unknown';
   
-  if (!amount || amount <= 0) {
-    return res.status(400).json({ error: 'Invalid amount' });
+  // Vulnerable: No rate limiting
+  if (!orderAttempts[clientIp]) {
+    orderAttempts[clientIp] = [];
   }
   
-  // Simulate database/network delay (crucial for race condition)
-  await new Promise(resolve => setTimeout(resolve, 100));
+  orderAttempts[clientIp].push({ 
+    item, 
+    quantity, 
+    timestamp: Date.now() 
+  });
   
-  // VULNERABLE: Check and act are NOT atomic (race condition)
-  if (lab3Balance >= amount) {
-    const balanceBefore = lab3Balance;
-    
-    // Withdrawal happens after delay
-    lab3Balance -= amount;
-    
-    // Check if we overdrafted (race condition exploited!)
-    if (lab3Balance < 0) {
-      return res.json({
-        flag: 'TACO{R4C3_C0ND1T10N_3XTR4_T4C0S}',
-        message: 'Race condition exploited! Overdraft occurred.',
-        vulnerability: 'Check-then-act race condition allowed concurrent withdrawals to exceed balance',
-        success: true,
-        withdrawn: amount,
-        balanceBefore: balanceBefore.toFixed(2),
-        balance: lab3Balance,
-        status: 'OVERDRAFTED'
-      });
-    }
-    
+  // Check if user made many rapid orders
+  const recentOrders = orderAttempts[clientIp].filter(
+    order => Date.now() - order.timestamp < 10000
+  );
+  
+  if (recentOrders.length > 20) {
     return res.json({
       success: true,
-      withdrawn: amount,
-      balanceBefore: balanceBefore.toFixed(2),
-      balance: lab3Balance,
-      message: 'Withdrawal successful'
+      orderId: Math.random().toString(36).substr(2, 9),
+      item,
+      quantity,
+      totalOrders: recentOrders.length,
+      flag: 'HARVEST{R4T3_L1M1T_M1SS1NG}',
+      message: '🎉 Flag captured! You exploited the missing rate limit!',
+      vulnerability: 'No rate limiting allows rapid-fire requests',
+      secureAlternative: 'Implement sliding window rate limit (e.g., max 10 orders per minute)'
     });
   }
   
-  res.status(400).json({
-    success: false,
-    error: 'Insufficient funds',
-    balance: lab3Balance,
-    requested: amount
-  });
-});
-
-app.post('/api/lab3/reset', (req, res) => {
-  lab3Balance = 50.00;
   res.json({
-    message: 'Balance reset to $50.00',
-    balance: lab3Balance
+    success: true,
+    orderId: Math.random().toString(36).substr(2, 9),
+    item,
+    quantity,
+    totalOrders: recentOrders.length,
+    hint: `${recentOrders.length}/20 rapid orders made`
   });
 });
 
-// Server listen
+// Lab 2 API - Logic Flaw vulnerability
+app.post('/api/apply-promo', (req, res) => {
+  const { promoCodes, cartTotal } = req.body;
+  
+  // Vulnerable: Allows stacking of codes that shouldn't be combined
+  let discountPercent = 0;
+  const appliedCodes = [];
+  
+  // Available codes
+  const validCodes = {
+    'FIRST10': 10,    // First order discount
+    'SAVE15': 15,     // General discount
+    'LUNCH20': 20,    // Lunch special
+    'VIP25': 25       // VIP members only
+  };
+  
+  promoCodes.forEach(code => {
+    if (validCodes[code]) {
+      discountPercent += validCodes[code];
+      appliedCodes.push(code);
+      
+      // Track usage for each session (vulnerable: no proper validation)
+      if (!promoCodeUsage[code]) {
+        promoCodeUsage[code] = 0;
+      }
+      promoCodeUsage[code]++;
+    }
+  });
+  
+  const discountAmount = (cartTotal * discountPercent) / 100;
+  const finalTotal = Math.max(0, cartTotal - discountAmount);
+  
+  // Flag when discount exceeds 50%
+  if (discountPercent >= 50) {
+    return res.json({
+      success: true,
+      originalTotal: cartTotal,
+      discountPercent,
+      discountAmount,
+      finalTotal,
+      appliedCodes,
+      flag: 'HARVEST{ST4CK_PR0M0_FL4W}',
+      message: '🎉 Flag captured! You exploited the promo code stacking flaw!',
+      vulnerability: 'Multiple discount codes can be stacked without validation',
+      secureAlternative: 'Implement mutually exclusive discount categories'
+    });
+  }
+  
+  res.json({
+    success: true,
+    originalTotal: cartTotal,
+    discountPercent,
+    discountAmount,
+    finalTotal,
+    appliedCodes,
+    hint: `${discountPercent}% discount applied. Try combining more codes!`
+  });
+});
+
+// Lab 3 API - Race Condition vulnerability
+app.post('/api/purchase', (req, res) => {
+  const { customerId, amount, item } = req.body;
+  
+  // Vulnerable: No locking or transaction control
+  const balance = accountBalances[customerId];
+  
+  if (balance === undefined) {
+    return res.status(404).json({ 
+      success: false, 
+      message: 'Customer not found' 
+    });
+  }
+  
+  // Check balance before purchase (vulnerable to race condition)
+  if (balance >= amount) {
+    // Simulate processing delay that allows race condition
+    setTimeout(() => {
+      accountBalances[customerId] -= amount;
+      
+      orderHistory.push({
+        customerId,
+        item,
+        amount,
+        timestamp: new Date().toISOString(),
+        balanceAfter: accountBalances[customerId]
+      });
+      
+      // Check if customer went over their original balance
+      const totalSpent = 50.00 - accountBalances[customerId];
+      
+      if (accountBalances[customerId] < 0 || totalSpent > 50.00) {
+        return res.json({
+          success: true,
+          item,
+          amount,
+          newBalance: accountBalances[customerId],
+          totalSpent,
+          flag: 'HARVEST{R4C3_C0ND1T10N_W1N}',
+          message: '🎉 Flag captured! You exploited the race condition!',
+          vulnerability: 'Concurrent requests processed without locking',
+          secureAlternative: 'Use database transactions with row-level locking'
+        });
+      }
+      
+      res.json({
+        success: true,
+        item,
+        amount,
+        newBalance: accountBalances[customerId],
+        totalSpent,
+        hint: 'Try sending multiple requests at the exact same time'
+      });
+    }, 10); // Small delay to make race condition easier to exploit
+  } else {
+    res.status(400).json({
+      success: false,
+      message: 'Insufficient balance',
+      balance,
+      required: amount
+    });
+  }
+});
+
 app.listen(PORT, () => {
-  console.log(`\x1b[33m
+  console.log(`\x1b[32m
 ╔════════════════════════════════════════════╗
-║   🌮 TacoTruck Express - Order System     ║
-║   Server running on port ${PORT.toString().padEnd(18)}║
+║   🌮 TacoTruck Express                    ║
+║   Server running on port ${PORT}           ║
 ║                                            ║
-║   Access: http://localhost:${PORT.toString().padEnd(13)}║
-║                                            ║
-║   Labs:                                    ║
-║   📚 Tutorial:  /example                   ║
-║   🌮 Lab 1:     /lab1 (Rate Limiting)      ║
-║   🎟️  Lab 2:     /lab2 (Logic Flaw)        ║
-║   💰 Lab 3:     /lab3 (Race Condition)     ║
+║   Access the portal:                      ║
+║   http://localhost:${PORT}                    ║
 ╚════════════════════════════════════════════╝
 \x1b[0m`);
 });
