@@ -228,6 +228,20 @@ docker compose build --no-cache
 docker compose up -d
 ```
 
+### Database schema errors (e.g., "column c.challenge_order does not exist")
+If you see errors about missing columns when clicking on topics in the portal:
+
+```bash
+# Option 1: Restart the portal to run migrations (preferred)
+docker compose restart portal
+
+# Option 2: If restart doesn't work, recreate with fresh database
+docker compose down -v
+docker compose up -d
+```
+
+**Note:** The portal now automatically runs database migrations on startup to add any missing columns. Simply restarting the portal container should fix schema-related errors.
+
 ### Out of memory
 ```bash
 # Stop unnecessary containers

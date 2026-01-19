@@ -17,6 +17,86 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD || 'portal_pass',
 });
 
+// Run database migrations on startup
+async function runMigrations() {
+  const maxRetries = 5;
+  let retries = 0;
+  
+  while (retries < maxRetries) {
+    try {
+      // Test database connection first
+      await pool.query('SELECT 1');
+      console.log('Database connection established');
+      console.log('Running database migrations...');
+      
+      // Add challenge_type column if it doesn't exist
+      await pool.query(`
+        DO $$ 
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                           WHERE table_name='challenges' AND column_name='challenge_type') THEN
+                ALTER TABLE challenges ADD COLUMN challenge_type VARCHAR(20) DEFAULT 'lab';
+                RAISE NOTICE 'Added challenge_type column';
+            END IF;
+        END $$;
+      `);
+      
+      // Add lab_number column if it doesn't exist
+      await pool.query(`
+        DO $$ 
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                           WHERE table_name='challenges' AND column_name='lab_number') THEN
+                ALTER TABLE challenges ADD COLUMN lab_number INTEGER;
+                RAISE NOTICE 'Added lab_number column';
+            END IF;
+        END $$;
+      `);
+      
+      // Add challenge_order column if it doesn't exist
+      await pool.query(`
+        DO $$ 
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                           WHERE table_name='challenges' AND column_name='challenge_order') THEN
+                ALTER TABLE challenges ADD COLUMN challenge_order INTEGER;
+                RAISE NOTICE 'Added challenge_order column';
+            END IF;
+        END $$;
+      `);
+      
+      console.log('Database migrations completed successfully');
+      return;
+    } catch (err) {
+      retries++;
+      console.error(`Migration attempt ${retries}/${maxRetries} failed:`, err.message);
+      
+      if (retries >= maxRetries) {
+        console.error('❌ DATABASE SCHEMA MIGRATION FAILED');
+        console.error('The portal may not work correctly until the database schema is updated.');
+        console.error('');
+        console.error('Troubleshooting steps:');
+        console.error('1. Check if the database is running: docker compose ps portal-db');
+        console.error('2. Check database logs: docker compose logs portal-db');
+        console.error('3. Restart the portal: docker compose restart portal');
+        console.error('4. If all else fails, recreate with fresh database: docker compose down -v && docker compose up -d');
+        console.error('');
+        return;
+      }
+      
+      // Wait before retrying (exponential backoff)
+      const waitTime = Math.min(1000 * Math.pow(2, retries - 1), 5000);
+      console.log(`Waiting ${waitTime}ms before retry...`);
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+    }
+  }
+}
+
+// Run migrations before starting the server
+runMigrations().then(() => {
+  console.log('Migration check complete, server is ready');
+});
+
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
