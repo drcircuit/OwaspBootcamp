@@ -1134,6 +1134,8 @@ const exampleMembers = [
 ];
 
 // Track enumeration progress for Part 4
+// Note: Global state is intentional for this demo - it tracks progress across all requests
+// to simulate real-world enumeration where the attacker makes multiple sequential requests
 const enumerationProgress = new Set();
 
 // Example Part 1 - DevTools Demo: Browse member profiles by ID
