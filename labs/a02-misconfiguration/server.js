@@ -1177,7 +1177,7 @@ app.get('/lab3', (req, res) => {
                             
                             // If it looks like HTML directory listing, render it
                             if (text.includes('<table>') && text.includes('<tr>')) {
-                                const tableMatch = text.match(/<table>.*<\\\\/table>/s);
+                                const tableMatch = text.match(/<table>.*<\\/table>/s);
                                 if (tableMatch && tableMatch[0]) {
                                     html += '<div class="dir-listing">' + tableMatch[0] + '</div>';
                                 }
