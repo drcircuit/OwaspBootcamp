@@ -3,13 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <title>Employee Profile - Evil Capitalistic Corp</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 2rem;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+        
+        nav a:hover {
+            opacity: 0.7;
+        }
+        
+        main {
+            padding: 3rem 2rem;
+        }
+        
+        .profile {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .profile h2 {
+            color: #1e3c72;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+        
+        .profile p {
+            margin: 1rem 0;
+            font-size: 1.1rem;
+        }
+        
+        .profile strong {
+            color: #1e3c72;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🏰 OWASP Citadel</h1>
+            <h1>🏢 Evil Capitalistic Corp</h1>
             <nav>
                 <a href="/">Home</a>
             </nav>
@@ -17,17 +90,11 @@
         
         <main>
             <div class="profile">
-                <h2>User Profile</h2>
-                <p><strong>ID:</strong> <%= user.id %></p>
-                <p><strong>Username:</strong> <%= user.username %></p>
+                <h2>Employee Profile</h2>
+                <p><strong>Employee ID:</strong> <%= user.id %></p>
+                <p><strong>Name:</strong> <%= user.username %></p>
                 <p><strong>Email:</strong> <%= user.email %></p>
-                <p><strong>Role:</strong> <%= user.role %></p>
-                
-                <div class="vulnerability-note">
-                    <h3>🔓 Vulnerability Found: Broken Access Control (A01)</h3>
-                    <p>You can access any user's profile by changing the ID in the URL!</p>
-                    <p>Try: /user/1, /user/2, /user/3</p>
-                </div>
+                <p><strong>Department:</strong> <%= user.role %></p>
             </div>
         </main>
     </div>

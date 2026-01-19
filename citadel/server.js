@@ -27,8 +27,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Home route
 app.get('/', (req, res) => {
   res.render('index', { 
-    title: 'OWASP Citadel',
-    message: 'Welcome to the OWASP Citadel - Break the security layers!'
+    title: 'Evil Capitalistic Corp',
+    message: 'Making Shareholder Value Since Yesterday'
   });
 });
 
