@@ -9,11 +9,11 @@ app.use(express.static('public'));
 app.use((req, res, next) => {
     const cookies = req.headers.cookie || '';
     
-    // Set default cookies if not present
-    if (!cookies.includes('userId=')) {
+    // Set default cookies if not present (using regex for precise matching)
+    if (!/\buserId=/.test(cookies)) {
         res.cookie('userId', CURRENT_USER_ID, { httpOnly: false });
     }
-    if (!cookies.includes('userRole=')) {
+    if (!/\buserRole=/.test(cookies)) {
         res.cookie('userRole', 'member', { httpOnly: false });
     }
     
@@ -577,15 +577,15 @@ app.get('/example', (req, res) => {
                     
                     btn.disabled = true;
                     btn.textContent = 'Enumerating...';
-                    output.textContent = 'Starting enumeration...\\n\\n';
+                    output.textContent = 'Starting enumeration...\n\n';
                     flagDiv.style.display = 'none';
                     
                     for (let id = 100; id <= 105; id++) {
                         try {
                             const response = await fetch('/api/example/part4/enumerate/' + id);
                             const data = await response.json();
-                            output.textContent += '\\n--- Member ID ' + id + ' ---\\n';
-                            output.textContent += JSON.stringify(data, null, 2) + '\\n';
+                            output.textContent += '\n--- Member ID ' + id + ' ---\n';
+                            output.textContent += JSON.stringify(data, null, 2) + '\n';
                             
                             if (data.flag) {
                                 flagDiv.textContent = '🎉 ' + data.flag;
@@ -598,7 +598,7 @@ app.get('/example', (req, res) => {
                             // Small delay between requests
                             await new Promise(resolve => setTimeout(resolve, 300));
                         } catch (error) {
-                            output.textContent += 'Error for ID ' + id + ': ' + error.message + '\\n';
+                            output.textContent += 'Error for ID ' + id + ': ' + error.message + '\n';
                         }
                     }
                     
@@ -1167,7 +1167,7 @@ app.get('/lab2', (req, res) => {
                         // Payment Information
                         html += '<div class="profile-section">';
                         html += '<h2>💳 Payment Information</h2>';
-                        html += '<div class="profile-field"><div class="field-label">Payment Method:</div><div class="field-value">Credit Card ending in ' + data.creditCard.substr(-4) + '</div></div>';
+                        html += '<div class="profile-field"><div class="field-label">Payment Method:</div><div class="field-value">Credit Card ending in ' + data.creditCard.slice(-4) + '</div></div>';
                         html += '<div class="profile-field"><div class="field-label">Billing Status:</div><div class="field-value">✅ Active</div></div>';
                         html += '</div>';
                         
