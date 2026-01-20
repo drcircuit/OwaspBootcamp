@@ -577,15 +577,15 @@ app.get('/example', (req, res) => {
                     
                     btn.disabled = true;
                     btn.textContent = 'Enumerating...';
-                    output.textContent = 'Starting enumeration...\n\n';
+                    output.textContent = 'Starting enumeration...\\n\\n';
                     flagDiv.style.display = 'none';
                     
                     for (let id = 100; id <= 105; id++) {
                         try {
                             const response = await fetch('/api/example/part4/enumerate/' + id);
                             const data = await response.json();
-                            output.textContent += '\n--- Member ID ' + id + ' ---\n';
-                            output.textContent += JSON.stringify(data, null, 2) + '\n';
+                            output.textContent += '\\n--- Member ID ' + id + ' ---\\n';
+                            output.textContent += JSON.stringify(data, null, 2) + '\\n';
                             
                             if (data.flag) {
                                 flagDiv.textContent = '🎉 ' + data.flag;
@@ -598,7 +598,7 @@ app.get('/example', (req, res) => {
                             // Small delay between requests
                             await new Promise(resolve => setTimeout(resolve, 300));
                         } catch (error) {
-                            output.textContent += 'Error for ID ' + id + ': ' + error.message + '\n';
+                            output.textContent += 'Error for ID ' + id + ': ' + error.message + '\\n';
                         }
                     }
                     
