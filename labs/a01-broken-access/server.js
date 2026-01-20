@@ -169,25 +169,19 @@ app.get('/', (req, res) => {
                 </div>
 
                 <div class="nav-cards">
-                    <a href="/example" class="card">
-                        <h3>📚 Onboarding Guide</h3>
-                        <p>New to TechCorp? Learn how to navigate the employee portal, access your benefits, and connect with your team.</p>
-                        <span class="card-badge badge-tutorial">Training</span>
-                    </a>
-
-                    <a href="/lab1" class="card">
+                    <a href="/employees" class="card">
                         <h3>👥 Employee Directory</h3>
                         <p>Search and connect with colleagues across all departments and locations.</p>
                         <span class="card-badge badge-easy">Directory</span>
                     </a>
 
-                    <a href="/lab2" class="card">
+                    <a href="/profile" class="card">
                         <h3>👤 My Profile</h3>
                         <p>View your employment details, compensation information, and performance reviews.</p>
                         <span class="card-badge badge-medium">Personal</span>
                     </a>
 
-                    <a href="/lab3" class="card">
+                    <a href="/admin" class="card">
                         <h3>🔐 HR Admin Dashboard</h3>
                         <p>HR staff-only area for managing employee records, processing changes, and accessing sensitive data.</p>
                         <span class="card-badge badge-hard">Restricted</span>
