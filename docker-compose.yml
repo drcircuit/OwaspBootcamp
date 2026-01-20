@@ -185,6 +185,13 @@ services:
 networks:
   owasp-network:
     driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_icc: "true"
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+      com.docker.network.driver.mtu: "1500"
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
 
 volumes:
   citadel-db-data:

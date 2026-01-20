@@ -215,6 +215,50 @@ See `instructor/README.md` for full details on using the writeups during worksho
 
 ## 🛠️ Troubleshooting
 
+### Ubuntu: Cannot access localhost (connection timeout)
+
+If you're on **Ubuntu/Linux** and containers start successfully but you cannot access http://localhost:3100 or other ports (connection times out), this is usually due to Docker networking configuration issues on native Linux.
+
+**Quick fix:**
+```bash
+# Run the Ubuntu setup script to configure networking
+sudo ./ubuntu-setup.sh
+
+# Then restart containers
+docker compose down
+docker compose up -d
+```
+
+**What this fixes:**
+- Enables IP forwarding (required for Docker bridge networking)
+- Restarts Docker to reset iptables rules
+- Adds firewall rules if UFW is active
+- Configures Docker bridge network with proper subnet
+
+**Manual fix (if script doesn't work):**
+```bash
+# 1. Enable IP forwarding
+sudo sysctl -w net.ipv4.ip_forward=1
+echo "net.ipv4.ip_forward=1" | sudo tee -a /etc/sysctl.conf
+
+# 2. Restart Docker
+sudo systemctl restart docker
+
+# 3. If using UFW, allow Docker ports
+sudo ufw allow 3000:3100/tcp
+sudo ufw allow from 172.25.0.0/16
+
+# 4. Restart containers
+docker compose down
+docker compose up -d
+```
+
+**Still not working?** Check:
+- Container status: `docker compose ps`
+- Container logs: `docker compose logs portal`
+- Port binding: `docker compose port portal 3100`
+- From inside container: `docker compose exec portal curl localhost:3100`
+
 ### Port conflicts / "address already in use"
 If you see errors like `failed to bind host port... address already in use`, containers are already running.
 
