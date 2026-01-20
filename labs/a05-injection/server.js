@@ -4,31 +4,31 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-const smoothies = [
-  { id: 1, name: 'Green Detox', price: 7.99, category: 'wellness', calories: 180, ingredients: 'spinach, kale, pineapple, banana, coconut water' },
-  { id: 2, name: 'Berry Blast', price: 6.99, category: 'classic', calories: 220, ingredients: 'strawberry, blueberry, raspberry, yogurt, honey' },
-  { id: 3, name: 'Tropical Paradise', price: 7.49, category: 'tropical', calories: 240, ingredients: 'mango, pineapple, passionfruit, orange juice' },
-  { id: 4, name: 'Protein Power', price: 8.99, category: 'fitness', calories: 320, ingredients: 'banana, peanut butter, whey protein, almond milk, oats' },
-  { id: 5, name: 'Acai Bowl', price: 9.99, category: 'bowls', calories: 350, ingredients: 'acai, banana, granola, coconut, honey' },
-  { id: 6, name: 'Mango Tango', price: 6.99, category: 'tropical', calories: 210, ingredients: 'mango, banana, orange juice, turmeric' },
-  { id: 7, name: 'Chocolate Bliss', price: 7.99, category: 'indulgent', calories: 380, ingredients: 'cacao, banana, dates, almond milk, vanilla' },
-  { id: 8, name: 'Immunity Boost', price: 8.49, category: 'wellness', calories: 190, ingredients: 'orange, ginger, carrot, lemon, turmeric' }
+const products = [
+  { id: 1, name: 'Wireless Headphones Pro', price: 249.99, category: 'audio', stock: 45, sku: 'AUD-HP-001', rating: 4.5 },
+  { id: 2, name: 'Smart Watch Series 5', price: 399.99, category: 'wearables', stock: 23, sku: 'WER-SW-005', rating: 4.7 },
+  { id: 3, name: 'USB-C Charging Cable 6ft', price: 19.99, category: 'accessories', stock: 150, sku: 'ACC-CBL-006', rating: 4.2 },
+  { id: 4, name: 'Laptop Stand Aluminum', price: 79.99, category: 'office', stock: 67, sku: 'OFF-STD-012', rating: 4.8 },
+  { id: 5, name: '4K Webcam Ultra HD', price: 129.99, category: 'video', stock: 34, sku: 'VID-WC-008', rating: 4.6 },
+  { id: 6, name: 'Mechanical Keyboard RGB', price: 159.99, category: 'peripherals', stock: 28, sku: 'PER-KB-015', rating: 4.9 },
+  { id: 7, name: 'Portable SSD 1TB', price: 149.99, category: 'storage', stock: 56, sku: 'STR-SSD-020', rating: 4.7 },
+  { id: 8, name: 'Wireless Mouse Ergonomic', price: 49.99, category: 'peripherals', stock: 89, sku: 'PER-MS-018', rating: 4.4 }
 ];
 
 const customers = [
-  { id: 1, email: 'admin@freshblend.com', password: 'FreshAdmin2024!', name: 'Sarah Manager', role: 'admin', rewards_points: 850, favorite: 'Protein Power' },
-  { id: 2, email: 'john.doe@email.com', password: 'Berry123', name: 'John Doe', role: 'customer', rewards_points: 120, favorite: 'Berry Blast' },
-  { id: 3, email: 'fitness_jen@email.com', password: 'Healthy2024', name: 'Jennifer Smith', role: 'customer', rewards_points: 340, favorite: 'Green Detox' },
-  { id: 4, email: 'mike_tropical@email.com', password: 'Sunshine99', name: 'Mike Johnson', role: 'customer', rewards_points: 75, favorite: 'Tropical Paradise' }
+  { id: 1, email: 'admin@shoptech.com', password: 'ShopAdmin2024!', name: 'Emma Martinez', role: 'admin', credit_card: '**** **** **** 4521', rewards_points: 12500, member_since: '2020-01-15' },
+  { id: 2, email: 'john.buyer@email.com', password: 'Tech123!', name: 'John Richardson', role: 'customer', credit_card: '**** **** **** 7834', rewards_points: 850, member_since: '2023-04-20' },
+  { id: 3, email: 'sarah.tech@email.com', password: 'Gadget2024', name: 'Sarah Chen', role: 'customer', credit_card: '**** **** **** 2193', rewards_points: 2340, member_since: '2022-08-10' },
+  { id: 4, email: 'mike.shopper@email.com', password: 'BuyStuff99', name: 'Mike Thompson', role: 'customer', credit_card: '**** **** **** 8901', rewards_points: 450, member_since: '2024-01-05' }
 ];
 
-// Shared styles for FreshBlend Smoothie Bar theme
+// Shared styles for ShopTech E-Commerce theme
 const styles = `
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #fff5e6 0%, #ffe4f0 100%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       padding: 20px;
       line-height: 1.6;
@@ -43,12 +43,12 @@ const styles = `
       text-align: center;
     }
     h1 {
-      color: #ff6b9d;
+      color: #667eea;
       font-size: 2.5em;
       margin-bottom: 10px;
       font-weight: 700;
     }
-    .subtitle { color: #4caf50; font-size: 1.2em; }
+    .subtitle { color: #764ba2; font-size: 1.2em; }
     .welcome-section {
       background: white;
       padding: 40px;
@@ -57,7 +57,7 @@ const styles = `
       margin-bottom: 30px;
     }
     .welcome-section h2 {
-      color: #ff6b9d;
+      color: #667eea;
       margin-bottom: 15px;
       font-size: 2em;
     }
@@ -80,13 +80,13 @@ const styles = `
       text-decoration: none;
       color: inherit;
       display: block;
-      border-left: 4px solid #ff6b9d;
+      border-left: 4px solid #667eea;
     }
     .card:hover {
       transform: translateY(-5px);
       box-shadow: 0 4px 20px rgba(0,0,0,0.12);
     }
-    .card h3 { color: #ff6b9d; margin-bottom: 15px; font-size: 1.4em; }
+    .card h3 { color: #667eea; margin-bottom: 15px; font-size: 1.4em; }
     .card p { color: #666; line-height: 1.6; margin-bottom: 15px; }
     .card-badge {
       display: inline-block;
@@ -214,18 +214,18 @@ app.get('/', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>FreshBlend Smoothie Bar</title>
+      <title>ShopTech Electronics</title>
       ${styles}
     </head>
     <body>
       <div class="container">
         <div class="header">
-          <h1>🥤 FreshBlend Smoothie Bar</h1>
+          <h1>💻 ShopTech Electronics</h1>
           <p class="subtitle">Fresh. Healthy. Delicious.</p>
         </div>
         
         <div class="welcome-section">
-          <h2>Welcome to FreshBlend!</h2>
+          <h2>Welcome to ShopTech!</h2>
           <p>Order your favorite smoothies online for pickup or delivery. Browse our menu, search for your favorites, and manage your account.</p>
         </div>
         
@@ -256,7 +256,7 @@ app.get('/', (req, res) => {
         </div>
 
         <div class="footer">
-          <p>🥤 FreshBlend Smoothie Bar • 789 Health Street • (555) 987-6543</p>
+          <p>💻 ShopTech Electronics • 789 Tech Avenue, Silicon Valley • (555) 987-6543</p>
         </div>
       </div>
     </body>
@@ -270,7 +270,7 @@ app.get('/example', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>SQL Injection Tutorial - FreshBlend</title>
+      <title>SQL Injection Tutorial - ShopTech</title>
       ${styles}
     </head>
     <body>
@@ -323,11 +323,11 @@ const query = "SELECT * FROM smoothies WHERE name LIKE '%" + userInput + "%'";</
             <pre>// Original query:
 SELECT * FROM customers WHERE email='user@email.com' AND password='pass123'
 
-// With injection (email: admin@freshblend.com'-- ):
-SELECT * FROM customers WHERE email='admin@freshblend.com'--' AND password='pass123'
+// With injection (email: admin@shoptech.com'-- ):
+SELECT * FROM customers WHERE email='admin@shoptech.com'--' AND password='pass123'
 
 // Becomes (password check commented out!):
-SELECT * FROM customers WHERE email='admin@freshblend.com'</pre>
+SELECT * FROM customers WHERE email='admin@shoptech.com'</pre>
           </div>
 
           <div class="interactive-demo">
@@ -528,7 +528,7 @@ app.get('/api/example/part1', (req, res) => {
     secure_query: secureQuery,
     secure_parameter: '%' + input + '%',
     sql_injection_detected: sqlInjectionDetected,
-    flag: sqlInjectionDetected ? 'FLAG{SQL_1NJ3CT10N_UND3RST00D}' : null,
+    flag: sqlInjectionDetected ? 'NSA{SQL_1NJ3CT10N_UND3RST00D}' : null,
     message: sqlInjectionDetected ? 'SQL injection pattern detected! See how the query is malformed?' : 'Normal input - query works safely',
     explanation: sqlInjectionDetected ? 'Notice how your input modified the SQL query structure. With parameterized queries, this would be impossible!' : 'With secure parameterized queries, even special characters are handled safely.'
   });
@@ -543,7 +543,7 @@ app.get('/api/example/part2', (req, res) => {
     email: email,
     vulnerable_query: vulnerableQuery,
     comment_detected: commentDetected,
-    flag: commentDetected ? 'FLAG{C0MM3NT_1NJ3CT10N_M4ST3R3D}' : null,
+    flag: commentDetected ? 'NSA{C0MM3NT_1NJ3CT10N_M4ST3R3D}' : null,
     message: commentDetected ? 'Comment injection detected! Password check bypassed!' : 'Normal email address',
     explanation: commentDetected ? 'The -- comment removed the password check from the query!' : 'Without injection, both email and password would be checked.',
     remaining_query: commentDetected ? vulnerableQuery.split('--')[0] : vulnerableQuery
@@ -559,7 +559,7 @@ app.get('/api/example/part3', (req, res) => {
     category: category,
     vulnerable_query: vulnerableQuery,
     union_detected: unionDetected,
-    flag: unionDetected ? 'FLAG{UN10N_S3L3CT_KNGW13DG3}' : null,
+    flag: unionDetected ? 'NSA{UN10N_S3L3CT_KN0WL3DG3}' : null,
     message: unionDetected ? 'UNION injection detected! This could expose data from other tables!' : 'Normal category filter',
     explanation: unionDetected ? 'UNION SELECT allows attackers to retrieve data from any table in the database!' : 'Standard query returns only smoothie data.',
     warning: unionDetected ? 'In real attacks, this could expose passwords, credit cards, and other sensitive data!' : null
@@ -568,7 +568,7 @@ app.get('/api/example/part3', (req, res) => {
 
 app.get('/api/example/part4', (req, res) => {
   res.json({
-    flag: 'FLAG{PR3V3NT10N_L34RN3D}',
+    flag: 'NSA{PR3V3NT10N_L34RN3D}',
     message: 'You understand SQL injection prevention!',
     vulnerable_code: {
       description: 'NEVER DO THIS',
@@ -596,7 +596,7 @@ app.get('/lab1', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Search Menu - FreshBlend</title>
+      <title>Product Search - ShopTech</title>
       ${styles}
     </head>
     <body>
@@ -718,7 +718,7 @@ app.get('/api/search', (req, res) => {
     message: 'Search completed successfully',
     query: query,
     results: results,
-    flag: 'FRESHBLEND{M3NU_S34RCH_W0RK1NG}',
+    flag: 'NSA{SQL_1NJ3CT10N_M1T1G4T3D}',
     security_note: 'This endpoint uses parameterized queries - SQL injection is not possible!',
     attempted_injection: query.includes("'") || query.includes('"') || query.includes('--'),
     explanation: 'Even if you tried SQL injection, the parameterized query treats your input as literal text, not SQL code.'
@@ -731,7 +731,7 @@ app.get('/lab2', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Advanced Search - FreshBlend</title>
+      <title>Advanced Search - ShopTech</title>
       ${styles}
     </head>
     <body>
@@ -852,7 +852,7 @@ app.get('/api/advanced-search', (req, res) => {
     return res.json({
       success: false,
       error: 'SQL Error Detected',
-      flag: 'FRESHBLEND{SQL_3RR0R_D3T3CT3D}',
+      flag: 'NSA{SQL_3RR0R_F0UND}',
       message: 'SQL injection vulnerability confirmed!',
       hint: 'The query was: ' + simulatedSQL,
       sql_error: "Syntax error near '" + (query || category) + "' in WHERE clause",
@@ -894,7 +894,7 @@ app.get('/lab3', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Customer Login - FreshBlend</title>
+      <title>Customer Login - ShopTech</title>
       ${styles}
     </head>
     <body>
@@ -913,7 +913,7 @@ app.get('/lab3', (req, res) => {
             <p>This login form is <strong>vulnerable to SQL injection</strong>! Can you bypass authentication?</p>
             <p>Try these techniques:</p>
             <ul>
-              <li><strong>Comment-based:</strong> <code>admin@freshblend.com'--</code> in email (any password)</li>
+              <li><strong>Comment-based:</strong> <code>admin@shoptech.com'--</code> in email (any password)</li>
               <li><strong>OR-based:</strong> <code>' OR '1'='1</code> in email or password</li>
               <li><strong>Known user:</strong> <code>john.doe@email.com'--</code> with wrong password</li>
             </ul>
@@ -937,7 +937,7 @@ app.get('/lab3', (req, res) => {
           </div>
 
           <div class="hint-box">
-            <strong>💡 Hint:</strong> Try <code>admin@freshblend.com'--</code> as the email. The <code>--</code> will comment out the password check!
+            <strong>💡 Hint:</strong> Try <code>admin@shoptech.com'--</code> as the email. The <code>--</code> will comment out the password check!
           </div>
         </div>
 
@@ -948,7 +948,7 @@ app.get('/lab3', (req, res) => {
             <li><strong>Email:</strong> john.doe@email.com | <strong>Password:</strong> Berry123</li>
             <li><strong>Email:</strong> fitness_jen@email.com | <strong>Password:</strong> Healthy2024</li>
           </ul>
-          <p>But the goal is to login as <strong>admin@freshblend.com</strong> WITHOUT knowing the password!</p>
+          <p>But the goal is to login as <strong>admin@shoptech.com</strong> WITHOUT knowing the password!</p>
         </div>
 
         <div class="tutorial-section">
@@ -958,10 +958,10 @@ const query = \`SELECT * FROM customers
                WHERE email = '\${email}' 
                AND password = '\${password}'\`;
 db.query(query);</pre>
-          <p><strong>Attack:</strong> Email: <code>admin@freshblend.com'--</code></p>
+          <p><strong>Attack:</strong> Email: <code>admin@shoptech.com'--</code></p>
           <p><strong>Query becomes:</strong></p>
           <pre>SELECT * FROM customers 
-WHERE email = 'admin@freshblend.com'--' 
+WHERE email = 'admin@shoptech.com'--' 
 AND password = 'anything'</pre>
           <p>The <code>--</code> comments out the password check!</p>
         </div>
@@ -1037,7 +1037,7 @@ app.post('/api/login', (req, res) => {
     { pattern: "' OR 1=1", name: 'OR-based injection (numeric)' },
     { pattern: "'--", name: 'Comment-based injection' },
     { pattern: "' #", name: 'Comment-based injection (hash)' },
-    { pattern: "admin@freshblend.com'--", name: 'Direct admin bypass' }
+    { pattern: "admin@shoptech.com'--", name: 'Direct admin bypass' }
   ];
   
   const injectionDetected = bypassPatterns.some(p => 
@@ -1049,9 +1049,9 @@ app.post('/api/login', (req, res) => {
     return res.json({
       success: true,
       message: 'Authentication successful (via SQL injection!)',
-      flag: 'FRESHBLEND{4UTH_BYP4SS_SUCC3SS}',
+      flag: 'NSA{SQL_4UTH_BYP4SS3D}',
       customer: {
-        email: 'admin@freshblend.com',
+        email: 'admin@shoptech.com',
         name: 'Sarah Manager',
         role: 'admin',
         rewards_points: 850,
@@ -1087,7 +1087,7 @@ app.post('/api/login', (req, res) => {
     query_executed: simulatedSQL,
     hint: 'Try SQL injection techniques to bypass authentication!',
     examples: [
-      "Email: admin@freshblend.com'-- (with any password)",
+      "Email: admin@shoptech.com'-- (with any password)",
       "Email: ' OR '1'='1 (with any password)",
       "Password: ' OR '1'='1 (with any email)"
     ]
@@ -1098,7 +1098,7 @@ app.post('/api/login', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`
 ╔════════════════════════════════════════════╗
-║   🥤 FreshBlend Smoothie Bar              ║
+║   💻 ShopTech E-Commerce                   ║
 ║   SQL Injection Training Lab               ║
 ║   Server running on port ${PORT}              ║
 ║                                            ║

@@ -20,15 +20,16 @@ app.use((req, res, next) => {
     next();
 });
 
-// Users database - ZenFlow Yoga Studio Members
+// Users database - TechCorp Global HR System
 const users = [
-    { id: 1, username: 'emma_s', email: 'emma.stevens@email.com', role: 'member', membership: 'Premium', creditCard: '**** 4532', renewalDate: '2025-03-15', joinDate: '2023-01-15', favoriteClass: 'Vinyasa Flow' },
-    { id: 2, username: 'sarah_m', email: 'sarah.martinez@email.com', role: 'member', membership: 'Basic', creditCard: '**** 7821', renewalDate: '2025-02-28', joinDate: '2024-06-20', favoriteClass: 'Hatha Yoga' },
-    { id: 3, username: 'mike_chen', email: 'mike.chen@email.com', role: 'member', membership: 'Premium', creditCard: '**** 3345', renewalDate: '2025-04-10', joinDate: '2023-09-08', favoriteClass: 'Power Yoga' },
-    { id: 4, username: 'instructor_jane', email: 'jane.williams@zenflow.yoga', role: 'instructor', membership: 'Staff', creditCard: '**** 9012', accessLevel: 'full', specialization: 'Vinyasa & Meditation', yearsTeaching: 8 }
+    { id: 1, username: 'jchen', email: 'jennifer.chen@techcorp.com', role: 'employee', department: 'Engineering', title: 'Senior Software Engineer', salary: 145000, ssn: '***-**-4521', performanceRating: 4.2, hireDate: '2019-03-15', securityClearance: 'Standard', directReports: 0, stockOptions: 5000 },
+    { id: 2, username: 'mrodriguez', email: 'maria.rodriguez@techcorp.com', role: 'employee', department: 'Marketing', title: 'Marketing Coordinator', salary: 68000, ssn: '***-**-7834', performanceRating: 3.8, hireDate: '2023-06-01', securityClearance: 'Standard', directReports: 0, stockOptions: 500 },
+    { id: 3, username: 'dthompson', email: 'david.thompson@techcorp.com', role: 'employee', department: 'Sales', title: 'Account Executive', salary: 95000, ssn: '***-**-2193', performanceRating: 4.5, hireDate: '2021-01-20', securityClearance: 'Standard', directReports: 0, stockOptions: 2000, lastReview: 'Exceeds expectations in Q4 2025' },
+    { id: 4, username: 'skumar', email: 'sarah.kumar@techcorp.com', role: 'manager', department: 'Human Resources', title: 'HR Director', salary: 165000, ssn: '***-**-8901', performanceRating: 4.8, hireDate: '2017-09-10', securityClearance: 'Elevated', directReports: 12, stockOptions: 15000, accessLevel: 'full', canAccessAllRecords: true, canModifySalaries: true },
+    { id: 5, username: 'rceo', email: 'robert.williams@techcorp.com', role: 'executive', department: 'Executive', title: 'Chief Executive Officer', salary: 850000, ssn: '***-**-0001', bonus: 500000, performanceRating: 5.0, hireDate: '2015-01-01', securityClearance: 'Executive', directReports: 8, stockOptions: 250000, boardMember: true, accessLevel: 'unrestricted' }
 ];
 
-const CURRENT_USER_ID = 2; // Sarah is the current logged-in member
+const CURRENT_USER_ID = 2; // Maria Rodriguez is the current logged-in employee
 
 // Home page
 app.get('/', (req, res) => {
@@ -36,12 +37,12 @@ app.get('/', (req, res) => {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>ZenFlow Yoga - Member Portal</title>
+            <title>TechCorp Global - Employee Portal</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-                    background: linear-gradient(135deg, #e8f5e9 0%, #c5e1a5 100%);
+                    background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
                     min-height: 100vh;
                     padding: 20px;
                 }
@@ -58,9 +59,14 @@ app.get('/', (req, res) => {
                 .logo {
                     font-size: 2em;
                     font-weight: 600;
-                    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
+                    color: #1976d2;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+                .logo::before {
+                    content: '🏢';
+                    font-size: 1.2em;
                 }
                 .user-info {
                     font-size: 0.9em;
@@ -78,7 +84,7 @@ app.get('/', (req, res) => {
                     margin-bottom: 30px;
                 }
                 .welcome-section h1 {
-                    color: #2e7d32;
+                    color: #1565c0;
                     margin-bottom: 15px;
                     font-size: 2.2em;
                 }
@@ -102,14 +108,14 @@ app.get('/', (req, res) => {
                     text-decoration: none;
                     color: inherit;
                     display: block;
-                    border-left: 4px solid #66bb6a;
+                    border-left: 4px solid #1976d2;
                 }
                 .card:hover {
                     transform: translateY(-5px);
                     box-shadow: 0 4px 20px rgba(0,0,0,0.12);
                 }
                 .card h3 {
-                    color: #2e7d32;
+                    color: #1565c0;
                     margin-bottom: 15px;
                     font-size: 1.4em;
                 }
@@ -144,57 +150,57 @@ app.get('/', (req, res) => {
                     transition: color 0.2s;
                 }
                 .footer a:hover {
-                    color: #2e7d32;
+                    color: #1565c0;
                 }
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
-                    <div class="logo">🧘 ZenFlow Yoga</div>
+                    <div class="logo">TechCorp Global</div>
                     <div class="user-info">
-                        Logged in as: <strong>sarah_m</strong> (Member #${CURRENT_USER_ID})
+                        Logged in as: <strong>mrodriguez</strong> (Employee #${CURRENT_USER_ID})
                     </div>
                 </div>
 
                 <div class="welcome-section">
-                    <h1>Welcome to Your Member Portal, Sarah! 🌸</h1>
-                    <p>Namaste! Access your membership details, connect with our community, view upcoming classes, and manage your account—all in one place.</p>
+                    <h1>Welcome to Your Employee Portal, Maria! 💼</h1>
+                    <p>Access your HR records, review benefits, connect with colleagues, and manage your employment information securely.</p>
                 </div>
 
                 <div class="nav-cards">
                     <a href="/example" class="card">
-                        <h3>📚 Getting Started Guide</h3>
-                        <p>New to our portal? Learn how to make the most of your membership, book classes, and update your preferences.</p>
-                        <span class="card-badge badge-tutorial">Help Center</span>
+                        <h3>📚 Onboarding Guide</h3>
+                        <p>New to TechCorp? Learn how to navigate the employee portal, access your benefits, and connect with your team.</p>
+                        <span class="card-badge badge-tutorial">Training</span>
                     </a>
 
                     <a href="/lab1" class="card">
-                        <h3>👥 Community Directory</h3>
-                        <p>Connect with fellow members and instructors in our vibrant yoga community.</p>
-                        <span class="card-badge badge-easy">Community</span>
+                        <h3>👥 Employee Directory</h3>
+                        <p>Search and connect with colleagues across all departments and locations.</p>
+                        <span class="card-badge badge-easy">Directory</span>
                     </a>
 
                     <a href="/lab2" class="card">
                         <h3>👤 My Profile</h3>
-                        <p>View and manage your membership details, payment information, and personal preferences.</p>
-                        <span class="card-badge badge-medium">Account</span>
+                        <p>View your employment details, compensation information, and performance reviews.</p>
+                        <span class="card-badge badge-medium">Personal</span>
                     </a>
 
                     <a href="/lab3" class="card">
-                        <h3>📅 Instructor Dashboard</h3>
-                        <p>Instructor-only area for managing class schedules, viewing bookings, and accessing teaching resources.</p>
-                        <span class="card-badge badge-hard">Staff Access</span>
+                        <h3>🔐 HR Admin Dashboard</h3>
+                        <p>HR staff-only area for managing employee records, processing changes, and accessing sensitive data.</p>
+                        <span class="card-badge badge-hard">Restricted</span>
                     </a>
                 </div>
 
                 <div class="footer">
-                    <p>🧘 ZenFlow Yoga Studio • 123 Peaceful Lane, Downtown • (555) 123-4567</p>
+                    <p>🏢 TechCorp Global • 500 Innovation Drive, Silicon Valley • (555) 867-5309</p>
                     <p style="margin-top: 10px; font-size: 0.9em;">
-                        <a href="/about">About Us</a> | 
-                        <a href="/contact">Contact</a> | 
-                        <a href="/classes">Class Schedule</a> | 
-                        <a href="/membership">Membership Plans</a>
+                        <a href="/about">About TechCorp</a> | 
+                        <a href="/contact">IT Support</a> | 
+                        <a href="/benefits">Benefits</a> | 
+                        <a href="/careers">Careers</a>
                     </p>
                 </div>
             </div>
@@ -209,7 +215,7 @@ app.get('/example', (req, res) => {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Getting Started - ZenFlow Yoga</title>
+            <title>Getting Started - TechCorp Global</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
@@ -617,7 +623,7 @@ app.get('/lab1', (req, res) => {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Community Directory - ZenFlow Yoga</title>
+            <title>Employee Directory - TechCorp Global</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
@@ -767,7 +773,7 @@ app.get('/lab1', (req, res) => {
 
                 <div class="info-section">
                     <h2>Welcome to Our Community</h2>
-                    <p>The ZenFlow Community Directory helps you connect with other members who share your passion for yoga. Browse member profiles, find practice partners, and get to know our instructors.</p>
+                    <p>The TechCorp Employee Directory helps you connect with colleagues across departments. Browse employee profiles, find team members, and access organizational information.</p>
                     
                     <div class="search-box">
                         <strong>🔍 Search for Members</strong>
@@ -893,7 +899,7 @@ app.get('/api/members/user/:id', (req, res) => {
             email: user.email,
             role: user.role,
             membership: user.membership,
-            flag: 'FLAG{C0MMUN1TY_3NUM3R4T10N_C0MPL3T3}',
+            flag: 'NSA{F0UND_TH3_US3RS}',
             message: 'You have successfully enumerated all community members!',
             stats: {
                 totalMembers: users.length,
@@ -933,7 +939,7 @@ app.get('/lab2', (req, res) => {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>My Profile - ZenFlow Yoga</title>
+            <title>Employee Profile - TechCorp Global</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
@@ -1225,7 +1231,7 @@ app.get('/api/profile/user/:id', (req, res) => {
     
     // If accessing someone else's profile (IDOR vulnerability exploited)
     if (userId !== CURRENT_USER_ID) {
-        profileData.flag = 'FLAG{1D0R_PR0F1L3_4CC3SS_V1OL4T10N}';
+        profileData.flag = 'NSA{1D0R_V1CT1M_4CC3SS}';
         profileData._vuln_note = 'Unauthorized access: You accessed another member\'s private profile!';
     }
     
@@ -1244,7 +1250,7 @@ app.get('/lab3', (req, res) => {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Instructor Dashboard - ZenFlow Yoga</title>
+            <title>HR Admin Dashboard - TechCorp Global</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
@@ -1403,7 +1409,7 @@ app.get('/lab3', (req, res) => {
                 <div class="alert-box">
                     <h2>🔒 Staff Access Required</h2>
                     <p>You are currently logged in as <strong>sarah_m</strong> (Basic Member).</p>
-                    <p style="margin-top: 10px;">This area is restricted to ZenFlow instructors and staff members only. If you believe you should have access, please contact our admin team at staff@zenflow.yoga.</p>
+                    <p style="margin-top: 10px;">This area is restricted to TechCorp HR administrators and authorized personnel only. If you believe you should have access, please contact our HR team at hr@techcorp.com.</p>
                 </div>
 
                 <div class="info-section">
@@ -1435,7 +1441,7 @@ app.get('/lab3', (req, res) => {
                 </div>
 
                 <div class="flag-reveal">
-                    🎉 FLAG{PR1V1L3G3_3SC4L4T10N_C00K13_M4N1PUL4T10N} 🎉
+                    🎉 NSA{R00T_4CC3SS_4CH13V3D} 🎉
                     <br><br>
                     <div style="font-size: 0.7em; font-weight: normal; margin-top: 15px;">
                         Congratulations! You successfully escalated your privileges by modifying the authentication cookie!
@@ -1488,7 +1494,7 @@ app.get('/lab3', (req, res) => {
 
                 <div class="info-section">
                     <h2>🎓 Becoming an Instructor</h2>
-                    <p>Interested in teaching at ZenFlow? We're always looking for passionate, certified yoga instructors to join our team.</p>
+                    <p>Interested in joining TechCorp? We're always looking for talented professionals to join our team across engineering, sales, and operations.</p>
                     <p style="margin-top: 15px;"><strong>Requirements:</strong></p>
                     <ul class="feature-list">
                         <li>200-hour (minimum) yoga teacher certification</li>
@@ -1496,7 +1502,7 @@ app.get('/lab3', (req, res) => {
                         <li>CPR/First Aid certification</li>
                         <li>Experience teaching group classes</li>
                     </ul>
-                    <p style="margin-top: 15px;">Contact <strong>careers@zenflow.yoga</strong> for more information about joining our teaching staff.</p>
+                    <p style="margin-top: 15px;">Contact <strong>careers@techcorp.com</strong> for more information about joining our team.</p>
                 </div>
 
                 <div class="back-link">
@@ -1531,7 +1537,7 @@ app.get('/api/instructor/user/:id/dashboard', (req, res) => {
     if (user.role !== 'instructor') {
         return res.status(403).json({ 
             error: 'Access Denied',
-            message: 'This area is restricted to ZenFlow instructors only.',
+            message: 'This area is restricted to TechCorp HR administrators only.',
             yourRole: 'member',
             requiredRole: 'instructor'
         });
@@ -1567,7 +1573,7 @@ app.get('/api/instructor/user/:id/dashboard', (req, res) => {
     
     // If privilege escalation occurred (accessing instructor dashboard as regular member)
     if (userId !== CURRENT_USER_ID) {
-        dashboardData.flag = 'FLAG{PR1V1L3G3_3SC4L4T10N_1NSTRUCT0R}';
+        dashboardData.flag = 'NSA{R00T_4CC3SS_4CH13V3D}';
         dashboardData._vuln_note = 'Privilege escalation detected: Regular member accessed instructor dashboard!';
     }
     
@@ -1586,7 +1592,7 @@ const exampleMembers = [
     { id: 103, name: 'Morgan Chen', email: 'morgan.c@email.com', membershipType: 'Basic', favoriteClass: 'Yin Yoga', joinedDate: '2024-03-15' },
     { id: 104, name: 'Casey Wong', email: 'casey.w@email.com', membershipType: 'Premium', favoriteClass: 'Ashtanga', joinedDate: '2023-08-30' },
     { id: 105, name: 'Riley Martinez', email: 'riley.m@email.com', membershipType: 'Family', favoriteClass: 'Restorative Yoga', joinedDate: '2024-02-18' },
-    { id: 108, name: 'Jamie Thompson', email: 'jamie.t@zenflow.yoga', membershipType: 'Staff', role: 'hidden_member', favoriteClass: 'Kundalini', joinedDate: '2022-01-05', specialNote: 'VIP Founding Member' }
+    { id: 108, name: 'Jamie Thompson', email: 'jamie.t@techcorp.com', membershipType: 'Staff', role: 'hidden_member', favoriteClass: 'Executive', joinedDate: '2022-01-05', specialNote: 'VIP Founding Member' }
 ];
 
 // Track enumeration progress for Part 4
@@ -1612,7 +1618,7 @@ app.get('/api/example/part1/member/:id', (req, res) => {
         return res.json({
             success: true,
             member: member,
-            flag: 'FLAG{D3VT00LS_M3MB3R_D1SC0V3RY}',
+            flag: 'NSA{D3VT00LS_M4ST3R}',
             message: '🎉 Congratulations! You discovered the hidden VIP member profile!',
             tutorial: 'You successfully used browser DevTools to enumerate member IDs and find hidden resources.'
         });
@@ -1640,7 +1646,7 @@ app.get('/api/example/part2/test', (req, res) => {
     if (userAgent.toLowerCase().includes('curl')) {
         return res.json({
             success: true,
-            flag: 'FLAG{CURL_C0MM4ND_L1N3_M4ST3R}',
+            flag: 'NSA{CURL_C0MM4ND3R}',
             message: '🎉 Success! You accessed the API using cURL!',
             tutorial: 'You learned how command-line tools can interact with web APIs in ways the browser cannot.',
             requestInfo: {
@@ -1670,7 +1676,7 @@ app.get('/api/example/part3/intercept', (req, res) => {
         return res.json({
             success: true,
             accessLevel: 'instructor',
-            flag: 'FLAG{1NT3RC3PT_P4R4M_M4N1PUL4T10N}',
+            flag: 'NSA{BURP_1NT3RC3PT0R}',
             message: '🎉 Access granted! You manipulated the access parameter to gain instructor privileges!',
             tutorial: 'You learned how to intercept and modify HTTP requests to change application behavior.',
             instructorData: {
@@ -1680,8 +1686,8 @@ app.get('/api/example/part3/intercept', (req, res) => {
                     { date: '2025-01-25', time: '10:00 AM', class: 'Power Yoga', enrolled: 15, capacity: 15 }
                 ],
                 teachingResources: {
-                    lessonPlans: 'https://zenflow.yoga/instructor/lessons',
-                    studentRoster: 'https://zenflow.yoga/instructor/roster',
+                    lessonPlans: 'https://techcorp.com/hr/policies',
+                    studentRoster: 'https://techcorp.com/hr/roster',
                     salaryInfo: '$45/hour base rate + bonuses'
                 }
             }
@@ -1728,7 +1734,7 @@ app.get('/api/example/part4/enumerate/:id', (req, res) => {
         return res.json({
             success: true,
             member: member,
-            flag: 'FLAG{3NUM3R4T10N_C0MPL3T3_4LL_M3MB3RS}',
+            flag: 'NSA{3NUM3R4T10N_PR0}',
             message: '🎉 Congratulations! You successfully enumerated all active members!',
             tutorial: 'You learned how sequential ID enumeration can expose all records in a system.',
             stats: {
@@ -1764,7 +1770,7 @@ app.get('/api/example/part4/enumerate/:id', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`\x1b[32m
 ╔════════════════════════════════════════════╗
-║   🧘 ZenFlow Yoga - Member Portal         ║
+║   🏢 TechCorp Global - Employee Portal    ║
 ║   Server running on port ${PORT}           ║
 ║                                            ║
 ║   Access the portal:                      ║

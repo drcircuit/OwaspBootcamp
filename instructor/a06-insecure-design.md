@@ -3,19 +3,25 @@
 **Lab URL:** http://localhost:3006  
 **Topic:** OWASP Top 10 2025 - A06: Insecure Design  
 **Difficulty:** Easy → Medium → Hard  
-**Theme:** TacoTruck Express 🌮
+**Theme:** SecureBank Online Banking 🏦
 
 ---
 
 ## Overview
 
-This lab demonstrates insecure design patterns through a food truck ordering system. Students learn about missing rate limiting, business logic flaws, and race conditions—all design-level vulnerabilities that can't be fixed by input validation alone.
+This lab demonstrates insecure design patterns through a realistic online banking system. Students learn about missing rate limiting, business logic flaws in financial transactions, and race conditions—all design-level vulnerabilities that can't be fixed by input validation alone.
+
+### Real-World Impact
+- **Account Takeover:** Unlimited PIN guessing attempts
+- **Financial Fraud:** Logic flaws enable unauthorized transfers
+- **Race Condition Exploits:** Concurrent withdrawals cause overdrafts
+- **Regulatory Violations:** Failed security controls trigger compliance issues
 
 ### Learning Objectives
-- Understand design-level security flaws
-- Identify missing security controls (rate limiting)
-- Exploit business logic vulnerabilities
-- Demonstrate race condition attacks
+- Understand design-level security flaws in financial systems
+- Identify missing security controls (rate limiting, transaction verification)
+- Exploit business logic vulnerabilities in money transfers
+- Demonstrate race condition attacks on balance calculations
 
 ---
 
@@ -23,9 +29,9 @@ This lab demonstrates insecure design patterns through a food truck ordering sys
 
 | Lab | Vulnerability | Solution | Flag |
 |-----|---------------|----------|------|
-| Lab 1 | Missing Rate Limiting | Brute force order codes | `TACO{R4T3_L1M1T_M1SS1NG_3XTR4_GU4C}` |
-| Lab 2 | Discount Stacking | Apply same promo code multiple times | `TACO{L0G1C_FL4W_FR33_GU4C4M0L3}` |
-| Lab 3 | Race Condition | Concurrent withdrawals overdraft balance | `TACO{R4C3_C0ND1T10N_3XTR4_T4C0S}` |
+| Lab 1 | Missing Rate Limiting | Brute force account PINs | `NSA{N0_R4T3_L1M1T}` |
+| Lab 2 | Logic Flaw | Exploit transfer validation bypass | `NSA{L0G1C_FL4W_F0UND}` |
+| Lab 3 | Race Condition | Concurrent withdrawals cause overdraft | `NSA{R4C3_C0ND1T10N_3XPL01T3D}` |
 
 ---
 

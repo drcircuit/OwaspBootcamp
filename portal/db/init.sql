@@ -125,78 +125,80 @@ INSERT INTO challenges (owasp_category, title, description, difficulty, points, 
 -- Lab 1 (Enumeration) - Easy
 INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order, tutorial, mission_brief) VALUES
     ('A01', 'A01 Lab 1: User Enumeration', 'Enumerate users in the system to identify potential targets.', 'Easy', 100, 'NSA{F0UND_TH3_US3RS}', 'User IDs are sequential', 'http://localhost:3001/lab1', 'lab', 1, 5, NULL,
-    '**MISSION BRIEF:** Agent, Evil Corp''s ZenFlow Yoga membership portal is our first target. Intelligence suggests their user directory is poorly secured.
+    '**MISSION BRIEF:** Agent, TechCorp Global''s HR portal is our first target. Intelligence suggests their employee directory lacks proper access controls.
 
-**YOUR OBJECTIVE:** Discover all members in the system. The more members you identify, the more targets we have for future operations.
+**YOUR OBJECTIVE:** Discover all employees in the system. The more personnel records you identify, the more targets we have for future operations.
 
 **WHAT WE KNOW:**
 - The portal is at http://localhost:3001/lab1
-- User IDs might be predictable
-- The "Community Directory" feature could be exploited
+- Employee IDs might be predictable
+- The "Employee Directory" feature could be exploited
 
 **WHAT YOU NEED TO FIND:**
-- How many total members exist?
-- Can you enumerate all usernames and email addresses?
-- Is there anyone with elevated privileges?
+- How many total employees exist?
+- Can you enumerate all names, titles, and email addresses?
+- Is there anyone with elevated HR privileges?
 
 **TOOLS TO USE:** Browser DevTools, cURL, or Burp Suite
-**ATTACK VECTOR:** Look for API endpoints that accept user IDs as parameters
+**ATTACK VECTOR:** Look for API endpoints that accept employee IDs as parameters
 
-The flag will reveal itself once you''ve successfully mapped their entire user base. Good hunting, agent! 🎯');
+The flag will reveal itself once you''ve successfully mapped their entire employee base. Good hunting, agent! 🎯');
 
 -- Lab 2 (Exploitation) - Medium
 INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order, tutorial, mission_brief) VALUES
     ('A01', 'A01 Lab 2: Access Other Profiles', 'Exploit IDOR to access data belonging to other users.', 'Medium', 150, 'NSA{1D0R_V1A_1NC3PT10N}', 'Try different IDs', 'http://localhost:3001/lab2', 'lab', 2, 6, NULL,
     '**MISSION BRIEF:** Excellent work on the reconnaissance, agent. Now it''s time to exploit what you''ve learned.
 
-**YOUR OBJECTIVE:** Access Sarah''s profile data. You''re logged in as a regular member, but we need to see what other members can see about each other.
+**YOUR OBJECTIVE:** Access Maria Rodriguez''s employment profile. You''re logged in as a regular employee, but we need her sensitive HR data.
 
-**THE VULNERABILITY:** Evil Corp''s "My Profile" feature (http://localhost:3001/lab2) doesn''t properly verify that users can only access their OWN data. This is called an Insecure Direct Object Reference (IDOR).
+**THE VULNERABILITY:** TechCorp''s "My Profile" feature (http://localhost:3001/lab2) doesn''t properly verify that employees can only access their OWN data. This is called an Insecure Direct Object Reference (IDOR).
 
 **YOUR APPROACH:**
 1. Access your own profile first to understand the request structure
-2. Identify how user IDs are passed (URL parameter? Cookie? Header?)
-3. Manipulate the request to access Sarah''s profile (user ID 2)
-4. Extract her sensitive payment information
+2. Identify how employee IDs are passed (URL parameter? Cookie? Header?)
+3. Manipulate the request to access Maria''s profile (employee ID 2)
+4. Extract her sensitive compensation information
 
 **WHAT YOU''RE LOOKING FOR:**
-- Credit card details (even if masked, the pattern tells us a lot)
-- Renewal dates and membership level
-- Personal preferences and history
+- Salary and compensation details
+- Performance ratings and reviews
+- SSN (even if masked) and hire date
+- Stock options and equity grants
 
-**WARNING:** Evil Corp''s logs might detect unusual access patterns. Work carefully and deliberately.
+**WARNING:** TechCorp''s security logs might detect unusual access patterns. Work carefully and deliberately.
 
-Success means gaining unauthorized access to another user''s private information. The flag awaits in Sarah''s profile data. 💳🔓');
+Success means gaining unauthorized access to another employee''s confidential HR data. The flag awaits in Maria''s profile. 💼🔓');
 
 -- Lab 3 (Escalation) - Hard
 INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order, tutorial, mission_brief) VALUES
     ('A01', 'A01 Lab 3: Privilege Escalation', 'Escalate privileges to gain administrator access.', 'Hard', 200, 'NSA{R00T_4CC3SS_4CH13V3D}', 'Admin is just another user', 'http://localhost:3001/lab3', 'lab', 3, 7, NULL,
-    '**MISSION BRIEF:** Outstanding work, agent. You''ve proven you can move laterally between user accounts. Now for the ultimate prize: instructor-level access.
+    '**MISSION BRIEF:** Outstanding work, agent. You''ve proven you can move laterally between employee accounts. Now for the ultimate prize: HR administrator access.
 
-**YOUR OBJECTIVE:** Break into the Instructor Dashboard at http://localhost:3001/lab3 and gain full administrative control over Evil Corp''s yoga studio system.
+**YOUR OBJECTIVE:** Break into the HR Admin Dashboard at http://localhost:3001/lab3 and gain full administrative control over TechCorp''s personnel system.
 
-**THE TARGET:** The instructor account has access to:
-- All member personal data and payment information
-- Class scheduling and booking systems  
-- Staff-only resources and internal communications
-- The master flag proving complete system compromise
+**THE TARGET:** The HR admin account has access to:
+- All employee salary data and compensation history
+- Complete organizational structure and reporting chains
+- Performance reviews and disciplinary records
+- System administration capabilities
+- The master flag proving complete HR system compromise
 
-**THE CHALLENGE:** You''ve exploited IDOR to access peer accounts. But can you escalate your privileges to a completely different role? 
+**THE CHALLENGE:** You''ve exploited IDOR to access peer accounts. But can you escalate your privileges to a completely different role with elevated access? 
 
 **ATTACK STRATEGY:**
-- Recall that instructor Jane Williams has username "instructor_jane" (user ID 4)
-- The same IDOR vulnerability that let you access Sarah might work on instructor accounts too
-- Staff accounts often have different data structures - analyze carefully
-- Look for the "accessLevel" field in the response
+- Recall that HR Director Sarah Kumar has elevated privileges (user ID 4, role: manager)
+- The same IDOR vulnerability might work, but you may need to manipulate authentication tokens
+- Check browser cookies - does the system trust client-side role assignments?
+- Look for cookies like `userRole` and `userId` that might be manipulable
 
 **WHAT MAKES THIS HARD:**
-- Instructor data might be structured differently
-- You might need to chain multiple requests
-- The flag could be hidden in instructor-specific features
+- Admin data might be structured differently
+- You might need to manipulate multiple authentication mechanisms
+- Cookie-based auth can be bypassed with DevTools
 
-**THE STAKES:** If you succeed, you''ll have demonstrated a complete privilege escalation attack chain - from anonymous recon to full administrative compromise of Evil Corp''s system.
+**THE STAKES:** If you succeed, you''ll have demonstrated a complete privilege escalation attack - from regular employee to full HR admin access with visibility into C-suite compensation and the power to modify personnel records.
 
-This is it, agent. Time to claim root access. 👑🔓');
+This is it, agent. Time to claim administrative access. 👑🔓');
 
 -- ========================================
 -- A02: SECURITY MISCONFIGURATION
@@ -238,7 +240,7 @@ Debug information gives attackers a roadmap of your system''s internals. Find wh
     ('A02', 'A02 Lab 2: Configuration Leak', 'Extract sensitive configuration data from exposed endpoints.', 'Medium', 150, 'NSA{C0NF1G_L3AK3D}', 'Check for config files', 'http://localhost:3002/lab2', 'lab', 2, 3, NULL,
     '**MISSION BRIEF:** Good work locating their debug endpoint, agent. Now let''s dig deeper into their configuration.
 
-**YOUR OBJECTIVE:** Extract sensitive configuration data that Evil Corp has carelessly exposed.
+**YOUR OBJECTIVE:** Extract sensitive configuration data that CloudDeploy has carelessly exposed.
 
 **THE VULNERABILITY:** Many applications store configuration in files like .env, config.json, or expose them via API endpoints. If these aren''t properly protected, attackers can read credentials, API keys, and system secrets.
 
@@ -259,36 +261,45 @@ Debug information gives attackers a roadmap of your system''s internals. Find wh
 
 Extract their secrets and claim your flag! 🗝️'),
     ('A02', 'A02 Lab 3: Admin Panel Access', 'Leverage misconfigurations to access the admin panel.', 'Hard', 200, 'NSA{4DM1N_P4N3L_PWN3D}', 'Default credentials exist', 'http://localhost:3002/lab3', 'lab', 3, 4, NULL,
-    '**MISSION BRIEF:** Excellent reconnaissance, agent. You''ve mapped their debug endpoints and extracted configuration data. Now it''s time to use that intelligence.
+    '**MISSION BRIEF:** Excellent reconnaissance, agent. You''ve mapped CloudDeploy''s debug endpoints and extracted their AWS credentials. Now it''s time to weaponize that intelligence.
 
-**YOUR OBJECTIVE:** Gain unauthorized access to Evil Corp''s administrative control panel.
+**YOUR OBJECTIVE:** Gain unauthorized administrative access to CloudDeploy''s platform control panel.
 
-**THE SCENARIO:** You''ve discovered they have an admin panel at http://localhost:3002/lab3, but it requires authentication. However, our intel suggests they committed the ultimate sin: default credentials.
+**THE SCENARIO:** You''ve discovered an admin panel at http://localhost:3002/lab3 requiring authentication. Our intel suggests they made a fatal mistake: using default credentials in production.
 
 **DEFAULT CREDENTIAL ATTACK:**
-Many systems ship with default admin accounts like:
+Many cloud platforms ship with default admin accounts:
 - admin/admin
+- admin/CloudDeploy123!
 - administrator/password
-- admin/password123
 - root/toor
 
-Organizations often deploy systems without changing these defaults. It''s shockingly common!
+**WHY THIS WORKS:** During rapid deployment cycles, DevOps teams often:
+1. Use default credentials for initial setup
+2. Forget to rotate them before going live
+3. Leave them unchanged for months or years
 
 **YOUR STRATEGY:**
-1. Navigate to the admin login at http://localhost:3002/lab3
-2. Use the configuration data you found earlier (hint: check what you learned in Lab 2!)
-3. Try common default credential combinations
-4. Once logged in, explore the admin features
-5. Locate the flag proving you have full administrative access
+1. Navigate to http://localhost:3002/lab3
+2. Review the configuration data from Lab 2 - credentials might be there
+3. Try common default combinations
+4. Check the exposed .env file for admin passwords
+5. Once authenticated, explore admin capabilities
 
 **WHAT MAKES THIS HARD:**
-- You need to connect the dots from previous labs
-- The credentials might be hidden in the config data you extracted
-- You might need to try multiple authentication methods
+- You must connect intelligence from previous labs
+- The password might be hidden in config data
+- Multiple authentication methods to try
 
-**THE PRIZE:** Admin access means total system control. You''ll be able to view all users, modify data, change system settings, and prove complete compromise of Evil Corp''s BookWise Library.
+**THE PRIZE:** Admin access to CloudDeploy platform means:
+- Full control over all customer deployments
+- Ability to inject malicious code
+- Access to customer databases and environments
+- Complete infrastructure compromise
 
-Time to claim your admin privileges, agent! 👑🚪');
+**REAL-WORLD PARALLEL:** This is exactly how the Twilio breach occurred - compromised credentials led to customer account takeover.
+
+Time to claim platform admin access, agent! 👑🚪☁️');
 
 -- ========================================
 -- A03: SOFTWARE SUPPLY CHAIN FAILURES
@@ -521,7 +532,7 @@ INSERT INTO challenges (owasp_category, title, description, difficulty, points, 
 -- Lab 1 (Discovery) - Easy
 INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order, tutorial, mission_brief) VALUES
     ('A05', 'A05 Lab 1: Find Input Points', 'Identify parameters that interact with the database.', 'Easy', 100, 'NSA{1NPUT_P01NTS_F0UND}', 'Forms and URLs accept input', 'http://localhost:3005/lab1', 'lab', 1, 5, NULL,
-    '**MISSION BRIEF:** Agent, Evil Corp''s PetShop Online is our next target. This e-commerce platform handles sensitive customer and payment data.
+    '**MISSION BRIEF:** Agent, ShopTech''s e-commerce platform is our next target. This online electronics retailer handles sensitive customer data and payment information.
 
 **YOUR OBJECTIVE:** Map all user input points that could interact with the backend database.
 
@@ -554,7 +565,7 @@ INSERT INTO challenges (owasp_category, title, description, difficulty, points, 
     ('A05', 'A05 Lab 2: Test for SQLi', 'Test identified parameters for SQL injection vulnerabilities.', 'Medium', 150, 'NSA{SQL1_D3T3CT3D}', 'Single quotes cause errors', 'http://localhost:3005/lab2', 'lab', 2, 6, NULL,
     '**MISSION BRIEF:** Excellent mapping, agent. Now let''s test which of those inputs are actually vulnerable.
 
-**YOUR OBJECTIVE:** Confirm SQL injection vulnerabilities in Evil Corp''s PetShop by testing the input points you discovered.
+**YOUR OBJECTIVE:** Confirm SQL injection vulnerabilities in ShopTech''s platform by testing the input points you discovered.
 
 **THE TESTING METHODOLOGY:**
 SQL injection happens when user input is concatenated directly into SQL queries without proper sanitization.
@@ -589,7 +600,7 @@ INSERT INTO challenges (owasp_category, title, description, difficulty, points, 
     ('A05', 'A05 Lab 3: Exploit SQL Injection', 'Exploit SQL injection to bypass authentication or extract data.', 'Hard', 200, 'NSA{1NJ3CT_Y0UR_W4Y_1N}', 'UNION SELECT is powerful', 'http://localhost:3005/lab3', 'lab', 3, 7, NULL,
     '**MISSION BRIEF:** Outstanding work confirming the vulnerability, agent. Now it''s time to weaponize it.
 
-**YOUR OBJECTIVE:** Exploit the SQL injection vulnerability to extract sensitive data from Evil Corp''s database.
+**YOUR OBJECTIVE:** Exploit the SQL injection vulnerability to extract sensitive data from ShopTech''s database.
 
 **THE CHALLENGE:** You''ve proven SQLi exists. Now you need to:
 1. Bypass authentication OR extract data directly
@@ -646,7 +657,7 @@ INSERT INTO challenges (owasp_category, title, description, difficulty, points, 
 **Step 8:** Examine workflows: Password reset, account recovery, order processing - where are the gaps?
 **Key Lesson:** Insecure design means the application was built without security in mind from the start. These flaws can''t be patched - they require redesign!', NULL),
     ('A06', 'A06 Lab 1: Identify Missing Controls', 'Find security controls that should exist but don''t.', 'Easy', 100, 'NSA{N0_R4T3_L1M1T}', 'No throttling exists', 'http://localhost:3006/lab1', 'lab', 1, 2, NULL,
-    '**MISSION BRIEF:** Agent, Evil Corp''s BankSafe Online Banking platform is our most ambitious target yet. Intelligence suggests they cut corners during development.
+    '**MISSION BRIEF:** Agent, SecureBank''s online banking platform is our most ambitious target yet. Intelligence suggests they cut corners during development.
 
 **YOUR OBJECTIVE:** Identify critical security controls that should exist but don''t.
 
@@ -678,7 +689,7 @@ Expose their missing security controls! 🚨🔓'),
     ('A06', 'A06 Lab 2: Logic Flaw Scan', 'Identify flaws in business logic implementation.', 'Medium', 150, 'NSA{L0G1C_FL4W_F0UND}', 'Order of operations matters', 'http://localhost:3006/lab2', 'lab', 2, 3, NULL,
     '**MISSION BRIEF:** Good work identifying missing controls, agent. Now let''s find flaws in their business logic.
 
-**YOUR OBJECTIVE:** Discover and exploit flaws in Evil Corp''s transaction processing logic.
+**YOUR OBJECTIVE:** Discover and exploit flaws in SecureBank''s transaction processing logic.
 
 **THE VULNERABILITY:** Business logic flaws occur when applications don''t enforce proper rules on workflows and operations. Unlike technical bugs, these exploit the INTENDED functionality in unintended ways.
 
@@ -710,7 +721,7 @@ Find the logic flaw and exploit it! 🧠💸'),
     ('A06', 'A06 Lab 3: Exploit Design Flaw', 'Exploit the identified design flaw for unauthorized access.', 'Hard', 200, 'NSA{L0G1C_0V3R_S3CUR1TY}', 'Race conditions win', 'http://localhost:3006/lab3', 'lab', 3, 4, NULL,
     '**MISSION BRIEF:** Excellent work uncovering the logic flaw, agent. Now weaponize it for maximum impact.
 
-**YOUR OBJECTIVE:** Exploit Evil Corp''s design flaws to gain unauthorized financial advantage or system access.
+**YOUR OBJECTIVE:** Exploit SecureBank''s design flaws to gain unauthorized financial advantage or system access.
 
 **THE CHALLENGE:** You''ve identified design weaknesses. Now chain them together for a high-impact attack:
 
@@ -1610,7 +1621,7 @@ Make their error handling your ally! 🤫🎯');
 -- CITADEL (Final Exam)
 -- ========================================
 INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order, tutorial, mission_brief) VALUES
-    ('ALL', 'Citadel: Final Exam', 'Exploit Evil Corp''s corporate website. All vulnerabilities present, no hints.', 'Expert', 500, 'NSA{C1T4D3L_C0MPL3T3}', 'Apply everything you learned', 'http://localhost:3000', 'exam', NULL, 1, NULL,
+    ('ALL', 'Citadel: Final Exam', 'Exploit Evil Corp''s corporate website. All vulnerabilities present, no hints.', 'Expert', 500, 'NSA{C1T4D3L_H4S_F4LL3N_R00T_4CC3SS}', 'Apply everything you learned', 'http://localhost:3000', 'exam', NULL, 1, NULL,
     '**MISSION BRIEF:** Congratulations, agent. You''ve completed your training across all OWASP Top 10 categories. Now comes your final test.
 
 **THE CITADEL:** Evil Corp''s main corporate website at http://localhost:3000 - their crown jewel. This is a real-world target with multiple vulnerabilities chained together.

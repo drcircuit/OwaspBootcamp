@@ -3,18 +3,26 @@
 **Lab URL:** http://localhost:3001  
 **Topic:** OWASP Top 10 2025 - A01: Broken Access Control  
 **Difficulty:** Easy → Medium → Hard  
+**Theme:** TechCorp Global HR System
 
 ---
 
 ## Overview
 
-This lab teaches students about Broken Access Control vulnerabilities through progressive challenges using a fictional "ZenFlow Yoga Studio" member portal. Students learn enumeration, IDOR (Insecure Direct Object References), and privilege escalation attacks.
+This lab teaches students about Broken Access Control vulnerabilities through progressive challenges using a realistic corporate HR portal. Students learn enumeration techniques, IDOR (Insecure Direct Object References) to access PII/salary data, and privilege escalation to gain HR admin access.
+
+### Real-World Impact
+- **PII Data Breach:** Unauthorized access to employee SSNs, salaries, performance reviews
+- **Insider Trading Risk:** Access to C-suite compensation and stock options
+- **Compliance Violations:** GDPR, CCPA violations for unauthorized PII access
+- **Privilege Escalation:** Regular employee gaining HR admin privileges
 
 ### Learning Objectives
-- Understand horizontal and vertical privilege escalation
-- Practice API enumeration techniques
-- Identify IDOR vulnerabilities
-- Learn proper access control implementation
+- Understand horizontal and vertical privilege escalation in corporate systems
+- Practice API enumeration to discover employee records
+- Identify IDOR vulnerabilities exposing sensitive HR data
+- Exploit cookie-based authentication to escalate privileges
+- Learn proper access control implementation for enterprise systems
 
 ---
 
@@ -28,11 +36,11 @@ This lab teaches students about Broken Access Control vulnerabilities through pr
 
 **Solution:**
 1. Visit `/api/example/part1/member/1` in browser
-2. Try IDs 2, 3, 4 to see different members
-3. Try ID 108 to find the hidden VIP member
-4. **Flag:** `FLAG{D3VT00LS_M3MB3R_D1SC0V3RY}`
+2. Try IDs 2, 3, 4 to see different employees
+3. Try ID 108 to find hidden employee records
+4. **Flag:** `NSA{D3VT00LS_M4ST3R}`
 
-**Teaching Point:** Sequential ID enumeration is a common way to discover hidden resources.
+**Teaching Point:** Sequential ID enumeration is a common way to discover hidden resources in HR systems.
 
 ### Part 2: cURL Command Line
 **Objective:** Access API using command-line tools
@@ -42,22 +50,22 @@ This lab teaches students about Broken Access Control vulnerabilities through pr
 curl http://localhost:3001/api/example/part2/test
 ```
 
-**Flag:** `FLAG{CURL_C0MM4ND_L1N3_M4ST3R}`
+**Flag:** `NSA{CURL_C0MM4ND3R}`
 
-**Teaching Point:** APIs often behave differently when accessed via different clients. The server checks the User-Agent header.
+**Teaching Point:** APIs often behave differently when accessed via different clients. Understanding HTTP fundamentals is critical.
 
 ### Part 3: Request Interception
 **Objective:** Modify request parameters to escalate privileges
 
 **Solution:**
-1. Visit `/api/example/part3/intercept` (default: member access)
-2. Add parameter: `/api/example/part3/intercept?access=instructor`
-3. **Flag:** `FLAG{1NT3RC3PT_P4R4M_M4N1PUL4T10N}`
+1. Visit `/api/example/part3/intercept` (default: employee access)
+2. Add parameter: `/api/example/part3/intercept?access=manager`
+3. **Flag:** `NSA{BURP_1NT3RC3PT0R}`
 
 **Teaching Point:** Never trust client-provided access control parameters. Access decisions must be made server-side based on authenticated session data.
 
 ### Part 4: Sequential Enumeration
-**Objective:** Find all members by systematically trying IDs
+**Objective:** Find all employees by systematically trying IDs
 
 **Solution:**
 ```bash
@@ -72,42 +80,44 @@ for i in {100..105}; do
 done
 ```
 
-**Flag:** `FLAG{3NUM3R4T10N_C0MPL3T3_4LL_M3MB3RS}` (after finding all 6 members)
+**Flag:** `NSA{3NUM3R4T10N_PR0}` (after finding all employees)
 
-**Teaching Point:** Predictable, sequential IDs allow complete database enumeration.
+**Teaching Point:** Predictable, sequential IDs allow complete database enumeration exposing entire employee roster.
 
 ---
 
-## LAB 1: Community Directory (EASY - Recon/Scanning)
+## LAB 1: Employee Directory (EASY - Recon/Scanning)
 
 **URL:** http://localhost:3001/lab1  
-**Challenge:** Enumerate member profiles to discover all users  
+**Challenge:** Enumerate employee profiles to discover all users in the organization  
 **Stage:** Recon/Scanning  
 
 ### Vulnerability
-Horizontal privilege escalation through unrestricted API access. Any user can view any other user's profile.
+Horizontal privilege escalation through unrestricted API access. Any employee can view detailed profiles of any other employee, including sensitive HR data.
 
 ### Exploitation Steps
 
-1. **Reconnaissance:** Visit the community directory page
+1. **Reconnaissance:** Visit the employee directory page
 2. **Identify API:** Notice the `/api/members/user/:id` endpoint
-3. **Enumerate:** Try IDs 1 through 4:
+3. **Enumerate:** Try IDs 1 through 5:
    ```bash
    curl http://localhost:3001/api/members/user/1
    curl http://localhost:3001/api/members/user/2
    curl http://localhost:3001/api/members/user/3
    curl http://localhost:3001/api/members/user/4
+   curl http://localhost:3001/api/members/user/5
    ```
-4. **Capture Flag:** Access ID 4 (instructor) to get the flag
+4. **Capture Flag:** Access all employee records to get the flag
 
 ### Flag
-`FLAG{C0MMUN1TY_3NUM3R4T10N_C0MPL3T3}`
+`NSA{F0UND_TH3_US3RS}`
 
 ### Sensitive Data Exposed
-- Usernames, emails, roles
-- Membership types and join dates
-- Favorite classes
-- Instructor specializations
+- Employee names, titles, departments
+- Email addresses and employee IDs
+- Hire dates and job roles
+- Manager and executive information
+- Security clearance levels
 
 ### Vulnerable Code Pattern
 ```javascript
@@ -217,25 +227,29 @@ app.get('/api/profile/user/:id', (req, res) => {
 
 ---
 
-## LAB 3: Instructor Dashboard (HARD - Privilege Escalation)
+## LAB 3: HR Admin Dashboard (HARD - Privilege Escalation)
 
 **URL:** http://localhost:3001/lab3  
-**Challenge:** Escalate privileges to access instructor-only dashboard  
+**Challenge:** Escalate privileges to access HR administrator dashboard  
 **Stage:** Maintained Access (Privilege Escalation)  
 
 ### Vulnerability
-Vertical privilege escalation - regular users can access privileged functionality by exploiting incorrect authorization logic.
+Vertical privilege escalation - regular employees can access HR admin functionality by manipulating client-side authentication tokens (cookies).
 
 ### Exploitation Steps
 
-1. **Identify Target:** Note that instructors have a special dashboard
-2. **Current User:** You are Sarah (ID 2, role: 'member')
-3. **Target User:** Instructor Jane (ID 4, role: 'instructor')
-4. **Exploit:** Request `/api/instructor/user/4/dashboard`
-5. **Capture Flag:** Successfully access instructor dashboard
+1. **Identify Target:** Note that HR managers have administrative dashboards
+2. **Current User:** You are Maria Rodriguez (ID 2, role: 'employee')
+3. **Target User:** HR Director Sarah Kumar (ID 4, role: 'manager')
+4. **Cookie Manipulation:**
+   - Open DevTools (F12) → Application/Storage → Cookies
+   - Modify `userRole` cookie from `employee` to `manager`
+   - Modify `userId` cookie from `2` to `4`
+   - Refresh the page
+5. **Capture Flag:** Successfully access HR admin dashboard
 
 ### Flag
-`FLAG{PR1V1L3G3_3SC4L4T10N_1NSTRUCT0R}`
+`NSA{R00T_4CC3SS_4CH13V3D}`
 
 ### Sensitive Data Exposed
 - Class schedules and student rosters

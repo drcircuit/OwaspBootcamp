@@ -3,16 +3,22 @@
 **Lab URL:** http://localhost:3005  
 **Topic:** OWASP Top 10 2025 - A05: Injection  
 **Difficulty:** Easy → Medium → Hard  
-**Theme:** FreshBlend Smoothie Bar
+**Theme:** ShopTech E-Commerce Platform
 
 ---
 
 ## Overview
 
-This lab teaches students about SQL Injection vulnerabilities through progressive challenges at a fictional "FreshBlend Smoothie Bar". Students learn to identify injection points, detect SQL errors, and exploit authentication bypass vulnerabilities.
+This lab teaches students about SQL Injection vulnerabilities through progressive challenges in a realistic e-commerce platform. Students learn to identify injection points in product searches, exploit SQL errors, and bypass authentication to access customer payment data.
+
+### Real-World Impact
+- **Payment Card Data Breach:** Access to customer credit card information
+- **PCI-DSS Violations:** Exposed payment data triggers massive fines
+- **Customer Database Dump:** Complete customer PII and order history
+- **Authentication Bypass:** Admin account takeover
 
 ### Learning Objectives
-- Understand SQL injection attack patterns
+- Understand SQL injection attack patterns in e-commerce systems
 - Identify injection vulnerabilities in search and login forms
 - Learn exploitation techniques (UNION, OR, comment-based)
 - Understand parameterized queries and input validation

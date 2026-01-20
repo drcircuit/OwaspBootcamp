@@ -6,48 +6,48 @@ app.use(express.json());
 
 // State for Lab 1: Rate Limiting vulnerability
 let lab1AttemptCount = 0;
-const VALID_ORDER_CODE = '1035';
+const VALID_ACCOUNT_PIN = '1035';
 
 // State for Lab 2: Logic Flaw vulnerability
-const MENU_ITEMS = {
-  'taco': 3.50,
-  'burrito': 7.50,
-  'quesadilla': 6.00,
-  'nachos': 5.00
+const TRANSFER_TYPES = {
+  'checking': { fee: 0, limit: 10000 },
+  'savings': { fee: 0, limit: 5000 },
+  'external': { fee: 2.50, limit: 2500 },
+  'wire': { fee: 25.00, limit: 50000 }
 };
 
 // State for Lab 3: Race Condition vulnerability
-let lab3Balance = 50.00;
+let lab3Balance = 1000.00;
 let lab3Processing = false;
 
-// TacoTruck Express theme styles
+// SecureBank Online Banking theme styles
 const styles = `
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #C1121F 100%);
-      color: #2B2D42;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+      color: #1e293b;
       min-height: 100vh;
       padding: 20px;
     }
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      background: #FFF8F0;
+      background: #ffffff;
       border-radius: 15px;
       padding: 40px;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     }
     h1 {
-      color: #C1121F;
+      color: #1e40af;
       margin-bottom: 10px;
       font-size: 2.8em;
       text-align: center;
       font-weight: 800;
     }
     h2 {
-      color: #FF6B35;
+      color: #2563eb;
       margin-top: 30px;
       margin-bottom: 15px;
       border-bottom: 3px solid #F7931E;
@@ -197,12 +197,12 @@ app.get('/', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>TacoTruck Express 🌮 - Order System</title>
+      <title>SecureBank Online 🏦 - Banking Portal</title>
       ${styles}
     </head>
     <body>
       <div class="container">
-        <h1>🌮 TACOTRUCK EXPRESS</h1>
+        <h1>� SECUREBANK ONLINE</h1>
         <p style="text-align: center; font-size: 1.2em; color: #F7931E; margin-bottom: 30px;">
           <strong>Pre-Order Your Favorite Tacos!</strong><br>
           Fast, fresh, and always delicious Mexican street food
@@ -210,7 +210,7 @@ app.get('/', (req, res) => {
         
         <div class="challenge">
           <h3>📚 Tutorial - How Our System Works <span class="difficulty example">START HERE</span></h3>
-          <p>Learn how TacoTruck Express handles orders, discounts, and loyalty rewards. See examples of our security measures in action.</p>
+          <p>Learn how SecureBank handles transactions, transfers, and account security. See examples of our security measures in action.</p>
           <p><a href="/example">→ View Tutorial</a></p>
         </div>
 
@@ -263,7 +263,7 @@ app.get('/example', (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>TacoTruck Express - Tutorial</title>
+      <title>SecureBank Online - Tutorial</title>
       ${styles}
       <style>
         .interactive-demo {
@@ -329,7 +329,7 @@ app.get('/example', (req, res) => {
     </head>
     <body>
       <div class="container">
-        <h1>📚 TACOTRUCK EXPRESS TUTORIAL</h1>
+        <h1>📚 SECUREBANK ONLINE TUTORIAL</h1>
         <div class="nav-links">
           <a href="/">🏠 Home</a>
         </div>
@@ -595,7 +595,7 @@ app.post('/api/example/verify-order', (req, res) => {
   if (lab1AttemptCount >= 10) {
     return res.json({
       success: false,
-      flag: 'TACO{D3M0_R4T3_L1M1T_M1SS1NG}',
+      flag: 'NSA{DESIGN_EXAMPLE_COMPLETE}',
       message: `Demo: ${lab1AttemptCount} attempts made with no rate limiting!`,
       hint: 'Try the real challenge in Lab 1'
     });
@@ -635,7 +635,7 @@ app.post('/api/example/test-discount', (req, res) => {
   
   if (promoCodes.length > 2 && total < originalTotal * 0.5) {
     return res.json({
-      flag: 'TACO{D3M0_L0G1C_FL4W_ST4CK1NG}',
+      flag: 'NSA{DESIGN_EXAMPLE_COMPLETE}',
       originalTotal: originalTotal.toFixed(2),
       finalTotal: total.toFixed(2),
       discountsApplied,
@@ -665,7 +665,7 @@ app.post('/api/example/test-withdraw', async (req, res) => {
     
     if (demoBalance < 0) {
       return res.json({
-        flag: 'TACO{D3M0_R4C3_C0ND1T10N}',
+        flag: 'NSA{DESIGN_EXAMPLE_COMPLETE}',
         success: true,
         balanceBefore,
         balanceAfter: demoBalance,
@@ -775,7 +775,7 @@ app.get('/lab1', (req, res) => {
 
         <div class="section">
           <h2>🌮 Challenge Description</h2>
-          <p>TacoTruck Express allows customers to verify their order status using a 4-digit order code. The system checks if your code matches an active order.</p>
+          <p>SecureBank allows customers to verify their account status using a 4-digit PIN. The system checks if your PIN matches an active account.</p>
           <p><strong>Your task:</strong> The verification system has no rate limiting. Try making many verification attempts to find a valid order code or trigger a security flag!</p>
         </div>
 
@@ -924,7 +924,7 @@ app.post('/api/lab1/verify-order', (req, res) => {
   if (lab1AttemptCount > 50) {
     return res.json({
       success: false,
-      flag: 'TACO{R4T3_L1M1T_M1SS1NG_3XTR4_GU4C}',
+      flag: 'NSA{N0_R4T3_L1M1T}',
       message: 'Rate limiting vulnerability confirmed! 50+ attempts made without blocking.',
       attempts: lab1AttemptCount,
       vulnerability: 'Missing rate limiting allows unlimited verification attempts'
@@ -1047,7 +1047,7 @@ app.get('/lab2', (req, res) => {
 
         <div class="section">
           <h2>🎟️ Challenge Description</h2>
-          <p>TacoTruck Express allows customers to apply multiple promo codes at checkout. The system applies each code in the list—but doesn't check for duplicates!</p>
+          <p>SecureBank allows customers to apply multiple benefit codes at account creation. The system applies each code in the list—but doesn't check for duplicates!</p>
           <p><strong>Your task:</strong> Exploit the logic flaw by applying the same discount code multiple times to stack discounts beyond the intended limit.</p>
         </div>
 
@@ -1200,7 +1200,7 @@ app.post('/api/lab2/checkout', (req, res) => {
   // Award flag if discount exceeds 50%
   if (total < originalTotal * 0.5) {
     return res.json({
-      flag: 'TACO{L0G1C_FL4W_FR33_GU4C4M0L3}',
+      flag: 'NSA{L0G1C_FL4W_F0UND}',
       message: 'Business logic flaw exploited! Promo codes stacked for extreme discount.',
       vulnerability: 'No validation prevents duplicate promo codes from being applied',
       originalTotal: `$${originalTotal.toFixed(2)}`,
@@ -1316,7 +1316,7 @@ app.get('/lab3', (req, res) => {
 
         <div class="section">
           <h2>💰 Challenge Description</h2>
-          <p>TacoTruck Express has a loyalty rewards system where customers can pay using their account balance. Your account has $50.00 available.</p>
+          <p>SecureBank has a transfer system where customers can move funds using their account balance. Your account has $1000.00 available.</p>
           <p><strong>The vulnerability:</strong> The system checks balance availability and then withdraws—these are separate operations, not atomic! Multiple concurrent requests can all pass the balance check before any withdrawal is processed.</p>
           <p><strong>Your task:</strong> Send 3 concurrent $30 withdrawal requests. If successful, you'll withdraw $90 from a $50 balance!</p>
         </div>
@@ -1386,7 +1386,7 @@ app.post('/api/order', (req, res) => {
       item,
       quantity,
       totalOrders: recentOrders.length,
-      flag: 'HARVEST{R4T3_L1M1T_M1SS1NG}',
+      flag: 'NSA{N0_R4T3_L1M1T}',
       message: '🎉 Flag captured! You exploited the missing rate limit!',
       vulnerability: 'No rate limiting allows rapid-fire requests',
       secureAlternative: 'Implement sliding window rate limit (e.g., max 10 orders per minute)'
@@ -1444,7 +1444,7 @@ app.post('/api/apply-promo', (req, res) => {
       discountAmount,
       finalTotal,
       appliedCodes,
-      flag: 'HARVEST{ST4CK_PR0M0_FL4W}',
+      flag: 'NSA{L0G1C_FL4W_F0UND}',
       message: '🎉 Flag captured! You exploited the promo code stacking flaw!',
       vulnerability: 'Multiple discount codes can be stacked without validation',
       secureAlternative: 'Implement mutually exclusive discount categories'
@@ -1500,7 +1500,7 @@ app.post('/api/purchase', (req, res) => {
           amount,
           newBalance: accountBalances[customerId],
           totalSpent,
-          flag: 'HARVEST{R4C3_C0ND1T10N_W1N}',
+          flag: 'NSA{R4C3_C0ND1T10N_3XPL01T3D}',
           message: '🎉 Flag captured! You exploited the race condition!',
           vulnerability: 'Concurrent requests processed without locking',
           secureAlternative: 'Use database transactions with row-level locking'
@@ -1529,7 +1529,7 @@ app.post('/api/purchase', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`\x1b[32m
 ╔════════════════════════════════════════════╗
-║   🌮 TacoTruck Express                    ║
+║   � SecureBank Online Banking             ║
 ║   Server running on port ${PORT}           ║
 ║                                            ║
 ║   Access the portal:                      ║

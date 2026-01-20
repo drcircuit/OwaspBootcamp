@@ -4,50 +4,63 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// BeanScene Coffee data
-const coffeeMenu = [
-    { id: 1, name: 'Espresso', price: 2.99, category: 'hot', description: 'Bold coffee shot' },
-    { id: 2, name: 'Cappuccino', price: 4.49, category: 'hot', description: 'Espresso with steamed milk' },
-    { id: 3, name: 'Cold Brew', price: 4.99, category: 'cold', description: 'Smooth cold coffee' },
-    { id: 4, name: 'Caramel Macchiato', price: 5.99, category: 'hot', description: 'Layered espresso drink' }
+// CloudDeploy Platform data
+const deployments = [
+    { id: 1, name: 'web-api-prod', environment: 'production', status: 'running', instances: 3, region: 'us-east-1' },
+    { id: 2, name: 'auth-service-prod', environment: 'production', status: 'running', instances: 2, region: 'us-east-1' },
+    { id: 3, name: 'data-pipeline', environment: 'production', status: 'running', instances: 5, region: 'us-west-2' },
+    { id: 4, name: 'analytics-dashboard', environment: 'staging', status: 'stopped', instances: 1, region: 'eu-west-1' }
 ];
 
-const staff = [
-    { id: 1, name: 'Emma Rodriguez', role: 'manager', email: 'emma@beanscene.local', shift: 'morning' },
-    { id: 2, name: 'Marcus Chen', role: 'barista', email: 'marcus@beanscene.local', shift: 'morning' },
-    { id: 3, name: 'Sofia Martinez', role: 'barista', email: 'sofia@beanscene.local', shift: 'afternoon' }
+const devOpsTeam = [
+    { id: 1, name: 'Alex Chen', role: 'DevOps Lead', email: 'alex.chen@clouddeploy.io', access: 'admin' },
+    { id: 2, name: 'Jordan Rivera', role: 'Platform Engineer', email: 'jordan@clouddeploy.io', access: 'read-write' },
+    { id: 3, name: 'Sam Patel', role: 'SRE', email: 'sam@clouddeploy.io', access: 'read-only' }
 ];
 
-// VULNERABLE configuration data
+// VULNERABLE configuration data - left exposed in production
 const configData = {
-    database: {
-        host: 'db.beanscene.local',
-        username: 'coffee_admin',
-        password: 'Bean\$cene2024!',
-        database: 'beanscene_prod'
+    aws: {
+        region: 'us-east-1',
+        access_key_id: 'AKIAIOSFODNN7EXAMPLE',
+        secret_access_key: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+        s3_bucket: 'clouddeploy-prod-backups',
+        account_id: '123456789012'
     },
-    payment_gateway: {
-        square_token: 'sq0atp-BeanScene_Live_Token_xyz789',
-        merchant_id: 'MLHV6GRVNB4XQ'
+    database: {
+        host: 'prod-db-cluster.us-east-1.rds.amazonaws.com',
+        port: 5432,
+        username: 'db_admin',
+        password: 'CloudD3pl0y!2024$PROD',
+        database: 'customer_data'
+    },
+    stripe: {
+        api_key: 'sk_live_51HvKj2LkdIyFiZACBmrE4WYDRqNH3tpAXmPLKeE',
+        webhook_secret: 'whsec_CloudDeployProductionSecret2024'
     },
     secrets: {
-        jwt_secret: 'beanscene_jwt_secret_key',
-        session_key: 'coffee-shop-session-2024'
+        jwt_secret: 'prod-jwt-secret-DO-NOT-COMMIT-12345',
+        encryption_key: 'aes-256-key-for-customer-pii-encryption',
+        admin_api_token: 'Bearer cloudadmin_prod_token_xyz789abc'
+    },
+    datadog: {
+        api_key: 'dd_api_key_1234567890abcdef',
+        app_key: 'dd_app_key_abcdef1234567890'
     }
 };
 
-// VULNERABLE default credentials
+// VULNERABLE default credentials - never changed from deployment
 const adminCredentials = {
     username: 'admin',
-    password: 'beanscene'
+    password: 'CloudDeploy123!'
 };
 
-// Example store systems
-const storeSystemsExamples = [
-    { id: 100, system: 'POS Terminal 1', status: 'online', version: '2.4.1', ip: '192.168.1.10' },
-    { id: 101, system: 'POS Terminal 2', status: 'online', version: '2.4.1', ip: '192.168.1.11' },
-    { id: 102, system: 'Inventory Scanner', status: 'online', version: '1.8.3', ip: '192.168.1.20' },
-    { id: 103, system: 'Back Office', status: 'maintenance', version: '3.1.0', ip: '192.168.1.30' }
+// Example cloud infrastructure systems
+const cloudSystemsExamples = [
+    { id: 100, system: 'Load Balancer', status: 'online', version: 'ALB v2.0', ip: '10.0.1.10' },
+    { id: 101, system: 'API Gateway', status: 'online', version: 'AWS APIGWv2', ip: '10.0.1.20' },
+    { id: 102, system: 'Cache Cluster', status: 'online', version: 'Redis 6.2', ip: '10.0.2.10' },
+    { id: 103, system: 'Admin Console', status: 'debug-enabled', version: 'v3.5.0', ip: '10.0.3.50' }
 ];
 
 
@@ -57,24 +70,24 @@ app.get('/', (req, res) => {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>BeanScene Coffee - Management Portal</title>
+            <title>CloudDeploy - Platform Console</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
-                    font-family: 'Georgia', serif;
-                    background: linear-gradient(135deg, #6B4423 0%, #3E2723 100%);
+                    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+                    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
                     min-height: 100vh;
                     padding: 20px;
                 }
                 .container { max-width: 1200px; margin: 0 auto; }
                 .header {
-                    background: linear-gradient(135deg, #D7CCC8 0%, #BCAAA4 100%);
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                     padding: 30px;
                     border-radius: 15px;
                     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
                     margin-bottom: 30px;
                     text-align: center;
-                    border: 3px solid #8D6E63;
+                    border: 2px solid rgba(255,255,255,0.1);
                 }
                 .logo {
                     font-size: 2.5em;
@@ -99,19 +112,19 @@ app.get('/', (req, res) => {
                     gap: 20px;
                 }
                 .card {
-                    background: linear-gradient(135deg, #EFEBE9 0%, #D7CCC8 100%);
+                    background: linear-gradient(135deg, #232526 0%, #414345 100%);
                     padding: 25px;
                     border-radius: 12px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
                     transition: transform 0.3s;
                     text-decoration: none;
-                    color: inherit;
+                    color: #fff;
                     display: block;
-                    border: 2px solid #A1887F;
+                    border: 1px solid rgba(102, 126, 234, 0.3);
                 }
-                .card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
-                .card h3 { color: #3E2723; margin-bottom: 12px; font-size: 1.4em; }
-                .card p { color: #5D4037; line-height: 1.6; margin-bottom: 12px; }
+                .card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4); }
+                .card h3 { color: #667eea; margin-bottom: 12px; font-size: 1.4em; }
+                .card p { color: #ddd; line-height: 1.6; margin-bottom: 12px; }
                 .card-badge {
                     display: inline-block;
                     padding: 6px 14px;
@@ -124,49 +137,58 @@ app.get('/', (req, res) => {
                 .badge-easy { background: #C8E6C9; color: #1B5E20; }
                 .badge-medium { background: #FFE0B2; color: #E65100; }
                 .badge-hard { background: #FFCDD2; color: #B71C1C; }
-                .footer { text-align: center; color: #D7CCC8; margin-top: 40px; padding: 20px; }
+                .welcome-section {
+                    background: rgba(255,255,255,0.1);
+                    padding: 30px;
+                    border-radius: 12px;
+                    margin-bottom: 30px;
+                    color: #fff;
+                    backdrop-filter: blur(10px);
+                }
+                .welcome-section h2 { color: #667eea; margin-bottom: 15px; }
+                .footer { text-align: center; color: #999; margin-top: 40px; padding: 20px; }
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
-                    <div class="logo">☕ BeanScene Coffee</div>
-                    <div class="tagline">Management Portal • Brew Excellence Daily</div>
+                    <div class="logo">☁️ CloudDeploy</div>
+                    <div class="tagline">Platform Console • Deploy with Confidence</div>
                 </div>
 
                 <div class="welcome-section">
-                    <h2>Welcome to BeanScene Management Portal</h2>
-                    <p>Manage shop operations, track inventory, review sales data, and configure store settings.</p>
+                    <h2>Welcome to CloudDeploy Platform</h2>
+                    <p>Monitor deployments, manage infrastructure, review logs, and configure cloud resources.</p>
                 </div>
 
                 <div class="nav-cards">
                     <a href="/example" class="card">
-                        <h3>📚 Getting Started</h3>
-                        <p>Learn how to navigate the management system and access reports.</p>
+                        <h3>📚 Platform Guide</h3>
+                        <p>Learn how to navigate the console and access deployment information.</p>
                         <span class="card-badge badge-tutorial">Tutorial</span>
                     </a>
 
                     <a href="/lab1" class="card">
-                        <h3>👥 Staff Dashboard</h3>
-                        <p>View staff schedules, performance metrics, and team information.</p>
-                        <span class="card-badge badge-easy">Staff</span>
+                        <h3>👥 DevOps Console</h3>
+                        <p>View team access, deployment status, and system health metrics.</p>
+                        <span class="card-badge badge-easy">Console</span>
                     </a>
 
                     <a href="/lab2" class="card">
-                        <h3>⚙️ Store Settings</h3>
-                        <p>Configure operations, payment systems, and integration settings.</p>
-                        <span class="card-badge badge-medium">Settings</span>
+                        <h3>⚙️ Configuration</h3>
+                        <p>Manage environment variables, API keys, and integration settings.</p>
+                        <span class="card-badge badge-medium">Config</span>
                     </a>
 
                     <a href="/lab3" class="card">
-                        <h3>🔐 Manager Portal</h3>
-                        <p>Access financial reports, system configuration, and admin controls.</p>
+                        <h3>🔐 Admin Access</h3>
+                        <p>Full platform control, billing, security settings, and admin tools.</p>
                         <span class="card-badge badge-hard">Admin</span>
                     </a>
                 </div>
 
                 <div class="footer">
-                    <p>☕ BeanScene Coffee • 456 Brew Street • (555) 234-5678</p>
+                    <p>☁️ CloudDeploy Platform • 456 Cloud Drive, Seattle • (555) 234-5678</p>
                 </div>
             </div>
         </body>
@@ -181,7 +203,7 @@ app.get('/example', (req, res) => {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Getting Started - BeanScene Coffee</title>
+            <title>Getting Started - CloudDeploy Platform</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
@@ -302,13 +324,13 @@ app.get('/example', (req, res) => {
             <div class="container">
                 <div class="header">
                     <h1>📚 Getting Started Guide</h1>
-                    <p class="subtitle">Learn to explore the BeanScene management system with interactive examples</p>
+                    <p class="subtitle">Learn to explore the CloudDeploy management system with interactive examples</p>
                 </div>
 
                 <!-- Part 1: System Enumeration -->
                 <div class="tutorial-section">
                     <h2>Part 1: System Discovery 🔍</h2>
-                    <p>BeanScene uses multiple systems for operations. Learn how to enumerate systems by ID to discover all available resources.</p>
+                    <p>CloudDeploy uses multiple microservices for operations. Learn how to enumerate services by ID to discover all available resources.</p>
                     
                     <div class="tutorial-box">
                         <h3>🎯 Your Mission</h3>
@@ -468,7 +490,7 @@ app.get('/api/example/systems/:id', (req, res) => {
     if (systemId === 103) {
         return res.json({
             ...system,
-            flag: 'FLAG{ST0R3_SYST3M_3NUM3R4T3D}',
+            flag: 'NSA{DEBUG_EXAMPLE_COMPLETE}',
             message: 'You found the maintenance system!',
             admin_note: 'System in maintenance mode - full access available'
         });
@@ -480,7 +502,7 @@ app.get('/api/example/systems/:id', (req, res) => {
 app.get('/api/example/diagnostic', (req, res) => {
     res.json({
         status: 'operational',
-        flag: 'FLAG{D14GN0ST1C_4CC3SS3D}',
+        flag: 'NSA{DEBUG_EXAMPLE_COMPLETE}',
         message: 'Diagnostic endpoint accessed successfully!',
         store_health: {
             pos_systems: 'online',
@@ -493,7 +515,7 @@ app.get('/api/example/diagnostic', (req, res) => {
 app.get('/api/example/auth-check', (req, res) => {
     res.json({
         authenticated: false,
-        flag: 'FLAG{4UTH_SYST3M_CH3CK3D}',
+        flag: 'NSA{DEBUG_EXAMPLE_COMPLETE}',
         message: 'Auth check completed!',
         hint: 'Authentication would normally validate credentials here'
     });
@@ -506,7 +528,7 @@ app.get('/lab1', (req, res) => {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Staff Dashboard - BeanScene</title>
+            <title>DevOps Dashboard - CloudDeploy</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
@@ -615,7 +637,7 @@ app.get('/lab1', (req, res) => {
 
                 <div class="section">
                     <h2>Team Overview</h2>
-                    <p>Access staff information and shift schedules. Our team keeps BeanScene running smoothly.</p>
+                    <p>Access DevOps team information and deployment schedules. Our team keeps CloudDeploy running smoothly.</p>
                     
                     ${staff.map(s => `
                         <div class="staff-card">
@@ -692,7 +714,7 @@ app.get('/lab1', (req, res) => {
 app.get('/api/staff/system-info', (req, res) => {
     // VULNERABLE: Debug info exposed in production
     res.json({
-        flag: 'FLAG{D3BUG_1NF0_3XP0S3D}',
+        flag: 'NSA{D3BUG_F0UND}',
         message: 'System information retrieved successfully!',
         vulnerability: 'Debug endpoint exposed - reveals system details',
         system_info: {
@@ -714,7 +736,7 @@ app.get('/lab2', (req, res) => {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Store Settings - BeanScene</title>
+            <title>Platform Settings - CloudDeploy</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
@@ -920,27 +942,27 @@ app.get('/lab2', (req, res) => {
 // Lab 2 API - VULNERABLE: .env file exposed through misconfiguration
 app.get('/.env', (req, res) => {
     // VULNERABLE: .env file accessible due to misconfigured static file serving
-    const envContent = `# BeanScene Coffee - Environment Configuration
+    const envContent = `# CloudDeploy Platform - Environment Configuration
 # WARNING: This file should NEVER be accessible via web!
 
 NODE_ENV=production
 PORT=3002
 
 # Database Configuration
-DB_HOST=db.beanscene.local
+DB_HOST=db.clouddeploy.io
 DB_USER=coffee_admin
 DB_PASSWORD=Bean$cene2024!
-DB_NAME=beanscene_prod
+DB_NAME=clouddeploy_prod
 
 # API Keys & Secrets
-JWT_SECRET=beanscene_jwt_secret_key_12345
+JWT_SECRET=clouddeploy_jwt_secret_key_12345
 SESSION_SECRET=coffee-shop-session-2024
-SQUARE_API_KEY=sq0atp-BeanScene_Live_Token_xyz789
+SQUARE_API_KEY=sq0atp-CloudDeploy_Live_Token_xyz789
 SQUARE_MERCHANT_ID=MLHV6GRVNB4XQ
 
 # Email Service
 SMTP_HOST=smtp.gmail.com
-SMTP_USER=notifications@beanscene.com
+SMTP_USER=notifications@clouddeploy.io
 SMTP_PASS=BeanMail!2024
 
 # Feature Flags
@@ -948,7 +970,7 @@ DEBUG_MODE=true
 ENABLE_LOGGING=true
 SHOW_ERRORS=true
 
-FLAG{3NV_F1L3_3XP0S3D}
+NSA{C0NF1G_L3AK3D}
 `;
     res.type('text/plain').send(envContent);
 });
@@ -958,7 +980,7 @@ app.get('/.env.backup', (req, res) => {
     const envBackup = `# Backup from 2024-01-15
 DB_PASSWORD=OldBean$2023!
 JWT_SECRET=old_jwt_secret_2023
-FLAG{B4CKUP_F1L3_L34K3D}
+NSA{C0NF1G_L3AK3D}
 `;
     res.type('text/plain').send(envBackup);
 });
@@ -969,7 +991,7 @@ app.get('/lab3', (req, res) => {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Manager Portal - BeanScene</title>
+            <title>Admin Console - CloudDeploy</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
@@ -1239,12 +1261,12 @@ app.get('/admin', (req, res) => {
 
 app.get('/admin/config.json', (req, res) => {
     res.json({
-        application: "BeanScene Manager Portal",
+        application: "CloudDeploy Admin Console",
         version: "1.2.3",
         database: {
-            host: "db.beanscene.local",
+            host: "db.clouddeploy.io",
             port: 5432,
-            name: "beanscene_prod"
+            name: "clouddeploy_prod"
         },
         features: {
             debug: true,
@@ -1255,13 +1277,14 @@ app.get('/admin/config.json', (req, res) => {
 
 app.get('/admin/credentials.txt', (req, res) => {
     // VULNERABLE: Credentials file accessible
-    const credentials = `BeanScene Admin Credentials
+    const credentials = `CloudDeploy Admin Credentials
 =================================
-Username: manager
-Password: Coffee2024!
-API Key: BSC-2024-ADMIN-xyz789
+Username: admin
+Password: CloudDeploy123!
+AWS Access Key: AKIAIOSFODNN7EXAMPLE
+API Token: Bearer cloudadmin_prod_token_xyz789abc
 
-FLAG{D1R3CT0RY_L1ST1NG_3N4BL3D}
+NSA{4DM1N_P4N3L_PWN3D}
 
 WARNING: This file should not be web-accessible!
 `;
@@ -1269,9 +1292,9 @@ WARNING: This file should not be web-accessible!
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`\x1b[33m
+    console.log(`\x1b[36m
 ╔════════════════════════════════════════════╗
-║   ☕ BeanScene Coffee Management Portal   ║
+║   ☁️  CloudDeploy Platform Console       ║
 ║   Server running on port ${PORT}           ║
 ║                                            ║
 ║   Access: http://localhost:${PORT}            ║

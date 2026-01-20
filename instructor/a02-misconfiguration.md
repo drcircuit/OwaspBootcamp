@@ -3,19 +3,25 @@
 **Lab URL:** http://localhost:3002  
 **Topic:** OWASP Top 10 2025 - A02: Security Misconfiguration  
 **Difficulty:** Easy → Medium → Hard  
-**Theme:** BeanScene Coffee Shop
+**Theme:** CloudDeploy Platform (SaaS/Cloud Infrastructure)
 
 ---
 
 ## Overview
 
-This lab teaches students about Security Misconfiguration through progressive challenges at a fictional "BeanScene Coffee Shop". Students learn to identify debug endpoints, exposed configurations, and default credentials.
+This lab teaches students about Security Misconfiguration through progressive challenges in a realistic cloud deployment platform. Students learn to identify debug endpoints, exposed AWS credentials, production secrets, and default admin passwords.
+
+### Real-World Impact
+- **Cloud Infrastructure Compromise:** Exposed AWS keys grant full account access
+- **Data Breach:** Database credentials expose customer PII
+- **Financial Loss:** Exposed Stripe API keys enable payment fraud
+- **Compliance Violations:** Exposed secrets violate PCI-DSS, SOC 2
 
 ### Learning Objectives
 - Identify information disclosure through debug endpoints
-- Discover configuration leaks containing sensitive credentials
-- Exploit default credentials in production systems
-- Understand proper configuration management
+- Discover configuration leaks containing AWS credentials and API keys
+- Exploit default credentials in production cloud systems
+- Understand proper secrets management and configuration security
 
 ---
 
@@ -36,9 +42,9 @@ curl http://localhost:3002/api/example/systems/102  # Milk Steamer
 curl http://localhost:3002/api/example/systems/103  # Maintenance System (hidden)
 ```
 
-**Flag:** `FLAG{ST0R3_SYST3M_3NUM3R4T3D}` (found at ID 103)
+**Flag:** `NSA{DEBUG_EXAMPLE_COMPLETE}` (found at ID 103)
 
-**Teaching Point:** Predictable system IDs allow complete enumeration of infrastructure.
+**Teaching Point:** Predictable system IDs allow complete enumeration of cloud infrastructure.
 
 ### Part 2: Diagnostic Access
 **Objective:** Access unprotected diagnostic endpoints
@@ -48,7 +54,7 @@ curl http://localhost:3002/api/example/systems/103  # Maintenance System (hidden
 curl http://localhost:3002/api/example/diagnostic
 ```
 
-**Flag:** `FLAG{D14GN0ST1C_4CC3SS3D}`
+**Flag:** `NSA{DEBUG_EXAMPLE_COMPLETE}`
 
 **Teaching Point:** Debug and diagnostic endpoints left enabled in production expose system information.
 
