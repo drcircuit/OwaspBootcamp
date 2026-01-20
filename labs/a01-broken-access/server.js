@@ -203,13 +203,13 @@ app.get('/', (req, res) => {
     `);
 });
 
-// Example page - Interactive Tutorial
-app.get('/example', (req, res) => {
+// Lab 1 - Employee Directory (IDOR vulnerability)
+app.get('/lab1', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Getting Started - TechCorp Global</title>
+            <title>Employee Directory - TechCorp Global</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
@@ -761,111 +761,50 @@ app.get('/lab1', (req, res) => {
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>👥 Community Directory</h1>
-                    <p class="subtitle">Connect with fellow yoga enthusiasts and instructors</p>
+                    <h1>👥 Employee Directory</h1>
+                    <p class="subtitle">TechCorp Global HR Portal - Connect with colleagues worldwide</p>
                 </div>
 
                 <div class="info-section">
-                    <h2>Welcome to Our Community</h2>
-                    <p>The TechCorp Employee Directory helps you connect with colleagues across departments. Browse employee profiles, find team members, and access organizational information.</p>
+                    <h2>Directory Listings</h2>
+                    <p>Browse employee profiles and contact information. Use the navigation above to access different HR systems.</p>
                     
-                    <div class="search-box">
-                        <strong>🔍 Search for Members</strong>
-                        <input type="number" class="search-input" placeholder="Enter member ID (e.g., 1, 2, 3, 4...)" id="searchInput" value="1">
-                        <button onclick="searchMember()" class="search-button">Search Member</button>
-                        <p style="margin-top: 10px; font-size: 0.9em; color: #666;">
-                            Try searching by member ID to view their public profile. Use your browser's DevTools (F12 → Network tab) to see the API calls!
-                        </p>
+                    <div class="member-card">
+                        <div class="member-name">Sarah Mitchell</div>
+                        <div class="member-info">
+                            📧 Email: sarah.mitchell@techcorp-global.com<br>
+                            🏢 Department: Engineering<br>
+                            📍 Location: Seattle, WA
+                        </div>
                     </div>
 
-                    <div class="tip-box">
-                        <strong>💡 Challenge Tip:</strong> Try different member IDs! What information can you discover about other members? Is there anyone with special privileges?
+                    <div class="member-card">
+                        <div class="member-name">James Rodriguez</div>
+                        <div class="member-info">
+                            📧 Email: james.rodriguez@techcorp-global.com<br>
+                            🏢 Department: Marketing<br>
+                            📍 Location: New York, NY
+                        </div>
                     </div>
+
+                    <div class="member-card">
+                        <div class="member-name">Emily Chen</div>
+                        <div class="member-info">
+                            📧 Email: emily.chen@techcorp-global.com<br>
+                            🏢 Department: Product<br>
+                            📍 Location: San Francisco, CA
+                        </div>
+                    </div>
+
+                    <p style="margin-top: 20px; color: #666; text-align: center;">
+                        <em>For full employee details, please contact HR at hr@techcorp-global.com</em>
+                    </p>
                 </div>
-
-                <div id="resultsContainer" class="results-container"></div>
 
                 <div class="back-link">
-                    <a href="/">← Back to Member Portal</a>
+                    <a href="/">← Back to HR Portal</a>
                 </div>
             </div>
-            
-            <script>
-                async function searchMember() {
-                    const id = document.getElementById('searchInput').value.trim();
-                    const resultsContainer = document.getElementById('resultsContainer');
-                    
-                    if (!id) {
-                        resultsContainer.innerHTML = '<div class="error-box">Please enter a member ID</div>';
-                        return;
-                    }
-                    
-                    resultsContainer.innerHTML = '<div class="info-section"><p>🔍 Searching member database...</p></div>';
-                    
-                    try {
-                        const response = await fetch('/api/members/user/' + id);
-                        const data = await response.json();
-                        
-                        if (response.status === 404) {
-                            resultsContainer.innerHTML = '<div class="error-box">' + 
-                                '<strong>Member Not Found</strong><br>' + 
-                                data.message + 
-                                '</div>';
-                            return;
-                        }
-                        
-                        let html = '<div class="info-section"><h2>Member Profile</h2>';
-                        
-                        html += '<div class="member-card">';
-                        html += '<div class="member-name">' + data.username + '</div>';
-                        html += '<div class="member-info">';
-                        html += '👤 <strong>ID:</strong> ' + data.id + '<br>';
-                        html += '📧 <strong>Email:</strong> ' + data.email + '<br>';
-                        html += '🎭 <strong>Role:</strong> ' + data.role + '<br>';
-                        html += '🎫 <strong>Membership:</strong> ' + data.membership + '<br>';
-                        
-                        if (data.joinDate) {
-                            html += '📅 <strong>Joined:</strong> ' + data.joinDate + '<br>';
-                        }
-                        if (data.favoriteClass) {
-                            html += '💫 <strong>Favorite Class:</strong> ' + data.favoriteClass + '<br>';
-                        }
-                        if (data.specialization) {
-                            html += '🧘 <strong>Specialization:</strong> ' + data.specialization + '<br>';
-                        }
-                        if (data.yearsTeaching) {
-                            html += '📚 <strong>Years Teaching:</strong> ' + data.yearsTeaching + '<br>';
-                        }
-                        
-                        html += '</div></div>';
-                        
-                        if (data.flag) {
-                            html += '<div class="flag-reveal">🎉 ' + data.flag + '<br><br>' + data.message + '</div>';
-                            if (data.stats) {
-                                html += '<div class="tip-box">';
-                                html += '<strong>📊 Community Stats:</strong><br>';
-                                html += 'Total Members: ' + data.stats.totalMembers + '<br>';
-                                html += 'Regular Members: ' + data.stats.members + '<br>';
-                                html += 'Instructors: ' + data.stats.instructors;
-                                html += '</div>';
-                            }
-                        }
-                        
-                        html += '</div>';
-                        resultsContainer.innerHTML = html;
-                        
-                    } catch (error) {
-                        resultsContainer.innerHTML = '<div class="error-box"><strong>Error:</strong> ' + error.message + '</div>';
-                    }
-                }
-
-                // Allow Enter key to trigger search
-                document.getElementById('searchInput').addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        searchMember();
-                    }
-                });
-            </script>
         </body>
         </html>
     `);
@@ -1071,113 +1010,66 @@ app.get('/lab2', (req, res) => {
             <div class="container">
                 <div class="header">
                     <h1>👤 My Profile</h1>
-                    <p class="subtitle">Manage your membership and personal information</p>
+                    <p class="subtitle">Manage your employee information</p>
                 </div>
 
                 <div class="profile-section">
-                    <h2>📋 Current Session</h2>
-                    <div class="info-box">
-                        <p>You are currently logged in as <strong>sarah_m</strong> (Member #${CURRENT_USER_ID})</p>
-                        <p style="margin-top: 10px; font-size: 0.9em;">Your profile data is loaded from the API. Use DevTools (F12 → Network tab) to see the API requests!</p>
+                    <h2>📋 Account Information</h2>
+                    <div class="profile-field">
+                        <div class="field-label">Employee ID:</div>
+                        <div class="field-value">#${CURRENT_USER_ID}</div>
                     </div>
-
-                    <div class="load-profile-section">
-                        <strong>🔍 Load Profile Data</strong>
-                        <p style="margin-top: 10px; font-size: 0.9em;">Enter a member ID to view their profile information:</p>
-                        <input type="number" id="profileId" class="profile-input" placeholder="Enter member ID (e.g., 1, 2, 3, 4...)" value="${CURRENT_USER_ID}">
-                        <button onclick="loadProfile()" class="btn">Load Profile</button>
+                    <div class="profile-field">
+                        <div class="field-label">Name:</div>
+                        <div class="field-value">Sarah Mitchell</div>
                     </div>
-
-                    <div class="tip-box">
-                        <strong>💡 Challenge Tip:</strong> The URL parameter determines which profile to load. What happens if you change it? Can you access other members' private data?
+                    <div class="profile-field">
+                        <div class="field-label">Email:</div>
+                        <div class="field-value">sarah.mitchell@techcorp-global.com</div>
+                    </div>
+                    <div class="profile-field">
+                        <div class="field-label">Department:</div>
+                        <div class="field-value">Engineering</div>
+                    </div>
+                    <div class="profile-field">
+                        <div class="field-label">Hire Date:</div>
+                        <div class="field-value">March 15, 2023</div>
                     </div>
                 </div>
 
-                <div id="profileData"></div>
+                <div class="profile-section">
+                    <h2>🎫 Benefits & Compensation</h2>
+                    <div class="profile-field">
+                        <div class="field-label">Health Plan:</div>
+                        <div class="field-value">Premium Plus</div>
+                    </div>
+                    <div class="profile-field">
+                        <div class="field-label">401(k) Status:</div>
+                        <div class="field-value">✅ Active (8% contribution)</div>
+                    </div>
+                    <div class="profile-field">
+                        <div class="field-label">PTO Balance:</div>
+                        <div class="field-value">15 days remaining</div>
+                    </div>
+                    <button class="btn">Request Time Off</button>
+                </div>
+
+                <div class="profile-section">
+                    <h2>💳 Direct Deposit</h2>
+                    <div class="profile-field">
+                        <div class="field-label">Bank Account:</div>
+                        <div class="field-value">****5678 (Wells Fargo)</div>
+                    </div>
+                    <div class="profile-field">
+                        <div class="field-label">Next Paycheck:</div>
+                        <div class="field-value">January 31, 2026</div>
+                    </div>
+                </div>
 
                 <div class="back-link">
-                    <a href="/">← Back to Member Portal</a>
+                    <a href="/">← Back to HR Portal</a>
                 </div>
             </div>
-            
-            <script>
-                // Load profile on page load
-                window.addEventListener('DOMContentLoaded', function() {
-                    loadProfile();
-                });
-
-                async function loadProfile() {
-                    const profileId = document.getElementById('profileId').value || ${CURRENT_USER_ID};
-                    const profileContainer = document.getElementById('profileData');
-                    
-                    profileContainer.innerHTML = '<div class="profile-section"><p>🔍 Loading profile data...</p></div>';
-                    
-                    try {
-                        const response = await fetch('/api/profile/user/' + profileId);
-                        const data = await response.json();
-                        
-                        if (response.status !== 200) {
-                            profileContainer.innerHTML = '<div class="profile-section" style="border-left-color: #d32f2f;"><p style="color: #d32f2f;">❌ ' + data.message + '</p></div>';
-                            return;
-                        }
-                        
-                        let html = '';
-                        
-                        // Flag reveal if present
-                        if (data.flag) {
-                            html += '<div class="flag-reveal">🎉 ' + data.flag;
-                            if (data._vuln_note) {
-                                html += '<br><br><small>' + data._vuln_note + '</small>';
-                            }
-                            html += '</div>';
-                        }
-                        
-                        // Account Information
-                        html += '<div class="profile-section">';
-                        html += '<h2>📋 Account Information</h2>';
-                        html += '<div class="profile-field"><div class="field-label">Member ID:</div><div class="field-value">#' + data.id + '</div></div>';
-                        html += '<div class="profile-field"><div class="field-label">Username:</div><div class="field-value">' + data.username + '</div></div>';
-                        html += '<div class="profile-field"><div class="field-label">Email:</div><div class="field-value">' + data.email + '</div></div>';
-                        html += '<div class="profile-field"><div class="field-label">Role:</div><div class="field-value">' + data.role + '</div></div>';
-                        
-                        if (data.joinDate) {
-                            html += '<div class="profile-field"><div class="field-label">Member Since:</div><div class="field-value">' + data.joinDate + '</div></div>';
-                        }
-                        html += '</div>';
-                        
-                        // Membership Details
-                        html += '<div class="profile-section">';
-                        html += '<h2>🎫 Membership Details</h2>';
-                        html += '<div class="profile-field"><div class="field-label">Plan:</div><div class="field-value">' + data.membership + '</div></div>';
-                        html += '<div class="profile-field"><div class="field-label">Renewal Date:</div><div class="field-value">' + data.renewalDate + '</div></div>';
-                        
-                        if (data.favoriteClass) {
-                            html += '<div class="profile-field"><div class="field-label">Favorite Class:</div><div class="field-value">' + data.favoriteClass + '</div></div>';
-                        }
-                        if (data.specialization) {
-                            html += '<div class="profile-field"><div class="field-label">Specialization:</div><div class="field-value">' + data.specialization + '</div></div>';
-                        }
-                        if (data.yearsTeaching) {
-                            html += '<div class="profile-field"><div class="field-label">Years Teaching:</div><div class="field-value">' + data.yearsTeaching + '</div></div>';
-                        }
-                        
-                        html += '<button class="btn">Upgrade to Premium</button>';
-                        html += '</div>';
-                        
-                        // Payment Information
-                        html += '<div class="profile-section">';
-                        html += '<h2>💳 Payment Information</h2>';
-                        html += '<div class="profile-field"><div class="field-label">Payment Method:</div><div class="field-value">Credit Card ending in ' + data.creditCard.slice(-4) + '</div></div>';
-                        html += '<div class="profile-field"><div class="field-label">Billing Status:</div><div class="field-value">✅ Active</div></div>';
-                        html += '</div>';
-                        
-                        profileContainer.innerHTML = html;
-                        
-                    } catch (error) {
-                        profileContainer.innerHTML = '<div class="profile-section" style="border-left-color: #d32f2f;"><p style="color: #d32f2f;">❌ Error: ' + error.message + '</p></div>';
-                    }
-                }
-            </script>
         </body>
         </html>
     `);
@@ -1395,112 +1287,80 @@ app.get('/lab3', (req, res) => {
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>📅 Instructor Dashboard</h1>
-                    <p class="subtitle">Manage classes, bookings, and teaching resources</p>
+                    <h1>📅 HR Admin Dashboard</h1>
+                    <p class="subtitle">Human Resources Management System</p>
                 </div>
 
                 ${!isInstructor ? `
                 <div class="alert-box">
-                    <h2>🔒 Staff Access Required</h2>
-                    <p>You are currently logged in as <strong>sarah_m</strong> (Basic Member).</p>
-                    <p style="margin-top: 10px;">This area is restricted to TechCorp HR administrators and authorized personnel only. If you believe you should have access, please contact our HR team at hr@techcorp.com.</p>
+                    <h2>🔒 Administrative Access Required</h2>
+                    <p>You are currently logged in as <strong>Employee #${userId}</strong></p>
+                    <p style="margin-top: 10px;">This area is restricted to TechCorp HR administrators and authorized personnel only. If you believe you should have access, please contact our IT department at it@techcorp-global.com.</p>
                 </div>
 
                 <div class="info-section">
-                    <h2>About the Instructor Dashboard</h2>
-                    <p>Our Instructor Dashboard provides teaching staff with tools to manage their classes and connect with students:</p>
+                    <h2>About the HR Dashboard</h2>
+                    <p>The TechCorp HR Dashboard provides administrators with comprehensive tools for managing employee data, benefits administration, and organizational analytics:</p>
                     
                     <ul class="feature-list">
-                        <li><strong>Class Scheduling:</strong> Create and manage your class schedule</li>
-                        <li><strong>Student Roster:</strong> View registered students for each class</li>
-                        <li><strong>Booking Management:</strong> Handle class cancellations and waitlists</li>
-                        <li><strong>Teaching Resources:</strong> Access lesson plans and studio guidelines</li>
-                        <li><strong>Performance Analytics:</strong> Track class attendance and student feedback</li>
+                        <li><strong>Employee Records:</strong> Access complete personnel files and documentation</li>
+                        <li><strong>Payroll Management:</strong> Process compensation and benefits administration</li>
+                        <li><strong>Performance Reviews:</strong> Track employee evaluations and development plans</li>
+                        <li><strong>Compliance Reporting:</strong> Generate regulatory and audit reports</li>
+                        <li><strong>Org Analytics:</strong> Workforce metrics and department insights</li>
                     </ul>
-                </div>
-
-                <div class="tip-box">
-                    <strong>💡 Challenge Tip:</strong> The application uses cookies to track your role. Open DevTools (F12 → Application/Storage → Cookies) to inspect the authentication cookies. Can you modify them to gain access?
-                </div>
-
-                <div class="cookie-info">
-                    <strong>🍪 Current Cookies:</strong><br>
-                    userRole=${userRole}<br>
-                    userId=${userId}
                 </div>
                 ` : `
                 <div class="success-box">
-                    <h2>✅ Welcome to the Instructor Dashboard!</h2>
-                    <p>Access granted. You are now viewing the instructor-only area.</p>
+                    <h2>✅ Welcome, HR Administrator</h2>
+                    <p>Access granted. You are viewing the administrative control panel.</p>
                 </div>
 
                 <div class="flag-reveal">
                     🎉 NSA{R00T_4CC3SS_4CH13V3D} 🎉
-                    <br><br>
-                    <div style="font-size: 0.7em; font-weight: normal; margin-top: 15px;">
-                        Congratulations! You successfully escalated your privileges by modifying the authentication cookie!
-                    </div>
                 </div>
 
                 <div class="info-section">
-                    <h2>📊 Your Teaching Dashboard</h2>
+                    <h2>📊 HR Dashboard</h2>
                     
                     <div class="dashboard-card">
-                        <h3>📅 Upcoming Classes</h3>
+                        <h3>📅 Pending Actions</h3>
                         <div class="class-item">
-                            <strong>Monday, Jan 20 - 9:00 AM</strong><br>
-                            Vinyasa Flow • 12 students enrolled • Studio A
-                        </div>
-                        <div class="class-item">
-                            <strong>Wednesday, Jan 22 - 6:00 PM</strong><br>
-                            Meditation Session • 8 students enrolled • Zen Room
-                        </div>
-                        <div class="class-item">
-                            <strong>Saturday, Jan 25 - 10:00 AM</strong><br>
-                            Power Yoga • 15 students enrolled • Studio B
+                            <strong>New Hire Onboarding:</strong> 3 employees starting next week<br>
+                            <strong>PTO Requests:</strong> 8 pending approvals<br>
+                            <strong>Performance Reviews:</strong> 12 overdue evaluations
                         </div>
                     </div>
 
                     <div class="dashboard-card">
-                        <h3>📈 Performance Metrics</h3>
-                        <p><strong>Total Students:</strong> 45 active students</p>
-                        <p><strong>Average Attendance:</strong> 87%</p>
-                        <p><strong>Student Rating:</strong> 4.8/5.0 ⭐</p>
-                        <p><strong>Classes This Month:</strong> 24</p>
+                        <h3>📈 Workforce Metrics</h3>
+                        <p><strong>Total Employees:</strong> 1,247</p>
+                        <p><strong>Average Tenure:</strong> 3.2 years</p>
+                        <p><strong>Turnover Rate:</strong> 8.5% (Q4 2025)</p>
+                        <p><strong>Open Positions:</strong> 23</p>
                     </div>
 
                     <div class="dashboard-card">
-                        <h3>📚 Teaching Resources</h3>
+                        <h3>📚 Quick Links</h3>
                         <ul class="feature-list">
-                            <li>Lesson Plans Library</li>
-                            <li>Studio Guidelines & Policies</li>
-                            <li>Attendance Reports</li>
-                            <li>Student Feedback Forms</li>
-                            <li>Professional Development Materials</li>
+                            <li>Employee Directory</li>
+                            <li>Payroll Processing</li>
+                            <li>Benefits Administration</li>
+                            <li>Compliance Reports</li>
+                            <li>Training & Development</li>
                         </ul>
                     </div>
-                </div>
-
-                <div class="tip-box">
-                    <strong>🎓 What You Learned:</strong> By modifying the cookie, you bypassed the application's access control. This demonstrates why authentication must be validated server-side, not just by checking cookies. Cookies can be easily manipulated by attackers!
                 </div>
                 `}
 
                 <div class="info-section">
-                    <h2>🎓 Becoming an Instructor</h2>
-                    <p>Interested in joining TechCorp? We're always looking for talented professionals to join our team across engineering, sales, and operations.</p>
-                    <p style="margin-top: 15px;"><strong>Requirements:</strong></p>
-                    <ul class="feature-list">
-                        <li>200-hour (minimum) yoga teacher certification</li>
-                        <li>Liability insurance</li>
-                        <li>CPR/First Aid certification</li>
-                        <li>Experience teaching group classes</li>
-                    </ul>
-                    <p style="margin-top: 15px;">Contact <strong>careers@techcorp.com</strong> for more information about joining our team.</p>
+                    <h2>🎓 Join Our Team</h2>
+                    <p>Interested in joining TechCorp? We're always looking for talented professionals across engineering, sales, operations, and more.</p>
+                    <p style="margin-top: 15px;">Visit <strong>careers.techcorp-global.com</strong> to view open positions and apply online.</p>
                 </div>
 
                 <div class="back-link">
-                    <a href="/">← Back to Member Portal</a>
+                    <a href="/">← Back to HR Portal</a>
                 </div>
             </div>
         </body>
@@ -1572,193 +1432,6 @@ app.get('/api/instructor/user/:id/dashboard', (req, res) => {
     }
     
     return res.json(dashboardData);
-});
-
-// ============================================================================
-// EXAMPLE API ENDPOINTS - For Instructor Demonstrations
-// ============================================================================
-
-// Example member profiles database for demonstrations
-const exampleMembers = [
-    { id: 100, name: 'Alex Rivera', email: 'alex.r@email.com', membershipType: 'Premium', favoriteClass: 'Vinyasa Flow', joinedDate: '2023-05-12' },
-    { id: 101, name: 'Jordan Lee', email: 'jordan.l@email.com', membershipType: 'Basic', favoriteClass: 'Hatha Yoga', joinedDate: '2024-01-08' },
-    { id: 102, name: 'Taylor Brooks', email: 'taylor.b@email.com', membershipType: 'Premium', favoriteClass: 'Power Yoga', joinedDate: '2023-11-20' },
-    { id: 103, name: 'Morgan Chen', email: 'morgan.c@email.com', membershipType: 'Basic', favoriteClass: 'Yin Yoga', joinedDate: '2024-03-15' },
-    { id: 104, name: 'Casey Wong', email: 'casey.w@email.com', membershipType: 'Premium', favoriteClass: 'Ashtanga', joinedDate: '2023-08-30' },
-    { id: 105, name: 'Riley Martinez', email: 'riley.m@email.com', membershipType: 'Family', favoriteClass: 'Restorative Yoga', joinedDate: '2024-02-18' },
-    { id: 108, name: 'Jamie Thompson', email: 'jamie.t@techcorp.com', membershipType: 'Staff', role: 'hidden_member', favoriteClass: 'Executive', joinedDate: '2022-01-05', specialNote: 'VIP Founding Member' }
-];
-
-// Track enumeration progress for Part 4
-// Note: Global state is intentional for this demo - it tracks progress across all requests
-// to simulate real-world enumeration where the attacker makes multiple sequential requests
-const enumerationProgress = new Set();
-
-// Example Part 1 - DevTools Demo: Browse member profiles by ID
-app.get('/api/example/part1/member/:id', (req, res) => {
-    const memberId = parseInt(req.params.id);
-    const member = exampleMembers.find(m => m.id === memberId);
-    
-    if (!member) {
-        return res.status(404).json({
-            error: 'Member not found',
-            message: 'No member profile exists with this ID.',
-            hint: 'Try IDs between 100-110'
-        });
-    }
-    
-    // Flag appears when accessing the hidden member (ID 108)
-    if (memberId === 108) {
-        return res.json({
-            success: true,
-            member: member,
-            flag: 'NSA{D3VT00LS_M4ST3R}',
-            message: '🎉 Congratulations! You discovered the hidden VIP member profile!',
-            tutorial: 'You successfully used browser DevTools to enumerate member IDs and find hidden resources.'
-        });
-    }
-    
-    // Regular member profile
-    res.json({
-        success: true,
-        member: {
-            id: member.id,
-            name: member.name,
-            email: member.email,
-            membershipType: member.membershipType,
-            favoriteClass: member.favoriteClass,
-            joinedDate: member.joinedDate
-        }
-    });
-});
-
-// Example Part 2 - cURL Demo: API that checks User-Agent
-app.get('/api/example/part2/test', (req, res) => {
-    const userAgent = req.headers['user-agent'] || '';
-    
-    // Check if request came from cURL
-    if (userAgent.toLowerCase().includes('curl')) {
-        return res.json({
-            success: true,
-            flag: 'NSA{CURL_C0MM4ND3R}',
-            message: '🎉 Success! You accessed the API using cURL!',
-            tutorial: 'You learned how command-line tools can interact with web APIs in ways the browser cannot.',
-            requestInfo: {
-                userAgent: userAgent,
-                method: req.method,
-                timestamp: new Date().toISOString()
-            }
-        });
-    }
-    
-    // Default response for browser requests
-    res.json({
-        success: false,
-        message: 'This endpoint requires cURL access.',
-        hint: 'Try accessing this endpoint using the cURL command-line tool instead of your browser.',
-        yourUserAgent: userAgent,
-        expectedUserAgent: 'curl/*'
-    });
-});
-
-// Example Part 3 - Intercept Demo: Access level parameter manipulation
-app.get('/api/example/part3/intercept', (req, res) => {
-    const accessLevel = req.query.access || 'member';
-    
-    // Vulnerable: trusts client-provided access level parameter
-    if (accessLevel === 'instructor') {
-        return res.json({
-            success: true,
-            accessLevel: 'instructor',
-            flag: 'NSA{BURP_1NT3RC3PT0R}',
-            message: '🎉 Access granted! You manipulated the access parameter to gain instructor privileges!',
-            tutorial: 'You learned how to intercept and modify HTTP requests to change application behavior.',
-            instructorData: {
-                upcomingClasses: [
-                    { date: '2025-01-20', time: '9:00 AM', class: 'Vinyasa Flow', enrolled: 12, capacity: 15 },
-                    { date: '2025-01-22', time: '6:00 PM', class: 'Meditation Session', enrolled: 8, capacity: 20 },
-                    { date: '2025-01-25', time: '10:00 AM', class: 'Power Yoga', enrolled: 15, capacity: 15 }
-                ],
-                teachingResources: {
-                    lessonPlans: 'https://techcorp.com/hr/policies',
-                    studentRoster: 'https://techcorp.com/hr/roster',
-                    salaryInfo: '$45/hour base rate + bonuses'
-                }
-            }
-        });
-    }
-    
-    // Member-level access (default)
-    res.json({
-        success: true,
-        accessLevel: 'member',
-        message: 'Member portal access',
-        memberData: {
-            upcomingClasses: [
-                { date: '2025-01-20', time: '9:00 AM', class: 'Vinyasa Flow', spotsLeft: 3 },
-                { date: '2025-01-22', time: '6:00 PM', class: 'Meditation Session', spotsLeft: 12 },
-                { date: '2025-01-25', time: '10:00 AM', class: 'Power Yoga', spotsLeft: 0 }
-            ]
-        },
-        hint: 'Standard member access. Notice the URL parameters...'
-    });
-});
-
-// Example Part 4 - Enumeration Demo: Find all active members
-app.get('/api/example/part4/enumerate/:id', (req, res) => {
-    const memberId = parseInt(req.params.id);
-    const member = exampleMembers.find(m => m.id === memberId && m.id >= 100 && m.id <= 105);
-    
-    if (!member) {
-        return res.status(404).json({
-            error: 'Member not found',
-            message: 'No active member found with this ID.',
-            hint: 'Active members have IDs in the range 100-105'
-        });
-    }
-    
-    // Track enumeration progress
-    enumerationProgress.add(memberId);
-    
-    // Check if all active members (100-105) have been enumerated
-    const allActiveMembers = [100, 101, 102, 103, 104, 105];
-    const allFound = allActiveMembers.every(id => enumerationProgress.has(id));
-    
-    if (allFound) {
-        return res.json({
-            success: true,
-            member: member,
-            flag: 'NSA{3NUM3R4T10N_PR0}',
-            message: '🎉 Congratulations! You successfully enumerated all active members!',
-            tutorial: 'You learned how sequential ID enumeration can expose all records in a system.',
-            stats: {
-                totalMembersFound: enumerationProgress.size,
-                activeMembers: allActiveMembers.length,
-                memberList: allActiveMembers.map(id => {
-                    const m = exampleMembers.find(member => member.id === id);
-                    return { id: m.id, name: m.name, email: m.email };
-                })
-            }
-        });
-    }
-    
-    // Normal response - show progress
-    res.json({
-        success: true,
-        member: {
-            id: member.id,
-            name: member.name,
-            email: member.email,
-            membershipType: member.membershipType,
-            favoriteClass: member.favoriteClass
-        },
-        progress: {
-            found: enumerationProgress.size,
-            total: allActiveMembers.length,
-            remaining: allActiveMembers.length - enumerationProgress.size,
-            hint: 'Keep enumerating to find all active members (IDs 100-105)'
-        }
-    });
 });
 
 app.listen(PORT, '0.0.0.0', () => {

@@ -607,43 +607,22 @@ app.get('/lab1', (req, res) => {
         </div>
 
         <div class="tutorial-section">
-          <h2>Smoothie Search</h2>
-          <p>Search by name, ingredient, or category to find your favorite blend!</p>
+          <h2>Product Search</h2>
+          <p>Search our catalog by product name, category, or specifications.</p>
           
-          <div class="tutorial-box">
-            <h3>🎯 Lab 1 Challenge</h3>
-            <p>This is a <strong>secure implementation</strong>. Try SQL injection attacks and see how they're safely handled!</p>
-            <p>Try these payloads:</p>
-            <ul>
-              <li><code>berry' OR '1'='1</code></li>
-              <li><code>protein'--</code></li>
-              <li><code>' UNION SELECT * FROM customers--</code></li>
-            </ul>
-            <p>Notice how they don't break the application? That's proper security!</p>
-          </div>
-
           <div class="interactive-demo">
-            <h3>Try Searching</h3>
-            <p>Open DevTools (F12 → Network tab) to watch the requests!</p>
+            <h3>Search Catalog</h3>
             <div class="demo-controls">
-              <input type="text" id="search-input" class="demo-input" placeholder="Try: berry, green, protein, or injection payloads!" value="">
+              <input type="text" id="search-input" class="demo-input" placeholder="Search for products..." value="">
               <button onclick="searchMenu()" class="demo-button">🔍 Search</button>
             </div>
             <div id="search-output" class="output-box"></div>
-            <div id="search-flag" class="flag-reveal"></div>
           </div>
 
-          <div class="hint-box">
-            <strong>💡 Tip:</strong> Check the Network tab to see the API response. Even with injection attempts, the search works safely!
+          <div style="margin-top: 20px; padding: 15px; background: #F5F5F5; border-radius: 8px;">
+            <strong>Popular Searches:</strong><br>
+            Laptop • Monitor • Keyboard • Mouse • Cable
           </div>
-        </div>
-
-        <div class="tutorial-section">
-          <h2>Why This Is Secure</h2>
-          <pre>// SECURE CODE:
-const query = 'SELECT * FROM smoothies WHERE name LIKE $1';
-db.query(query, ['%' + searchTerm + '%'], callback);</pre>
-          <p>This uses <strong>parameterized queries</strong> where user input is treated as data, never as SQL code!</p>
         </div>
 
         <div class="back-link">
@@ -655,7 +634,6 @@ db.query(query, ['%' + searchTerm + '%'], callback);</pre>
         async function searchMenu() {
           const query = document.getElementById('search-input').value;
           const output = document.getElementById('search-output');
-          const flagDiv = document.getElementById('search-flag');
           
           if (!query) {
             output.textContent = 'Please enter a search term';
@@ -663,28 +641,23 @@ db.query(query, ['%' + searchTerm + '%'], callback);</pre>
           }
           
           output.textContent = 'Searching...';
-          flagDiv.style.display = 'none';
           
           try {
             const response = await fetch('/api/search?q=' + encodeURIComponent(query));
             const data = await response.json();
             
-            let displayText = JSON.stringify(data, null, 2);
+            let displayText = '';
             
             if (data.results && data.results.length > 0) {
-              displayText = 'Found ' + data.results.length + ' smoothie(s):\\n\\n';
+              displayText = 'Found ' + data.results.length + ' product(s):\\n\\n';
               data.results.forEach(s => {
                 displayText += s.name + ' - $' + s.price + '\\n' + s.ingredients + '\\n\\n';
               });
-              displayText += '\\n--- Full API Response ---\\n' + JSON.stringify(data, null, 2);
+            } else {
+              displayText = 'No products found';
             }
             
             output.textContent = displayText;
-            
-            if (data.flag) {
-              flagDiv.textContent = '🎉 ' + data.flag;
-              flagDiv.style.display = 'block';
-            }
           } catch (error) {
             output.textContent = 'Error: ' + error.message;
           }
@@ -753,39 +726,23 @@ app.get('/lab2', (req, res) => {
               <li><code>berry'</code> - Single quote causes SQL error</li>
               <li><code>test' OR '1'='1</code> - OR-based injection</li>
               <li><code>test'--</code> - Comment-based injection</li>
-            </ul>
-            <p>Watch for SQL error messages in the response!</p>
-          </div>
+        <div class="tutorial-section">
+          <h2>Advanced Product Search</h2>
+          <p>Refine your search with category filters and specific criteria.</p>
 
           <div class="interactive-demo">
             <h3>Search with Filters</h3>
-            <p>Open DevTools (F12 → Network tab) to see the full response!</p>
             <div class="demo-controls">
               <label style="display: block; margin-top: 10px; font-weight: 600;">Search Term:</label>
-              <input type="text" id="adv-search-input" class="demo-input" placeholder="Enter smoothie name or ingredient" value="">
+              <input type="text" id="adv-search-input" class="demo-input" placeholder="Enter product name or specs" value="">
               
               <label style="display: block; margin-top: 10px; font-weight: 600;">Category:</label>
-              <input type="text" id="adv-category-input" class="demo-input" placeholder="wellness, classic, tropical, fitness" value="">
+              <input type="text" id="adv-category-input" class="demo-input" placeholder="e.g., Electronics, Accessories" value="">
               
               <button onclick="advancedSearch()" class="demo-button">🔍 Search</button>
             </div>
             <div id="adv-search-output" class="output-box"></div>
-            <div id="adv-search-flag" class="flag-reveal"></div>
           </div>
-
-          <div class="hint-box">
-            <strong>💡 Tip:</strong> Try entering a single quote (<code>'</code>) in the search field. Watch what happens in the response!
-          </div>
-        </div>
-
-        <div class="tutorial-section">
-          <h2>What's Wrong Here?</h2>
-          <pre>// VULNERABLE CODE:
-const query = \`SELECT * FROM smoothies 
-               WHERE name LIKE '%\${q}%' 
-               AND category = '\${category}'\`;
-db.query(query);</pre>
-          <p>This uses <strong>string concatenation</strong> instead of parameterized queries. User input goes directly into the SQL!</p>
         </div>
 
         <div class="back-link">
@@ -798,7 +755,6 @@ db.query(query);</pre>
           const query = document.getElementById('adv-search-input').value;
           const category = document.getElementById('adv-category-input').value;
           const output = document.getElementById('adv-search-output');
-          const flagDiv = document.getElementById('adv-search-flag');
           
           if (!query && !category) {
             output.textContent = 'Please enter a search term or category';
@@ -806,7 +762,6 @@ db.query(query);</pre>
           }
           
           output.textContent = 'Searching...';
-          flagDiv.style.display = 'none';
           
           try {
             let url = '/api/advanced-search?';
@@ -816,11 +771,14 @@ db.query(query);</pre>
             const response = await fetch(url);
             const data = await response.json();
             
-            output.textContent = JSON.stringify(data, null, 2);
-            
-            if (data.flag) {
-              flagDiv.textContent = '🎉 ' + data.flag + '\\n' + (data.message || '');
-              flagDiv.style.display = 'block';
+            if (data.results && data.results.length > 0) {
+              let displayText = 'Found ' + data.results.length + ' product(s):\\n\\n';
+              data.results.forEach(s => {
+                displayText += s.name + ' - $' + s.price + '\\n';
+              });
+              output.textContent = displayText;
+            } else {
+              output.textContent = 'No products found';
             }
           } catch (error) {
             output.textContent = 'Error: ' + error.message;
@@ -914,15 +872,12 @@ app.get('/lab3', (req, res) => {
             <p>Try these techniques:</p>
             <ul>
               <li><strong>Comment-based:</strong> <code>admin@shoptech.com'--</code> in email (any password)</li>
-              <li><strong>OR-based:</strong> <code>' OR '1'='1</code> in email or password</li>
-              <li><strong>Known user:</strong> <code>john.doe@email.com'--</code> with wrong password</li>
-            </ul>
-            <p>Goal: Login as admin without knowing the password!</p>
-          </div>
+        <div class="tutorial-section">
+          <h2>Customer Login</h2>
+          <p>Sign in to access your account, order history, and rewards.</p>
 
           <div class="interactive-demo">
             <h3>Login Form</h3>
-            <p>Open DevTools (F12 → Network tab) to see the requests and responses!</p>
             <div class="demo-controls">
               <label style="display: block; margin-top: 10px; font-weight: 600;">Email:</label>
               <input type="text" id="login-email" class="demo-input" placeholder="your.email@example.com" value="">
@@ -936,34 +891,10 @@ app.get('/lab3', (req, res) => {
             <div id="login-flag" class="flag-reveal"></div>
           </div>
 
-          <div class="hint-box">
-            <strong>💡 Hint:</strong> Try <code>admin@shoptech.com'--</code> as the email. The <code>--</code> will comment out the password check!
+          <div style="margin-top: 20px; padding: 15px; background: #F5F5F5; border-radius: 8px;">
+            <strong>Need an account?</strong><br>
+            <a href="#" style="color: #0066cc;">Create new account</a> | <a href="#" style="color: #0066cc;">Forgot password?</a>
           </div>
-        </div>
-
-        <div class="tutorial-section">
-          <h2>Test Accounts</h2>
-          <p>For legitimate testing:</p>
-          <ul>
-            <li><strong>Email:</strong> john.doe@email.com | <strong>Password:</strong> Berry123</li>
-            <li><strong>Email:</strong> fitness_jen@email.com | <strong>Password:</strong> Healthy2024</li>
-          </ul>
-          <p>But the goal is to login as <strong>admin@shoptech.com</strong> WITHOUT knowing the password!</p>
-        </div>
-
-        <div class="tutorial-section">
-          <h2>The Vulnerability</h2>
-          <pre>// CRITICAL VULNERABILITY:
-const query = \`SELECT * FROM customers 
-               WHERE email = '\${email}' 
-               AND password = '\${password}'\`;
-db.query(query);</pre>
-          <p><strong>Attack:</strong> Email: <code>admin@shoptech.com'--</code></p>
-          <p><strong>Query becomes:</strong></p>
-          <pre>SELECT * FROM customers 
-WHERE email = 'admin@shoptech.com'--' 
-AND password = 'anything'</pre>
-          <p>The <code>--</code> comments out the password check!</p>
         </div>
 
         <div class="back-link">
@@ -997,15 +928,13 @@ AND password = 'anything'</pre>
             
             const data = await response.json();
             
-            output.textContent = JSON.stringify(data, null, 2);
-            
-            if (data.success && data.flag) {
-              flagDiv.textContent = '🎉 ' + data.flag + '\\n\\nWelcome, ' + data.customer.name + '!\\nRole: ' + data.customer.role;
+            if (data.success) {
+              flagDiv.textContent = '✓ Login successful! Welcome, ' + (data.customer?.name || 'Customer');
               flagDiv.style.display = 'block';
-            } else if (data.success) {
-              flagDiv.textContent = '✓ Login successful as ' + data.customer.name;
-              flagDiv.style.display = 'block';
-              flagDiv.style.background = 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)';
+              flagDiv.style.background = 'linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)';
+              output.textContent = '';
+            } else {
+              output.textContent = 'Login failed: ' + data.message;
             }
           } catch (error) {
             output.textContent = 'Error: ' + error.message;

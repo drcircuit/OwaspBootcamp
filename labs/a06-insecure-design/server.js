@@ -767,47 +767,31 @@ app.get('/lab1', (req, res) => {
         </div>
 
         <div class="lab-info">
-          <h3>🎯 Your Mission</h3>
-          <p><strong>Scenario:</strong> Test our order verification system during lunch rush</p>
-          <p><strong>Your Goal:</strong> Find a valid order code by brute-forcing the system</p>
-          <p><strong>Flag:</strong> Discover what happens when you make 50+ verification attempts</p>
+          <h3>🎯 Account Verification</h3>
+          <p><strong>Scenario:</strong> Verify your account status during business hours</p>
+          <p><strong>Service:</strong> Enter your 4-digit PIN to check account details</p>
         </div>
 
         <div class="section">
-          <h2>🌮 Challenge Description</h2>
-          <p>SecureBank allows customers to verify their account status using a 4-digit PIN. The system checks if your PIN matches an active account.</p>
-          <p><strong>Your task:</strong> The verification system has no rate limiting. Try making many verification attempts to find a valid order code or trigger a security flag!</p>
+          <h2>🔐 Account Status Check</h2>
+          <p>SecureBank allows customers to verify their account status using a 4-digit PIN. Enter your PIN below to access your account information.</p>
         </div>
 
         <div class="interactive-demo">
-          <h3>Order Verification System</h3>
-          <p>Try to verify your order by entering different codes:</p>
+          <h3>Verification System</h3>
+          <p>Enter your account PIN:</p>
           <div class="demo-controls">
-            <input type="text" id="order-code" class="demo-input" placeholder="Enter 4-digit order code (try 1000-1050)" value="1000">
-            <button onclick="verifyOrder()" class="demo-button">🔍 Verify Order</button>
-            <button onclick="bruteForce()" id="brute-btn" class="demo-button">⚡ Auto Brute Force (1000-1050)</button>
-            <button onclick="resetLab()" class="demo-button">🔄 Reset Lab</button>
+            <input type="text" id="order-code" class="demo-input" placeholder="Enter 4-digit PIN" value="">
+            <button onclick="verifyOrder()" class="demo-button">🔍 Verify Account</button>
+            <button onclick="resetLab()" class="demo-button">🔄 Clear</button>
           </div>
           <div id="output" class="output-box"></div>
           <div id="flag" class="flag-reveal"></div>
         </div>
-
-        <div class="hint-box">
-          <strong>💡 DevTools Tip:</strong>
-          <ul>
-            <li>Open DevTools (F12) → Network tab to see each API call</li>
-            <li>Watch how many requests you can make without being blocked</li>
-            <li>Notice there's no rate limiting mechanism in place!</li>
           </ul>
         </div>
 
         <div class="bad">
-          <h3>⚠️ Vulnerability: Missing Rate Limiting</h3>
-          <p><strong>Issue:</strong> The order verification endpoint has no rate limiting, allowing unlimited attempts.</p>
-          <p><strong>Impact:</strong> Attackers can brute-force order codes to access any customer's order information.</p>
-          <p><strong>Fix:</strong> Implement rate limiting (e.g., max 10 attempts per 15 minutes) using middleware like express-rate-limit.</p>
-        </div>
-
         <div style="text-align: center; margin-top: 40px;">
           <a href="/">← Back to Home</a> | <a href="/lab2">Next Lab →</a>
         </div>
@@ -819,7 +803,12 @@ app.get('/lab1', (req, res) => {
           const output = document.getElementById('output');
           const flagDiv = document.getElementById('flag');
           
-          output.textContent = 'Verifying order...';
+          if (!orderCode) {
+            output.textContent = 'Please enter a PIN';
+            return;
+          }
+          
+          output.textContent = 'Verifying account...';
           
           try {
             const response = await fetch('/api/lab1/verify-order', {
@@ -829,10 +818,14 @@ app.get('/lab1', (req, res) => {
             });
             const data = await response.json();
             
-            output.textContent = JSON.stringify(data, null, 2);
+            if (data.valid) {
+              output.textContent = 'Account verified!\\n' + JSON.stringify(data.details, null, 2);
+            } else {
+              output.textContent = 'Invalid PIN. Please try again.';
+            }
             
             if (data.flag) {
-              flagDiv.innerHTML = '🎉 FLAG CAPTURED!<br><br>' + data.flag + '<br><br>' + data.message;
+              flagDiv.innerHTML = '🎉 ' + data.flag;
               flagDiv.style.display = 'block';
             }
           } catch (error) {
@@ -840,51 +833,11 @@ app.get('/lab1', (req, res) => {
           }
         }
 
-        async function bruteForce() {
-          const output = document.getElementById('output');
-          const flagDiv = document.getElementById('flag');
-          const btn = document.getElementById('brute-btn');
-          
-          btn.disabled = true;
-          output.textContent = 'Starting brute force attack...\\n\\n';
-          flagDiv.style.display = 'none';
-          
-          for (let code = 1000; code <= 1050; code++) {
-            try {
-              const response = await fetch('/api/lab1/verify-order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ orderCode: code.toString() })
-              });
-              const data = await response.json();
-              
-              output.textContent += \`Attempt \${code}: \${data.message || 'Checking...'}\\n\`;
-              
-              if (data.flag) {
-                output.textContent += \`\\n🎉 FLAG FOUND!\\n\`;
-                flagDiv.innerHTML = '🎉 FLAG CAPTURED!<br><br>' + data.flag + '<br><br>' + data.message;
-                flagDiv.style.display = 'block';
-                break;
-              }
-              
-              if (data.validOrder) {
-                output.textContent += \`\\n✅ Valid order found: \${code}\\n\`;
-              }
-              
-              // Small delay to make it visible
-              await new Promise(resolve => setTimeout(resolve, 50));
-            } catch (error) {
-              output.textContent += \`Attempt \${code}: Error\\n\`;
-            }
-          }
-          
-          btn.disabled = false;
-        }
-
         async function resetLab() {
-          const output = document.getElementById('output');
-          output.textContent = 'Resetting lab...';
-          
+          document.getElementById('order-code').value = '';
+          document.getElementById('output').textContent = '';
+          document.getElementById('flag').style.display = 'none';
+        }
           try {
             const response = await fetch('/api/lab1/reset', { method: 'POST' });
             const data = await response.json();
@@ -1039,69 +992,40 @@ app.get('/lab2', (req, res) => {
         </div>
 
         <div class="lab-info">
-          <h3>🎯 Your Mission</h3>
-          <p><strong>Scenario:</strong> Maximize your savings with promo codes!</p>
-          <p><strong>Your Goal:</strong> Apply the same promo code multiple times to get >50% discount</p>
-          <p><strong>Flag:</strong> Exploit the business logic flaw to trigger the flag</p>
+          <h3>🎯 Benefit Application</h3>
+          <p><strong>Scenario:</strong> Apply account benefits during signup</p>
+          <p><strong>Service:</strong> Add benefit codes to reduce initial deposit</p>
         </div>
 
         <div class="section">
-          <h2>🎟️ Challenge Description</h2>
-          <p>SecureBank allows customers to apply multiple benefit codes at account creation. The system applies each code in the list—but doesn't check for duplicates!</p>
-          <p><strong>Your task:</strong> Exploit the logic flaw by applying the same discount code multiple times to stack discounts beyond the intended limit.</p>
+          <h2>🎟️ Account Benefits</h2>
+          <p>SecureBank allows customers to apply multiple benefit codes at account creation. Add codes below to reduce your initial deposit requirement.</p>
         </div>
 
         <div class="section">
-          <h2>🌮 Menu Prices</h2>
+          <h2>🎟️ Available Codes</h2>
           <ul style="font-size: 1.1em;">
-            <li>🌮 <strong>Taco</strong> - $3.50 each</li>
-            <li>🌯 <strong>Burrito</strong> - $7.50 each</li>
-            <li>🧀 <strong>Quesadilla</strong> - $6.00 each</li>
-            <li>🥑 <strong>Nachos</strong> - $5.00 each</li>
-          </ul>
-        </div>
-
-        <div class="section">
-          <h2>🎟️ Available Promo Codes</h2>
-          <ul style="font-size: 1.1em;">
-            <li><code>TACO10</code> - 10% off</li>
-            <li><code>LUNCH15</code> - 15% off</li>
+            <li><code>SAVE10</code> - 10% off</li>
+            <li><code>WELCOME15</code> - 15% off</li>
             <li><code>FIRST5</code> - $5 off</li>
           </ul>
         </div>
 
         <div class="interactive-demo">
-          <h3>Checkout System</h3>
-          <p><strong>Step 1:</strong> Select your items</p>
+          <h3>Application System</h3>
+          <p><strong>Step 1:</strong> Select your account type</p>
           <div class="item-selector">
-            <button class="item-btn" onclick="toggleItem('taco')">🌮 Taco ($3.50)</button>
-            <button class="item-btn" onclick="toggleItem('burrito')">🌯 Burrito ($7.50)</button>
-            <button class="item-btn" onclick="toggleItem('quesadilla')">🧀 Quesadilla ($6.00)</button>
-            <button class="item-btn" onclick="toggleItem('nachos')">🥑 Nachos ($5.00)</button>
+            <button class="item-btn" onclick="toggleItem('checking')">💰 Checking ($100)</button>
+            <button class="item-btn" onclick="toggleItem('savings')">💎 Savings ($250)</button>
+            <button class="item-btn" onclick="toggleItem('investment')">📈 Investment ($500)</button>
           </div>
           
-          <p style="margin-top: 15px;"><strong>Step 2:</strong> Enter promo codes (comma-separated, duplicates allowed!)</p>
-          <input type="text" id="promo-codes" class="demo-input" placeholder="e.g., TACO10,TACO10,TACO10,TACO10" value="TACO10,TACO10,TACO10,TACO10">
+          <p style="margin-top: 15px;"><strong>Step 2:</strong> Enter benefit codes (comma-separated)</p>
+          <input type="text" id="promo-codes" class="demo-input" placeholder="e.g., SAVE10" value="">
           
-          <button onclick="checkout()" class="demo-button" style="width: 100%;">💳 Checkout with Codes</button>
+          <button onclick="checkout()" class="demo-button" style="width: 100%;">✅ Apply Benefits</button>
           <div id="output" class="output-box"></div>
           <div id="flag" class="flag-reveal"></div>
-        </div>
-
-        <div class="hint-box">
-          <strong>💡 DevTools Tip:</strong>
-          <ul>
-            <li>Open DevTools (F12) → Network tab to see the checkout request</li>
-            <li>Look at the request payload—notice how promo codes are sent as an array</li>
-            <li>Try applying the same code 4+ times to exceed 50% discount</li>
-          </ul>
-        </div>
-
-        <div class="bad">
-          <h3>⚠️ Vulnerability: Business Logic Flaw</h3>
-          <p><strong>Issue:</strong> The checkout system doesn't validate that promo codes are unique, allowing discount stacking.</p>
-          <p><strong>Impact:</strong> Customers can apply the same code multiple times to get extreme discounts or even negative prices.</p>
-          <p><strong>Fix:</strong> Use a Set to track applied codes, validate maximum discount caps, and check for duplicate code usage per order.</p>
         </div>
 
         <div style="text-align: center; margin-top: 40px;">
@@ -1308,43 +1232,29 @@ app.get('/lab3', (req, res) => {
         </div>
 
         <div class="lab-info">
-          <h3>🎯 Your Mission</h3>
-          <p><strong>Scenario:</strong> Exploit concurrent transaction processing</p>
-          <p><strong>Your Goal:</strong> Withdraw more than your $50 balance by exploiting a race condition</p>
-          <p><strong>Flag:</strong> Trigger an overdraft to capture the flag</p>
+          <h3>🎯 Transfer System</h3>
+          <p><strong>Service:</strong> Transfer funds between accounts</p>
+          <p><strong>Balance:</strong> $1000.00 available</p>
         </div>
 
         <div class="section">
-          <h2>💰 Challenge Description</h2>
-          <p>SecureBank has a transfer system where customers can move funds using their account balance. Your account has $1000.00 available.</p>
-          <p><strong>The vulnerability:</strong> The system checks balance availability and then withdraws—these are separate operations, not atomic! Multiple concurrent requests can all pass the balance check before any withdrawal is processed.</p>
-          <p><strong>Your task:</strong> Send 3 concurrent $30 withdrawal requests. If successful, you'll withdraw $90 from a $50 balance!</p>
+          <h2>💰 Account Transfer</h2>
+          <p>SecureBank allows customers to transfer funds to other accounts or external recipients using available balance.</p>
         </div>
 
         <div class="balance-display">
-          Current Balance: <span id="balance-display">$50.00</span>
-        </div>
-
-        <div class="hint-box">
-          <strong>💡 Testing Hints:</strong>
-          <ul>
-            <li>Your account balance: $50.00 (customer123)</li>
-            <li>Each taco order costs $3.50</li>
-            <li>Try sending multiple requests at the exact same time</li>
-            <li>Race conditions occur when concurrent requests aren't synchronized</li>
-          </ul>
+          Current Balance: <span id="balance-display">$1000.00</span>
         </div>
 
         <div class="section">
-          <h2>🔧 How to Test</h2>
-          <p><strong>Endpoint:</strong> <code>POST /api/purchase</code></p>
+          <h2>🔧 API Information</h2>
+          <p><strong>Endpoint:</strong> <code>POST /api/transfer</code></p>
           <p><strong>Request Body:</strong></p>
           <pre>{
-  "customerId": "customer123",
-  "amount": 3.50,
-  "item": "Carne Asada Taco"
+  "accountId": "acc_123",
+  "amount": 250.00,
+  "recipient": "External Account"
 }</pre>
-          <p><strong>Goal:</strong> Purchase more than $50 worth of tacos by exploiting the race condition!</p>
         </div>
 
         <div style="text-align: center; margin-top: 40px;">

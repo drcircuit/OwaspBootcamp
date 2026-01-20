@@ -649,62 +649,26 @@ app.get('/lab1', (req, res) => {
                 </div>
 
                 <div class="section">
-                    <h2>🔍 System Information</h2>
-                    <p>Access system diagnostics and configuration details for troubleshooting.</p>
-                    
-                    <div class="search-box">
-                        <strong>🛠️ Check System Info</strong>
-                        <p style="margin-top: 10px; font-size: 0.95em; color: #555;">
-                            View system diagnostics and health status. Use DevTools (F12 → Network tab) to see the API calls!
-                        </p>
-                        <button onclick="loadSystemInfo()" class="demo-button">Load System Information</button>
+                    <h2>�️ Deployment Schedule</h2>
+                    <p><strong>Today's Deployments:</strong></p>
+                    <div class="staff-card">
+                        <strong>Production Release 2.4.1</strong><br>
+                        Time: 2:00 AM PST<br>
+                        Engineer: Alex Chen<br>
+                        Status: ✅ Completed
                     </div>
-
-                    <div class="tip-box">
-                        <strong>💡 Challenge Tip:</strong> Debug endpoints can expose sensitive system information. What data can you discover? Look at the network request in DevTools to see the endpoint URL.
+                    <div class="staff-card">
+                        <strong>Database Migration</strong><br>
+                        Time: 4:00 PM PST<br>
+                        Engineer: Maria Rodriguez<br>
+                        Status: ⏳ Scheduled
                     </div>
                 </div>
-
-                <div id="resultsContainer"></div>
 
                 <div class="back-link">
                     <a href="/">← Back to Portal</a>
                 </div>
             </div>
-            
-            <script>
-                async function loadSystemInfo() {
-                    const resultsContainer = document.getElementById('resultsContainer');
-                    
-                    resultsContainer.innerHTML = '<div class="section"><p>🔍 Loading system information...</p></div>';
-                    
-                    try {
-                        const response = await fetch('/api/staff/system-info');
-                        const data = await response.json();
-                        
-                        let html = '<div class="section"><h2>System Diagnostics</h2>';
-                        
-                        if (data.flag) {
-                            html += '<div class="flag-reveal">🎉 ' + data.flag + '<br><br>' + data.message + '</div>';
-                        }
-                        
-                        html += '<div class="output-box">' + JSON.stringify(data, null, 2) + '</div>';
-                        
-                        if (data.vulnerability) {
-                            html += '<div class="tip-box">';
-                            html += '<strong>⚠️ Security Issue:</strong> ' + data.vulnerability + '<br>';
-                            html += data.warning || '';
-                            html += '</div>';
-                        }
-                        
-                        html += '</div>';
-                        resultsContainer.innerHTML = html;
-                        
-                    } catch (error) {
-                        resultsContainer.innerHTML = '<div class="section"><p style="color: #d32f2f;">❌ Error: ' + error.message + '</p></div>';
-                    }
-                }
-            </script>
         </body>
         </html>
     `);
@@ -861,79 +825,25 @@ app.get('/lab2', (req, res) => {
                     
                     <h3 style="margin-top: 20px; color: #3E2723;">Quick Settings:</h3>
                     <ul style="color: #5D4037; line-height: 1.7; margin-left: 20px; margin-top: 10px;">
-                        <li>Store hours configuration</li>
-                        <li>Payment gateway settings</li>
-                        <li>Inventory thresholds</li>
-                        <li>Email notification preferences</li>
+                        <li>Store hours: Mon-Fri 6AM-8PM, Sat-Sun 7AM-9PM</li>
+                        <li>Payment processing via Square</li>
+                        <li>Low inventory alerts enabled</li>
+                        <li>Email notifications: Active</li>
+                    </ul>
+
+                    <h3 style="margin-top: 20px; color: #3E2723;">Active Integrations:</h3>
+                    <ul style="color: #5D4037; line-height: 1.7; margin-left: 20px; margin-top: 10px;">
+                        <li>✅ Square POS - Connected</li>
+                        <li>✅ Gmail SMTP - Operational</li>
+                        <li>✅ AWS S3 Storage - Active</li>
+                        <li>⏸️ Loyalty Program - Pending setup</li>
                     </ul>
                 </div>
-
-                <div class="section">
-                    <h2>🔍 Configuration Files</h2>
-                    <p>Access configuration and environment files for troubleshooting and setup.</p>
-                    
-                    <div class="search-box">
-                        <strong>📄 Check Configuration Files</strong>
-                        <p style="margin-top: 10px; font-size: 0.95em; color: #555;">
-                            Enter a file path to view its contents. Try common configuration files like <code>.env</code> or <code>.env.backup</code>
-                        </p>
-                        <input type="text" id="filePath" class="demo-input" placeholder="e.g., .env or .env.backup" value=".env">
-                        <button onclick="loadConfigFile()" class="demo-button">Load Configuration File</button>
-                    </div>
-
-                    <div class="tip-box">
-                        <strong>💡 Challenge Tip:</strong> Configuration files often contain sensitive data. What happens if they're exposed via web access? Environment files like <code>.env</code> should never be web-accessible!
-                    </div>
-                </div>
-
-                <div id="resultsContainer"></div>
 
                 <div class="back-link">
                     <a href="/">← Back to Portal</a>
                 </div>
             </div>
-            
-            <script>
-                async function loadConfigFile() {
-                    const filePath = document.getElementById('filePath').value.trim();
-                    const resultsContainer = document.getElementById('resultsContainer');
-                    
-                    if (!filePath) {
-                        resultsContainer.innerHTML = '<div class="section"><p style="color: #d32f2f;">Please enter a file path</p></div>';
-                        return;
-                    }
-                    
-                    resultsContainer.innerHTML = '<div class="section"><p>🔍 Loading configuration file...</p></div>';
-                    
-                    try {
-                        const response = await fetch('/' + filePath);
-                        const text = await response.text();
-                        
-                        let html = '<div class="section"><h2>Configuration File: ' + filePath + '</h2>';
-                        
-                        // Check if flag is in content
-                        if (text.includes('FLAG{')) {
-                            const flagMatch = text.match(/FLAG\\{[^}]+\\}/);
-                            if (flagMatch) {
-                                html += '<div class="flag-reveal">🎉 ' + flagMatch[0] + '<br><br>Configuration file exposed!</div>';
-                            }
-                        }
-                        
-                        html += '<div class="output-box">' + text.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
-                        
-                        html += '<div class="warning-box">';
-                        html += '<strong>⚠️ Security Issue:</strong> This file is web-accessible! Configuration files containing secrets, passwords, and API keys should never be accessible via HTTP.<br><br>';
-                        html += '<strong>Impact:</strong> Attackers can steal database credentials, API keys, and other sensitive information.';
-                        html += '</div>';
-                        
-                        html += '</div>';
-                        resultsContainer.innerHTML = html;
-                        
-                    } catch (error) {
-                        resultsContainer.innerHTML = '<div class="section"><p style="color: #d32f2f;">❌ Error loading file: ' + error.message + '</p></div>';
-                    }
-                }
-            </script>
         </body>
         </html>
     `);
@@ -1126,7 +1036,7 @@ app.get('/lab3', (req, res) => {
 
                 <div class="restricted">
                     <strong>🔒 Authentication Required</strong><br>
-                    This area requires manager credentials. Administrative files may be accessible via direct URL access.
+                    This area requires manager credentials. Please log in at the admin console.
                 </div>
 
                 <div class="section">
@@ -1138,89 +1048,22 @@ app.get('/lab3', (req, res) => {
                         <li>Inventory ordering and management</li>
                         <li>System configuration and settings</li>
                     </ul>
-                </div>
 
-                <div class="section">
-                    <h2>🗂️ Administrative Files</h2>
-                    <p>Administrative configuration files and directories are stored on the server.</p>
-                    
-                    <div class="search-box">
-                        <strong>📂 Browse Admin Directory</strong>
-                        <p style="margin-top: 10px; font-size: 0.95em; color: #555;">
-                            Check for administrative files and directories. Try paths like <code>/admin</code> or <code>/admin/credentials.txt</code>
-                        </p>
-                        <input type="text" id="adminPath" class="demo-input" placeholder="e.g., /admin or /admin/credentials.txt" value="/admin">
-                        <button onclick="loadAdminPath()" class="demo-button">Browse Path</button>
-                    </div>
-
-                    <div class="tip-box">
-                        <strong>💡 Challenge Tip:</strong> Directory listing exposes file structures. Configuration files and credentials should never be web-accessible! Look for sensitive files like <code>config.json</code> or <code>credentials.txt</code>.
+                    <div style="margin-top: 20px; padding: 15px; background: #FFF8E7; border-radius: 8px;">
+                        <strong>📊 Quick Stats (Manager View):</strong><br>
+                        <div style="margin-top: 10px; color: #5D4037;">
+                            Today's Revenue: $2,847<br>
+                            Active Orders: 12<br>
+                            Staff on Shift: 4<br>
+                            Low Stock Items: 3
+                        </div>
                     </div>
                 </div>
-
-                <div id="resultsContainer"></div>
 
                 <div class="back-link">
                     <a href="/">← Back to Portal</a>
                 </div>
             </div>
-            
-            <script>
-                async function loadAdminPath() {
-                    const adminPath = document.getElementById('adminPath').value.trim();
-                    const resultsContainer = document.getElementById('resultsContainer');
-                    
-                    if (!adminPath) {
-                        resultsContainer.innerHTML = '<div class="section"><p style="color: #d32f2f;">Please enter a path</p></div>';
-                        return;
-                    }
-                    
-                    resultsContainer.innerHTML = '<div class="section"><p>🔍 Loading path...</p></div>';
-                    
-                    try {
-                        const response = await fetch(adminPath);
-                        const contentType = response.headers.get('content-type');
-                        
-                        let html = '<div class="section"><h2>Path: ' + adminPath + '</h2>';
-                        
-                        if (contentType && contentType.includes('application/json')) {
-                            const data = await response.json();
-                            html += '<div class="output-box">' + JSON.stringify(data, null, 2) + '</div>';
-                        } else {
-                            const text = await response.text();
-                            
-                            // Check if flag is in content
-                            if (text.includes('FLAG{')) {
-                                const flagMatch = text.match(/FLAG\\{[^}]+\\}/);
-                                if (flagMatch) {
-                                    html += '<div class="flag-reveal">🎉 ' + flagMatch[0] + '<br><br>Directory listing vulnerability exploited!</div>';
-                                }
-                            }
-                            
-                            // If it looks like HTML directory listing, render it
-                            if (text.includes('<table>') && text.includes('<tr>')) {
-                                const tableMatch = text.match(/<table>.*<\\/table>/s);
-                                if (tableMatch && tableMatch[0]) {
-                                    html += '<div class="dir-listing">' + tableMatch[0] + '</div>';
-                                }
-                            } else {
-                                html += '<div class="output-box">' + text.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
-                            }
-                        }
-                        
-                        html += '<div class="tip-box">';
-                        html += '<strong>⚠️ Security Issue:</strong> Directory listing is enabled! This allows attackers to browse server directories and discover sensitive files.<br><br>';
-                        html += '<strong>Impact:</strong> Credentials, configuration files, backups, and other sensitive data can be accessed.';
-                        html += '</div>';
-                        
-                        html += '</div>';
-                        resultsContainer.innerHTML = html;
-                        
-                    } catch (error) {
-                        resultsContainer.innerHTML = '<div class="section"><p style="color: #d32f2f;">❌ Error loading path: ' + error.message + '</p></div>';
-                    }
-                }
-            </script>
         </body>
         </html>
     `);
