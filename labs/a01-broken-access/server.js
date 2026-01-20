@@ -1761,7 +1761,7 @@ app.get('/api/example/part4/enumerate/:id', (req, res) => {
     });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`\x1b[32m
 ╔════════════════════════════════════════════╗
 ║   🧘 ZenFlow Yoga - Member Portal         ║
