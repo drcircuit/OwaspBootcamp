@@ -1526,7 +1526,7 @@ app.post('/api/purchase', (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`\x1b[32m
 ╔════════════════════════════════════════════╗
 ║   🌮 TacoTruck Express                    ║

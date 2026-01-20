@@ -644,7 +644,7 @@ app.delete('/api/audit-logs', (req, res) => {
     });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`\x1b[32m
 ╔════════════════════════════════════════════╗
 ║   🎨 ArtSpace Gallery                     ║

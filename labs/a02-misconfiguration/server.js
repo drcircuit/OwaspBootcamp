@@ -1268,7 +1268,7 @@ WARNING: This file should not be web-accessible!
     res.type('text/plain').send(credentials);
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`\x1b[33m
 ╔════════════════════════════════════════════╗
 ║   ☕ BeanScene Coffee Management Portal   ║
