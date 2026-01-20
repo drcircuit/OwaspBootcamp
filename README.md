@@ -94,30 +94,44 @@ Each topic includes **1 example + 3 progressive labs**:
 
 ### Starting the Workshop
 
+**Recommended (especially on Ubuntu/Linux):**
 ```bash
 # Clone the repository
 git clone https://github.com/drcircuit/OwaspBootcamp.git
 cd OwaspBootcamp
 
+# Use the start script (handles Ubuntu networking issues automatically)
+./start.sh
+```
+
+The start script will:
+- Check Docker availability
+- Detect and fix Ubuntu/Linux networking issues automatically
+- Offer clean rebuild options
+- Start all containers
+- Verify connectivity
+
+**Manual start (if you prefer):**
+```bash
 # Start all containers
-docker-compose up -d
+docker compose up -d
 
 # View logs
-docker-compose logs -f
+docker compose logs -f
 
 # Stop all containers
-docker-compose down
+docker compose down
 ```
 
 ### Starting Individual Labs
 
 ```bash
 # Start only specific labs
-docker-compose up -d lab-a01-broken-access
-docker-compose up -d lab-a05-injection
+docker compose up -d lab-a01-broken-access
+docker compose up -d lab-a05-injection
 
 # Start just the Citadel
-docker-compose up -d citadel citadel-db
+docker compose up -d citadel citadel-db
 ```
 
 ## 📚 Lab Access
@@ -215,11 +229,22 @@ See `instructor/README.md` for full details on using the writeups during worksho
 
 ## 🛠️ Troubleshooting
 
-### Ubuntu: Cannot access localhost (connection timeout)
+### Ubuntu: Cannot access localhost / Database connection timeouts
 
-If you're on **Ubuntu/Linux** and containers start successfully but you cannot access http://localhost:3100 or other ports (connection times out), this is usually due to Docker networking configuration issues on native Linux.
+If you're on **Ubuntu/Linux** and experience either of these symptoms:
+- Cannot access http://localhost:3100 (connection times out)
+- Portal shows "Database error" or logs show `ETIMEDOUT` connecting to database
+- Logs show: `connect ETIMEDOUT 172.x.x.x:5432`
 
-**Quick fix:**
+This is due to Docker bridge networking issues on native Linux - containers cannot communicate with each other or with the host. The root cause is usually iptables FORWARD chain blocking traffic.
+
+**Easiest fix - Use the start script:**
+```bash
+./start.sh
+```
+The start script automatically detects and fixes these issues.
+
+**Quick manual fix:**
 ```bash
 # Run the Ubuntu setup script to configure networking
 sudo ./ubuntu-setup.sh
@@ -231,9 +256,10 @@ docker compose up -d
 
 **What this fixes:**
 - Enables IP forwarding (required for Docker bridge networking)
+- Sets iptables FORWARD chain to ACCEPT (allows inter-container traffic)
 - Restarts Docker to reset iptables rules
-- Adds firewall rules if UFW is active
-- Configures Docker bridge network with proper subnet
+- Configures UFW to work with Docker (if UFW is active)
+- Adds firewall rules for Docker bridge networks
 
 **Manual fix (if script doesn't work):**
 ```bash
@@ -241,14 +267,33 @@ docker compose up -d
 sudo sysctl -w net.ipv4.ip_forward=1
 echo "net.ipv4.ip_forward=1" | sudo tee -a /etc/sysctl.conf
 
-# 2. Restart Docker
+# 2. Set iptables FORWARD chain to ACCEPT (critical!)
+sudo iptables -P FORWARD ACCEPT
+
+# 3. Add Docker-specific FORWARD rules
+sudo iptables -I FORWARD -i docker0 -j ACCEPT
+sudo iptables -I FORWARD -o docker0 -j ACCEPT
+
+# 4. If using UFW, configure it to work with Docker
+if command -v ufw &> /dev/null && ufw status | grep -q "active"; then
+  # Allow Docker bridge networks
+  sudo ufw allow from 172.25.0.0/16
+  sudo ufw allow to 172.25.0.0/16
+  
+  # Add forwarding rules for Docker interfaces
+  sudo sed -i '/^COMMIT$/i \
+-A ufw-before-forward -i docker0 -j ACCEPT\n\
+-A ufw-before-forward -o docker0 -j ACCEPT\n\
+-A ufw-before-forward -i br-+ -j ACCEPT\n\
+-A ufw-before-forward -o br-+ -j ACCEPT' /etc/ufw/before.rules
+  
+  sudo ufw reload
+fi
+
+# 5. Restart Docker
 sudo systemctl restart docker
 
-# 3. If using UFW, allow Docker ports
-sudo ufw allow 3000:3100/tcp
-sudo ufw allow from 172.25.0.0/16
-
-# 4. Restart containers
+# 6. Restart containers
 docker compose down
 docker compose up -d
 ```
