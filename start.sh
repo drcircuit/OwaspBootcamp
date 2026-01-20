@@ -224,7 +224,13 @@ RETRY=0
 PORTAL_OK=false
 
 while [ $RETRY -lt $MAX_RETRIES ]; do
-  if timeout 2 bash -c "echo > /dev/tcp/127.0.0.1/3100" 2>/dev/null; then
+  # Try curl first (more portable), fallback to bash /dev/tcp
+  if command -v curl &> /dev/null; then
+    if timeout 2 curl -s -o /dev/null http://127.0.0.1:3100 2>/dev/null; then
+      PORTAL_OK=true
+      break
+    fi
+  elif timeout 2 bash -c "echo > /dev/tcp/127.0.0.1/3100" 2>/dev/null; then
     PORTAL_OK=true
     break
   fi
