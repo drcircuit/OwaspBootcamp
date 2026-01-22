@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
@@ -288,7 +288,7 @@ app.get('/example', (req, res) => {
     `);
 });
 
-// Example API endpoints
+// Example API endpoints - Auto-called for DevTools discovery practice
 app.get('/api/example/health', (req, res) => {
     res.json({
         status: 'healthy',
@@ -338,332 +338,8 @@ app.get('/api/example/debug/config', (req, res) => {
     });
 });
 
-// Old Example API endpoints (deprecated but kept for compatibility)
-app.get('/api/example/systems/:id', (req, res) => {
-    res.send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Getting Started - CloudDeploy Platform</title>
-            <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body {
-                    font-family: 'Georgia', serif;
-                    background: linear-gradient(135deg, #6B4423 0%, #3E2723 100%);
-                    padding: 20px;
-                    min-height: 100vh;
-                    line-height: 1.6;
-                }
-                .container { max-width: 1000px; margin: 0 auto; }
-                .header {
-                    background: #EFEBE9;
-                    padding: 30px;
-                    border-radius: 15px;
-                    margin-bottom: 30px;
-                    text-align: center;
-                    border: 2px solid #A1887F;
-                }
-                h1 { color: #3E2723; font-size: 2.5em; margin-bottom: 10px; }
-                .subtitle { color: #5D4037; font-size: 1.1em; }
-                .tutorial-section {
-                    background: #EFEBE9;
-                    padding: 30px;
-                    border-radius: 15px;
-                    margin-bottom: 25px;
-                    border: 2px solid #A1887F;
-                }
-                .tutorial-section h2 {
-                    color: #3E2723;
-                    margin-bottom: 15px;
-                    font-size: 1.8em;
-                }
-                .tutorial-section p { color: #5D4037; margin-bottom: 15px; line-height: 1.7; }
-                .tutorial-box {
-                    background: #E8F5E9;
-                    padding: 20px;
-                    border-radius: 10px;
-                    margin: 15px 0;
-                    border-left: 3px solid #4CAF50;
-                }
-                .interactive-demo {
-                    background: #FFF3E0;
-                    padding: 20px;
-                    border-radius: 10px;
-                    margin: 15px 0;
-                    border-left: 3px solid #FF9800;
-                }
-                .demo-controls { margin: 15px 0; }
-                .demo-input {
-                    width: 100%;
-                    padding: 12px;
-                    border: 2px solid #8D6E63;
-                    border-radius: 8px;
-                    font-size: 1em;
-                    margin: 10px 0;
-                }
-                .demo-button {
-                    background: linear-gradient(135deg, #8D6E63 0%, #6D4C41 100%);
-                    color: white;
-                    padding: 12px 24px;
-                    border: none;
-                    border-radius: 8px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    font-size: 1em;
-                    margin: 5px;
-                }
-                .demo-button:hover {
-                    background: linear-gradient(135deg, #6D4C41 0%, #5D4037 100%);
-                }
-                .demo-button:disabled {
-                    opacity: 0.5;
-                    cursor: not-allowed;
-                }
-                .output-box {
-                    background: #f5f5f5;
-                    padding: 15px;
-                    border-radius: 8px;
-                    margin: 15px 0;
-                    font-family: 'Courier New', monospace;
-                    font-size: 0.9em;
-                    white-space: pre-wrap;
-                    word-wrap: break-word;
-                    max-height: 300px;
-                    overflow-y: auto;
-                    border: 1px solid #ddd;
-                }
-                .flag-reveal {
-                    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
-                    color: white;
-                    padding: 20px;
-                    border-radius: 10px;
-                    margin: 15px 0;
-                    text-align: center;
-                    font-weight: bold;
-                    font-size: 1.2em;
-                    display: none;
-                }
-                .hint-box {
-                    background: #E3F2FD;
-                    border-left: 4px solid #2196F3;
-                    padding: 15px;
-                    margin: 15px 0;
-                    border-radius: 5px;
-                }
-                code {
-                    background: #D7CCC8;
-                    padding: 2px 6px;
-                    border-radius: 3px;
-                    font-family: 'Courier New', monospace;
-                    color: #c62828;
-                }
-                .back-link { text-align: center; margin-top: 30px; }
-                .back-link a { color: #5D4037; text-decoration: none; font-weight: 600; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>📚 Getting Started Guide</h1>
-                    <p class="subtitle">Learn to explore the CloudDeploy management system with interactive examples</p>
-                </div>
 
-                <!-- Part 1: System Enumeration -->
-                <div class="tutorial-section">
-                    <h2>Part 1: System Discovery 🔍</h2>
-                    <p>CloudDeploy uses multiple microservices for operations. Learn how to enumerate services by ID to discover all available resources.</p>
-                    
-                    <div class="tutorial-box">
-                        <h3>🎯 Your Mission</h3>
-                        <p>The system directory allows you to search by ID. Try different IDs to discover all systems, including a hidden maintenance system at ID 103!</p>
-                    </div>
-
-                    <div class="interactive-demo">
-                        <h3>Interactive Demo</h3>
-                        <p>Enter a system ID to view its information. Open DevTools (F12) to watch the network requests!</p>
-                        <div class="demo-controls">
-                            <input type="number" id="part1-id" class="demo-input" placeholder="Enter system ID (try 100-105)" value="100">
-                            <button onclick="part1Search()" class="demo-button">🔍 Search System</button>
-                        </div>
-                        <div id="part1-output" class="output-box"></div>
-                        <div id="part1-flag" class="flag-reveal"></div>
-                    </div>
-
-                    <div class="hint-box">
-                        <strong>💡 Tip:</strong> Press F12 to open DevTools, go to the Network tab, and watch what happens when you search!
-                    </div>
-                </div>
-
-                <!-- Part 2: Diagnostic Endpoint -->
-                <div class="tutorial-section">
-                    <h2>Part 2: Diagnostic Access 💻</h2>
-                    <p>Many applications expose diagnostic endpoints for troubleshooting. These can reveal sensitive system information.</p>
-                    
-                    <div class="tutorial-box">
-                        <h3>🎯 Your Mission</h3>
-                        <p>Access the diagnostic endpoint to retrieve system health information and discover what data is exposed.</p>
-                    </div>
-
-                    <div class="interactive-demo">
-                        <h3>Try it yourself</h3>
-                        <p>Click to access the diagnostic endpoint:</p>
-                        <button onclick="part2Test()" class="demo-button">🌐 Access Diagnostics</button>
-                        <div id="part2-output" class="output-box" style="display:none;"></div>
-                        <div id="part2-flag" class="flag-reveal"></div>
-                    </div>
-
-                    <div class="hint-box">
-                        <strong>💡 Tip:</strong> Diagnostic endpoints should never be exposed in production systems!
-                    </div>
-                </div>
-
-                <!-- Part 3: Auth Check -->
-                <div class="tutorial-section">
-                    <h2>Part 3: Authentication Check 🔐</h2>
-                    <p>Learn how authentication systems can be probed to understand their configuration and security posture.</p>
-                    
-                    <div class="tutorial-box">
-                        <h3>🎯 Your Mission</h3>
-                        <p>Check the authentication system endpoint to see what information it reveals about the auth configuration.</p>
-                    </div>
-
-                    <div class="interactive-demo">
-                        <h3>Interactive Demo</h3>
-                        <p>Click to check the authentication system:</p>
-                        <button onclick="part3Test()" class="demo-button">🔓 Check Auth System</button>
-                        <div id="part3-output" class="output-box"></div>
-                        <div id="part3-flag" class="flag-reveal"></div>
-                    </div>
-
-                    <div class="hint-box">
-                        <strong>💡 Tip:</strong> Open DevTools Network tab to see the endpoint URL and response data!
-                    </div>
-                </div>
-
-                <div class="back-link">
-                    <a href="/">← Back to Portal</a>
-                </div>
-            </div>
-
-            <script>
-                // Part 1: System Enumeration
-                async function part1Search() {
-                    const id = document.getElementById('part1-id').value;
-                    const output = document.getElementById('part1-output');
-                    const flagDiv = document.getElementById('part1-flag');
-                    
-                    output.textContent = 'Loading...';
-                    flagDiv.style.display = 'none';
-                    
-                    try {
-                        const response = await fetch('/api/example/systems/' + id);
-                        const data = await response.json();
-                        output.textContent = JSON.stringify(data, null, 2);
-                        
-                        if (data.flag) {
-                            flagDiv.textContent = '🎉 ' + data.flag + ' - ' + data.message;
-                            flagDiv.style.display = 'block';
-                        }
-                    } catch (error) {
-                        output.textContent = 'Error: ' + error.message;
-                    }
-                }
-
-                // Part 2: Diagnostic Endpoint
-                async function part2Test() {
-                    const output = document.getElementById('part2-output');
-                    const flagDiv = document.getElementById('part2-flag');
-                    
-                    output.style.display = 'block';
-                    output.textContent = 'Loading...';
-                    flagDiv.style.display = 'none';
-                    
-                    try {
-                        const response = await fetch('/api/example/diagnostic');
-                        const data = await response.json();
-                        output.textContent = JSON.stringify(data, null, 2);
-                        
-                        if (data.flag) {
-                            flagDiv.textContent = '🎉 ' + data.flag + ' - ' + data.message;
-                            flagDiv.style.display = 'block';
-                        }
-                    } catch (error) {
-                        output.textContent = 'Error: ' + error.message;
-                    }
-                }
-
-                // Part 3: Auth Check
-                async function part3Test() {
-                    const output = document.getElementById('part3-output');
-                    const flagDiv = document.getElementById('part3-flag');
-                    
-                    output.textContent = 'Loading...';
-                    flagDiv.style.display = 'none';
-                    
-                    try {
-                        const response = await fetch('/api/example/auth-check');
-                        const data = await response.json();
-                        output.textContent = JSON.stringify(data, null, 2);
-                        
-                        if (data.flag) {
-                            flagDiv.textContent = '🎉 ' + data.flag + ' - ' + data.message;
-                            flagDiv.style.display = 'block';
-                        }
-                    } catch (error) {
-                        output.textContent = 'Error: ' + error.message;
-                    }
-                }
-            </script>
-        </body>
-        </html>
-    `);
-});
-
-// Example API endpoints
-app.get('/api/example/systems/:id', (req, res) => {
-    const systemId = parseInt(req.params.id);
-    const system = storeSystemsExamples.find(s => s.id === systemId);
-    
-    if (!system) {
-        return res.status(404).json({ error: 'System not found', hint: 'Try IDs 100-103' });
-    }
-    
-    if (systemId === 103) {
-        return res.json({
-            ...system,
-            flag: 'NSA{DEBUG_EXAMPLE_COMPLETE}',
-            message: 'You found the maintenance system!',
-            admin_note: 'System in maintenance mode - full access available'
-        });
-    }
-    
-    res.json(system);
-});
-
-app.get('/api/example/diagnostic', (req, res) => {
-    res.json({
-        status: 'operational',
-        flag: 'NSA{DEBUG_EXAMPLE_COMPLETE}',
-        message: 'Diagnostic endpoint accessed successfully!',
-        store_health: {
-            pos_systems: 'online',
-            inventory: 'synced',
-            payment_gateway: 'connected'
-        }
-    });
-});
-
-app.get('/api/example/auth-check', (req, res) => {
-    res.json({
-        authenticated: false,
-        flag: 'NSA{DEBUG_EXAMPLE_COMPLETE}',
-        message: 'Auth check completed!',
-        hint: 'Authentication would normally validate credentials here'
-    });
-});
-
-
-// Lab 1 - Staff Dashboard
+// Lab 1 - Deployment Dashboard
 app.get('/lab1', (req, res) => {
     res.send(`
         <!DOCTYPE html>
@@ -827,6 +503,122 @@ NSA{ST4CK_TR4C3_L34K}`;
     res.json(deployment);
 });
 
+
+// Lab 2 - Configuration Access
+app.get('/lab2', (req, res) => {
+                    margin: 10px 0;
+                    border-radius: 8px;
+                    border-left: 4px solid #8D6E63;
+                }
+                .search-box {
+                    background: #E8F5E9;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                    border-left: 3px solid #4CAF50;
+                }
+                .demo-button {
+                    background: linear-gradient(135deg, #8D6E63 0%, #6D4C41 100%);
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-size: 1em;
+                    margin-top: 10px;
+                    width: 100%;
+                }
+                .demo-button:hover {
+                    background: linear-gradient(135deg, #6D4C41 0%, #5D4037 100%);
+                }
+                .output-box {
+                    background: #f5f5f5;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin: 15px 0;
+                    font-family: 'Courier New', monospace;
+                    font-size: 0.9em;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                    max-height: 400px;
+                    overflow-y: auto;
+                    border: 1px solid #ddd;
+                }
+                .flag-reveal {
+                    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 1.2em;
+                }
+                .tip-box {
+                    background: #FFF3E0;
+                    border-left: 4px solid #FF9800;
+                    padding: 15px;
+                    margin: 20px 0;
+                    border-radius: 5px;
+                }
+                code {
+                    background: #D7CCC8;
+                    padding: 3px 8px;
+                    border-radius: 4px;
+                    font-family: monospace;
+                    color: #c62828;
+                }
+                .back-link { text-align: center; margin-top: 30px; }
+                .back-link a { color: #5D4037; text-decoration: none; font-weight: 600; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>👥 Staff Dashboard</h1>
+                    <p class="subtitle">View team schedules and system information</p>
+                </div>
+
+                <div class="section">
+                    <h2>Team Overview</h2>
+                    <p>Access DevOps team information and deployment schedules. Our team keeps CloudDeploy running smoothly.</p>
+                    
+                    ${staff.map(s => `
+                        <div class="staff-card">
+                            <strong>${s.name}</strong> - ${s.role}<br>
+                            Email: ${s.email}<br>
+                            Shift: ${s.shift}
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="section">
+                    <h2>�️ Deployment Schedule</h2>
+                    <p><strong>Today's Deployments:</strong></p>
+                    <div class="staff-card">
+                        <strong>Production Release 2.4.1</strong><br>
+                        Time: 2:00 AM PST<br>
+                        Engineer: Alex Chen<br>
+                        Status: ✅ Completed
+                    </div>
+                    <div class="staff-card">
+                        <strong>Database Migration</strong><br>
+                        Time: 4:00 PM PST<br>
+                        Engineer: Maria Rodriguez<br>
+                        Status: ⏳ Scheduled
+                    </div>
+                </div>
+
+                <div class="back-link">
+                    <a href="/">← Back to Portal</a>
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
+});
+
 // Lab 1 API - VULNERABLE debug endpoint
 app.get('/api/staff/system-info', (req, res) => {
     // VULNERABLE: Debug info exposed in production
@@ -847,7 +639,7 @@ app.get('/api/staff/system-info', (req, res) => {
 });
 
 
-// Lab 2 - Configuration Access  
+// Lab 2 - Configuration Access
 app.get('/lab2', (req, res) => {
     res.send(`
         <!DOCTYPE html>
@@ -928,7 +720,7 @@ app.get('/lab2', (req, res) => {
     `);
 });
 
-
+// Lab 2 VULNERABLE - .env file exposed through misconfiguration
 app.get('/.env', (req, res) => {
     // VULNERABLE: .env file accessible due to misconfigured static file serving
     const envContent = `# CloudDeploy Platform - Environment Configuration
@@ -981,7 +773,7 @@ NSA{C0NF1G_L3AK3D}
 });
 
 
-// Lab 3 - Manager Portal
+// Lab 3 - Admin Panel
 app.get('/lab3', (req, res) => {
     res.send(`
         <!DOCTYPE html>
@@ -1007,19 +799,39 @@ app.get('/lab3', (req, res) => {
                     border-radius: 15px;
                     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
                 }
-                .logo { text-align: center; margin-bottom: 30px; }
-                .logo h1 { color: #2c5364; font-size: 2em; }
-                .logo p { color: #666; margin-top: 5px; }
-                .form-group { margin-bottom: 20px; }
-                label { display: block; margin-bottom: 8px; color: #333; font-weight: 600; }
+                .logo {
+                    text-align: center;
+                    margin-bottom: 30px;
+                }
+                .logo h1 {
+                    color: #2c5364;
+                    font-size: 2em;
+                }
+                .logo p {
+                    color: #666;
+                    margin-top: 5px;
+                }
+                .form-group {
+                    margin-bottom: 20px;
+                }
+                label {
+                    display: block;
+                    margin-bottom: 8px;
+                    color: #333;
+                    font-weight: 600;
+                }
                 input {
                     width: 100%;
                     padding: 12px;
                     border: 2px solid #ddd;
                     border-radius: 8px;
                     font-size: 1em;
+                    transition: border 0.3s;
                 }
-                input:focus { outline: none; border-color: #667eea; }
+                input:focus {
+                    outline: none;
+                    border-color: #667eea;
+                }
                 button {
                     width: 100%;
                     padding: 12px;
@@ -1030,43 +842,76 @@ app.get('/lab3', (req, res) => {
                     font-size: 1.1em;
                     font-weight: 600;
                     cursor: pointer;
+                    transition: transform 0.2s;
                 }
-                button:hover { transform: translateY(-2px); }
-                .hint { background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #2196f3; font-size: 0.9em; }
-                .error { background: #ffebee; color: #c62828; padding: 12px; border-radius: 8px; margin-bottom: 15px; display: none; }
-                .success { background: #e8f5e9; color: #2e7d32; padding: 20px; border-radius: 8px; margin-bottom: 15px; display: none; text-align: center; font-weight: 600; }
-                .back-link { text-align: center; margin-top: 20px; }
-                .back-link a { color: #667eea; text-decoration: none; font-weight: 600; }
+                button:hover {
+                    transform: translateY(-2px);
+                }
+                .hint {
+                    background: #e3f2fd;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin-top: 20px;
+                    border-left: 4px solid #2196f3;
+                    font-size: 0.9em;
+                }
+                .error {
+                    background: #ffebee;
+                    color: #c62828;
+                    padding: 12px;
+                    border-radius: 8px;
+                    margin-bottom: 15px;
+                    display: none;
+                }
+                .success {
+                    background: #e8f5e9;
+                    color: #2e7d32;
+                    padding: 20px;
+                    border-radius: 8px;
+                    margin-bottom: 15px;
+                    display: none;
+                    text-align: center;
+                    font-weight: 600;
+                }
+                .back-link {
+                    text-align: center;
+                    margin-top: 20px;
+                }
+                .back-link a {
+                    color: #667eea;
+                    text-decoration: none;
+                    font-weight: 600;
+                }
             </style>
         </head>
         <body>
-            <div class="login-container">
-                <div class="logo">
+            <div class=\"login-container\">
+                <div class=\"logo\">
                     <h1>☁️ CloudDeploy</h1>
                     <p>Lab 3: Admin Console</p>
                 </div>
 
-                <div id="error" class="error"></div>
-                <div id="success" class="success"></div>
+                <div id=\"error\" class=\"error\"></div>
+                <div id=\"success\" class=\"success\"></div>
 
-                <form id="loginForm" onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" name="username" required>
+                <form id=\"loginForm\" onsubmit=\"handleLogin(event)\">
+                    <div class=\"form-group\">
+                        <label for=\"username\">Username</label>
+                        <input type=\"text\" id=\"username\" name=\"username\" required>
                     </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" required>
+                    <div class=\"form-group\">
+                        <label for=\"password\">Password</label>
+                        <input type=\"password\" id=\"password\" name=\"password\" required>
                     </div>
-                    <button type="submit">Sign In</button>
+                    <button type=\"submit\">Sign In</button>
                 </form>
 
-                <div class="hint">
+                <div class=\"hint\">
                     <strong>💡 Tip:</strong> Many systems are deployed with default credentials that administrators forget to change. Try common admin credentials or check if there's documentation exposed.
                 </div>
 
-                <div class="back-link">
-                    <a href="/">← Back to Portal</a>
+                <div class=\"back-link\">
+                    <a href=\"/\">← Back to Portal</a>
                 </div>
             </div>
 
@@ -1110,7 +955,7 @@ app.get('/lab3', (req, res) => {
     `);
 });
 
-// Lab 3 API - Login endpoint with default credentials
+// Lab 3 API - VULNERABLE: Default credentials
 app.post('/api/admin/login', (req, res) => {
     const { username, password } = req.body;
     
@@ -1154,6 +999,156 @@ For support, contact devops@clouddeploy.io
     res.type('text/plain').send(readme);
 });
 
+// Directory listing showing admin files
+app.get('/admin', (req, res) => {
+    // VULNERABLE: Directory listing shows all admin files
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Index of /admin</title>
+            <style>
+                body { font-family: monospace; background: #f5f5f5; padding: 20px; }
+                h1 { color: #333; }
+                table { border-collapse: collapse; width: 100%; background: white; }
+                th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+                th { background: #333; color: white; }
+                a { color: #0066cc; text-decoration: none; }
+                a:hover { text-decoration: underline; }
+            </style>
+        </head>
+        <body>
+            <h1>Index of /admin</h1>
+            <table>
+                <tr><th>Name</th><th>Last Modified</th><th>Size</th></tr>
+                <tr><td><a href="/">..</a></td><td>-</td><td>-</td></tr>
+                <tr><td><a href="/admin/README.txt">README.txt</a></td><td>2024-11-20 16:45</td><td>428 bytes</td></tr>
+                <tr><td><a href="/admin/config.json">config.json</a></td><td>2024-12-15 14:30</td><td>2.1 KB</td></tr>
+                <tr><td><a href="/admin/backup/">backup/</a></td><td>2024-12-10 09:15</td><td>-</td></tr>
+                <tr><td><a href="/admin/logs/">logs/</a></td><td>2025-01-19 10:00</td><td>-</td></tr>
+            </table>
+        </body>
+        </html>
+    `);
+});
+
+app.get('/admin/config.json', (req, res) => {
+    res.json({
+        application: "CloudDeploy Admin Console",
+        version: "1.2.3",
+        database: {
+            host: "db.clouddeploy.io",
+                    background: linear-gradient(135deg, #6D4C41 0%, #5D4037 100%);
+                }
+                .output-box {
+                    background: #f5f5f5;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin: 15px 0;
+                    font-family: 'Courier New', monospace;
+                    font-size: 0.9em;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                    max-height: 400px;
+                    overflow-y: auto;
+                    border: 1px solid #ddd;
+                }
+                .flag-reveal {
+                    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 1.2em;
+                }
+                .tip-box {
+                    background: #FFF3E0;
+                    border-left: 4px solid #FF9800;
+                    padding: 15px;
+                    margin: 20px 0;
+                    border-radius: 5px;
+                }
+                .restricted {
+                    background: #FFEBEE;
+                    border-left: 4px solid #D32F2F;
+                    padding: 15px;
+                    margin: 15px 0;
+                    border-radius: 5px;
+                }
+                .dir-listing {
+                    background: white;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    margin: 15px 0;
+                    overflow: hidden;
+                }
+                .dir-item {
+                    padding: 12px;
+                    border-bottom: 1px solid #eee;
+                    cursor: pointer;
+                    transition: background 0.2s;
+                }
+                .dir-item:hover {
+                    background: #f5f5f5;
+                }
+                .dir-item:last-child {
+                    border-bottom: none;
+                }
+                code {
+                    background: #D7CCC8;
+                    padding: 3px 8px;
+                    border-radius: 4px;
+                    font-family: monospace;
+                    color: #c62828;
+                }
+                .back-link { text-align: center; margin-top: 30px; }
+                .back-link a { color: #5D4037; text-decoration: none; font-weight: 600; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🔐 Manager Portal</h1>
+                    <p class="subtitle">Administrative controls and reporting</p>
+                </div>
+
+                <div class="restricted">
+                    <strong>🔒 Authentication Required</strong><br>
+                    This area requires manager credentials. Please log in at the admin console.
+                </div>
+
+                <div class="section">
+                    <h2>Manager Features</h2>
+                    <p>The manager portal provides access to:</p>
+                    <ul style="color: #5D4037; line-height: 1.7; margin-left: 20px; margin-top: 10px;">
+                        <li>Financial reports and sales analytics</li>
+                        <li>Staff management and scheduling</li>
+                        <li>Inventory ordering and management</li>
+                        <li>System configuration and settings</li>
+                    </ul>
+
+                    <div style="margin-top: 20px; padding: 15px; background: #FFF8E7; border-radius: 8px;">
+                        <strong>📊 Quick Stats (Manager View):</strong><br>
+                        <div style="margin-top: 10px; color: #5D4037;">
+                            Today's Revenue: $2,847<br>
+                            Active Orders: 12<br>
+                            Staff on Shift: 4<br>
+                            Low Stock Items: 3
+                        </div>
+                    </div>
+                </div>
+
+                <div class="back-link">
+                    <a href="/">← Back to Portal</a>
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
+});
+
 // Lab 3 API - VULNERABLE: Directory listing enabled
 app.get('/admin', (req, res) => {
     // VULNERABLE: Directory listing shows all admin files
@@ -1180,7 +1175,7 @@ app.get('/admin', (req, res) => {
                 <tr><td><a href="/admin/config.json">config.json</a></td><td>2024-12-15 14:30</td><td>2.1 KB</td></tr>
                 <tr><td><a href="/admin/backup/">backup/</a></td><td>2024-12-10 09:15</td><td>-</td></tr>
                 <tr><td><a href="/admin/logs/">logs/</a></td><td>2025-01-19 10:00</td><td>-</td></tr>
-                <tr><td><a href="/admin/README.txt">README.txt</a></td><td>2024-11-20 16:45</td><td>486 bytes</td></tr>
+                <tr><td><a href="/admin/credentials.txt">credentials.txt</a></td><td>2024-11-20 16:45</td><td>156 bytes</td></tr>
             </table>
         </body>
         </html>

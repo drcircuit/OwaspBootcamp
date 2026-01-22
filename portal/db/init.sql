@@ -124,81 +124,76 @@ INSERT INTO challenges (owasp_category, title, description, difficulty, points, 
 
 -- Lab 1 (Enumeration) - Easy
 INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order, tutorial, mission_brief) VALUES
-    ('A01', 'A01 Lab 1: User Enumeration', 'Enumerate users in the system to identify potential targets.', 'Easy', 100, 'NSA{F0UND_TH3_US3RS}', 'User IDs are sequential', 'http://localhost:3001/lab1', 'lab', 1, 5, NULL,
-    '**MISSION BRIEF:** Agent, TechCorp Global''s HR portal is our first target. Intelligence suggests their employee directory lacks proper access controls.
+    ('A01', 'A01 Lab 1: Employee Directory Enumeration', 'Discover all employees in TechCorp''s directory system.', 'Easy', 100, 'NSA{F0UND_TH3_US3RS}', 'API endpoints might be discoverable', 'http://localhost:3001/lab1', 'lab', 1, 5, NULL,
+    '**MISSION BRIEF:** Agent, TechCorp Global''s HR portal is your first target. Intelligence suggests their employee directory may have API endpoints that lack proper access controls.
 
-**YOUR OBJECTIVE:** Discover all employees in the system. The more personnel records you identify, the more targets we have for future operations.
+**YOUR OBJECTIVE:** Map the entire employee base. Discover names, titles, emails, and organizational structure.
 
 **WHAT WE KNOW:**
-- The portal is at http://localhost:3001/lab1
-- Employee IDs might be predictable
-- The "Employee Directory" feature could be exploited
+- Target: http://localhost:3001/lab1
+- The directory system uses APIs to retrieve employee data
+- Employee records exist but may not all be visible through the UI
 
-**WHAT YOU NEED TO FIND:**
-- How many total employees exist?
-- Can you enumerate all names, titles, and email addresses?
-- Is there anyone with elevated HR privileges?
+**YOUR MISSION:**
+1. Discover hidden API endpoints
+2. Enumerate all employee records in the system
+3. Extract the flag hidden in one of the employee profiles
 
-**TOOLS TO USE:** Browser DevTools, cURL, or Burp Suite
-**ATTACK VECTOR:** Look for API endpoints that accept employee IDs as parameters
+**RECOMMENDED TOOLS:** gobuster, curl, browser DevTools
 
-The flag will reveal itself once you''ve successfully mapped their entire employee base. Good hunting, agent! 🎯');
+Success means complete visibility into TechCorp''s organizational structure. 🎯');
 
 -- Lab 2 (Exploitation) - Medium
 INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order, tutorial, mission_brief) VALUES
-    ('A01', 'A01 Lab 2: Access Other Profiles', 'Exploit IDOR to access data belonging to other users.', 'Medium', 150, 'NSA{1D0R_V1A_1NC3PT10N}', 'Try different IDs', 'http://localhost:3001/lab2', 'lab', 2, 6, NULL,
-    '**MISSION BRIEF:** Excellent work on the reconnaissance, agent. Now it''s time to exploit what you''ve learned.
+    ('A01', 'A01 Lab 2: Profile Data Breach', 'Access sensitive employee profile information.', 'Medium', 150, 'NSA{C00K13_M4N1PUL4T10N}', 'Check your browser cookies', 'http://localhost:3001/lab2', 'lab', 2, 6, NULL,
+    '**MISSION BRIEF:** Your reconnaissance revealed TechCorp''s employee roster. Now it''s time to access confidential data.
 
-**YOUR OBJECTIVE:** Access Maria Rodriguez''s employment profile. You''re logged in as a regular employee, but we need her sensitive HR data.
+**YOUR OBJECTIVE:** Access another employee''s private profile to extract sensitive compensation and personal information.
 
-**THE VULNERABILITY:** TechCorp''s "My Profile" feature (http://localhost:3001/lab2) doesn''t properly verify that employees can only access their OWN data. This is called an Insecure Direct Object Reference (IDOR).
+**THE TARGET:** http://localhost:3001/lab2 - The employee profile system
 
-**YOUR APPROACH:**
-1. Access your own profile first to understand the request structure
-2. Identify how employee IDs are passed (URL parameter? Cookie? Header?)
-3. Manipulate the request to access Maria''s profile (employee ID 2)
-4. Extract her sensitive compensation information
-
-**WHAT YOU''RE LOOKING FOR:**
+**WHAT YOU''RE AFTER:**
 - Salary and compensation details
-- Performance ratings and reviews
-- SSN (even if masked) and hire date
-- Stock options and equity grants
+- Social Security Numbers
+- Performance ratings
+- Stock options and equity
 
-**WARNING:** TechCorp''s security logs might detect unusual access patterns. Work carefully and deliberately.
+**YOUR MISSION:**
+1. Access your own profile to understand the system
+2. Identify the authentication mechanism
+3. Bypass access controls to view other employees'' profiles
+4. Extract sensitive data from unauthorized profiles
 
-Success means gaining unauthorized access to another employee''s confidential HR data. The flag awaits in Maria''s profile. 💼🔓');
+**RECOMMENDED TOOLS:** Browser DevTools (Application tab), curl, Burp Suite
+
+The flag will appear when you successfully access another employee''s confidential data. 💼🔓');
 
 -- Lab 3 (Escalation) - Hard
 INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order, tutorial, mission_brief) VALUES
-    ('A01', 'A01 Lab 3: Privilege Escalation', 'Escalate privileges to gain administrator access.', 'Hard', 200, 'NSA{R00T_4CC3SS_4CH13V3D}', 'Admin is just another user', 'http://localhost:3001/lab3', 'lab', 3, 7, NULL,
-    '**MISSION BRIEF:** Outstanding work, agent. You''ve proven you can move laterally between employee accounts. Now for the ultimate prize: HR administrator access.
+    ('A01', 'A01 Lab 3: Privilege Escalation', 'Escalate privileges to gain administrator access.', 'Hard', 200, 'NSA{PR1V1L3G3_3SC4L4T10N}', 'Authorization might be client-side', 'http://localhost:3001/lab3', 'lab', 3, 7, NULL,
+    '**MISSION BRIEF:** Excellent progress, agent. You''ve accessed employee profiles. Now it''s time for the ultimate challenge: administrative access.
 
-**YOUR OBJECTIVE:** Break into the HR Admin Dashboard at http://localhost:3001/lab3 and gain full administrative control over TechCorp''s personnel system.
+**YOUR OBJECTIVE:** Break into the HR Admin Dashboard and gain full administrative control over TechCorp''s personnel system.
 
-**THE TARGET:** The HR admin account has access to:
-- All employee salary data and compensation history
-- Complete organizational structure and reporting chains
-- Performance reviews and disciplinary records
-- System administration capabilities
-- The master flag proving complete HR system compromise
+**THE TARGET:** http://localhost:3001/lab3 - The HR Admin Dashboard
 
-**THE CHALLENGE:** You''ve exploited IDOR to access peer accounts. But can you escalate your privileges to a completely different role with elevated access? 
+**WHAT ADMINISTRATIVE ACCESS PROVIDES:**
+- Complete organizational chart and reporting structure
+- C-suite compensation data
+- System-wide analytics and statistics
+- Full access to all employee records
+- Performance metrics and audit trails
 
-**ATTACK STRATEGY:**
-- Recall that HR Director Sarah Kumar has elevated privileges (user ID 4, role: manager)
-- The same IDOR vulnerability might work, but you may need to manipulate authentication tokens
-- Check browser cookies - does the system trust client-side role assignments?
-- Look for cookies like `userRole` and `userId` that might be manipulable
+**YOUR MISSION:**
+1. Attempt to access the admin dashboard with your current credentials
+2. Analyze how the system determines authorization levels
+3. Identify weaknesses in the privilege checking mechanism
+4. Escalate your privileges to administrator level
+5. Extract the flag from the admin dashboard
 
-**WHAT MAKES THIS HARD:**
-- Admin data might be structured differently
-- You might need to manipulate multiple authentication mechanisms
-- Cookie-based auth can be bypassed with DevTools
+**RECOMMENDED TOOLS:** Browser DevTools (Application/Network tabs), curl with headers
 
-**THE STAKES:** If you succeed, you''ll have demonstrated a complete privilege escalation attack - from regular employee to full HR admin access with visibility into C-suite compensation and the power to modify personnel records.
-
-This is it, agent. Time to claim administrative access. 👑🔓');
+**THE CHALLENGE:** This isn''t about accessing another user''s data - it''s about changing your own access level. How does the system know whether you''re an admin? 👑🔓');
 
 -- ========================================
 -- A02: SECURITY MISCONFIGURATION

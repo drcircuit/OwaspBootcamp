@@ -516,113 +516,187 @@ app.post('/api/verify-pin', (req, res) => {
   });
 });
 
-// Lab 2 - Business Logic Flaw (Discount Stacking)
 app.get('/lab2', (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html>
     <head>
-      <title>SecureBank Checkout</title>
+      <title>Lab 2 - Discount Codes</title>
       ${styles}
+      <style>
+        .interactive-demo {
+          background: #FFF3E0;
+          padding: 20px;
+          border-radius: 10px;
+          margin: 15px 0;
+          border-left: 3px solid #FF9800;
+        }
+        .demo-input {
+          width: 100%;
+          padding: 12px;
+          border: 2px solid #FF6B35;
+          border-radius: 8px;
+          font-size: 1em;
+          margin: 10px 0;
+        }
+        .demo-button {
+          background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+          color: white;
+          padding: 12px 24px;
+          border: none;
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+          font-size: 1em;
+          margin: 5px;
+        }
+        .demo-button:hover {
+          background: linear-gradient(135deg, #C1121F 0%, #FF6B35 100%);
+        }
+        .output-box {
+          background: #f5f5f5;
+          padding: 15px;
+          border-radius: 8px;
+          margin: 15px 0;
+          font-family: 'Courier New', monospace;
+          font-size: 0.9em;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+          max-height: 400px;
+          overflow-y: auto;
+          border: 1px solid #ddd;
+        }
+        .flag-reveal {
+          background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+          color: white;
+          padding: 20px;
+          border-radius: 10px;
+          margin: 15px 0;
+          text-align: center;
+          font-weight: bold;
+          font-size: 1.2em;
+          display: none;
+        }
+        .item-selector {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          margin: 10px 0;
+        }
+        .item-btn {
+          padding: 10px 15px;
+          border: 2px solid #FF6B35;
+          background: white;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 600;
+          transition: all 0.3s;
+        }
+        .item-btn.selected {
+          background: #FF6B35;
+          color: white;
+        }
+      </style>
     </head>
     <body>
       <div class="container">
-        <h1>🛒 CHECKOUT & PAYMENT</h1>
+        <h1>🎟️ LAB 2: PROMO CODE STACKING <span class="difficulty medium">MEDIUM</span></h1>
         <div class="nav-links">
           <a href="/">🏠 Home</a>
+          <a href="/example">📚 Tutorial</a>
         </div>
 
-        <div class="challenge" style="margin: 30px 0;">
-          <h2>Complete Your Purchase</h2>
-          <p>Review your cart and apply promo codes for additional savings.</p>
-          
-          <div style="background: white; padding: 30px; border-radius: 10px; max-width: 600px; margin: 30px auto;">
-            <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-              <h3 style="margin-top: 0;">Shopping Cart</h3>
-              <div style="display: flex; justify-content: space-between; margin: 10px 0; padding: 10px 0; border-bottom: 1px solid #ddd;">
-                <span>Premium Account Upgrade</span>
-                <span style="font-weight: bold;">$99.99</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; margin: 10px 0; padding: 10px 0;">
-                <span style="font-size: 1.2em; font-weight: bold;">Subtotal:</span>
-                <span id="cart-total" style="font-size: 1.2em; font-weight: bold; color: #667eea;">$99.99</span>
-              </div>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 10px; font-weight: 600;">Promo Codes:</label>
-              <input type="text" id="promo-codes" placeholder="Enter codes (comma-separated)" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 10px;">
-              <p style="color: #666; font-size: 0.9em; margin-bottom: 15px;">
-                Available codes: <strong>SAVE20</strong> (20% off), <strong>FIRST10</strong> (10% off), <strong>VIP15</strong> (15% off)
-              </p>
-            </div>
-            
-            <button onclick="checkout()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: 600; cursor: pointer;">
-              Apply Codes & Checkout
-            </button>
+        <div class="lab-info">
+          <h3>🎯 Benefit Application</h3>
+          <p><strong>Scenario:</strong> Apply account benefits during signup</p>
+          <p><strong>Service:</strong> Add benefit codes to reduce initial deposit</p>
+        </div>
+
+        <div class="section">
+          <h2>🎟️ Account Benefits</h2>
+          <p>SecureBank allows customers to apply multiple benefit codes at account creation. Add codes below to reduce your initial deposit requirement.</p>
+        </div>
+
+        <div class="section">
+          <h2>🎟️ Available Codes</h2>
+          <ul style="font-size: 1.1em;">
+            <li><code>SAVE10</code> - 10% off</li>
+            <li><code>WELCOME15</code> - 15% off</li>
+            <li><code>FIRST5</code> - $5 off</li>
+          </ul>
+        </div>
+
+        <div class="interactive-demo">
+          <h3>Application System</h3>
+          <p><strong>Step 1:</strong> Select your account type</p>
+          <div class="item-selector">
+            <button class="item-btn" onclick="toggleItem('checking')">💰 Checking ($100)</button>
+            <button class="item-btn" onclick="toggleItem('savings')">💎 Savings ($250)</button>
+            <button class="item-btn" onclick="toggleItem('investment')">📈 Investment ($500)</button>
           </div>
           
-          <div id="checkout-result" style="margin-top: 30px;"></div>
+          <p style="margin-top: 15px;"><strong>Step 2:</strong> Enter benefit codes (comma-separated)</p>
+          <input type="text" id="promo-codes" class="demo-input" placeholder="e.g., SAVE10" value="">
           
-          <div class="hint-box" style="margin-top: 30px;">
-            <strong>💡 Discovery Tip:</strong> Test how the system handles multiple discount codes. What happens if you apply the same code multiple times?<br>
-            Try: <code>SAVE20,SAVE20,SAVE20</code> or similar combinations.
-          </div>
+          <button onclick="checkout()" class="demo-button" style="width: 100%;">✅ Apply Benefits</button>
+          <div id="output" class="output-box"></div>
+          <div id="flag" class="flag-reveal"></div>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+          <a href="/lab1">← Previous Lab</a> | <a href="/">Home</a> | <a href="/lab3">Next Lab →</a>
         </div>
       </div>
 
       <script>
+        let selectedItems = [];
+
+        function toggleItem(item) {
+          const btn = event.target;
+          const index = selectedItems.indexOf(item);
+          
+          if (index > -1) {
+            selectedItems.splice(index, 1);
+            btn.classList.remove('selected');
+          } else {
+            selectedItems.push(item);
+            btn.classList.add('selected');
+          }
+        }
+
         async function checkout() {
-          const promoCodes = document.getElementById('promo-codes').value
-            .split(',')
-            .map(c => c.trim())
-            .filter(c => c.length > 0);
+          const promoInput = document.getElementById('promo-codes').value;
+          const promoCodes = promoInput.split(',').map(c => c.trim()).filter(c => c);
+          const output = document.getElementById('output');
+          const flagDiv = document.getElementById('flag');
           
-          const resultDiv = document.getElementById('checkout-result');
-          const cartTotal = 99.99;
-          
-          if (promoCodes.length === 0) {
-            resultDiv.innerHTML = '<div style="background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px;">Please enter at least one promo code</div>';
+          if (selectedItems.length === 0) {
+            output.textContent = 'Please select at least one item!';
             return;
           }
           
+          output.textContent = 'Processing checkout...';
+          flagDiv.style.display = 'none';
+          
           try {
-            const response = await fetch('/api/checkout', {
+            const response = await fetch('/api/lab2/checkout', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ cart_total: cartTotal, promo_codes: promoCodes })
+              body: JSON.stringify({ 
+                items: selectedItems,
+                promoCodes
+              })
             });
-            
             const data = await response.json();
             
-            let html = '<div style="background: white; padding: 25px; border-radius: 10px; border: 2px solid #ddd;">';
-            html += '<h3 style="margin-top: 0;">Order Summary</h3>';
-            html += \`<div style="margin: 15px 0;"><strong>Original Total:</strong> $\${cartTotal.toFixed(2)}</div>\`;
-            
-            if (data.discounts_applied && data.discounts_applied.length > 0) {
-              html += '<div style="margin: 15px 0;"><strong>Discounts Applied:</strong><ul style="margin: 10px 0;">';
-              data.discounts_applied.forEach(d => {
-                html += \`<li>\${d.code}: -$\${d.amount.toFixed(2)}</li>\`;
-              });
-              html += '</ul></div>';
-            }
-            
-            html += \`<div style="margin: 15px 0; font-size: 1.3em;"><strong>Final Total:</strong> <span style="color: \${data.final_total <= 0 ? '#4caf50' : '#667eea'}; font-weight: bold;">$\${data.final_total.toFixed(2)}</span></div>\`;
-            html += '</div>';
+            output.textContent = JSON.stringify(data, null, 2);
             
             if (data.flag) {
-              html += \`
-                <div style="background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%); color: white; padding: 25px; border-radius: 10px; margin-top: 20px;">
-                  <h3>🎯 Logic Flaw Exploited!</h3>
-                  <p style="font-size: 1.3em; font-weight: bold; margin: 15px 0;">\${data.flag}</p>
-                  <p>\${data.message}</p>
-                </div>
-              \`;
+              flagDiv.innerHTML = '🎉 FLAG CAPTURED!<br><br>' + data.flag + '<br><br>' + data.message;
+              flagDiv.style.display = 'block';
             }
-            
-            resultDiv.innerHTML = html;
           } catch (error) {
-            resultDiv.innerHTML = '<div style="background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px;">Connection error</div>';
+            output.textContent = 'Error: ' + error.message;
           }
         }
       </script>
@@ -631,309 +705,360 @@ app.get('/lab2', (req, res) => {
   `);
 });
 
-// Lab 2 API - VULNERABLE: No validation preventing duplicate promo codes
-app.post('/api/checkout', (req, res) => {
-  const { cart_total, promo_codes } = req.body;
+// Lab 2 API endpoint
+app.post('/api/lab2/checkout', (req, res) => {
+  const { items, promoCodes } = req.body;
   
-  if (!cart_total || !promo_codes || !Array.isArray(promo_codes)) {
-    return res.status(400).json({
-      success: false,
-      message: 'Invalid request format'
-    });
+  if (!items || items.length === 0) {
+    return res.status(400).json({ error: 'No items in cart' });
   }
   
-  const VALID_CODES = {
-    'SAVE20': { type: 'percent', value: 20 },
-    'FIRST10': { type: 'percent', value: 10 },
-    'VIP15': { type: 'percent', value: 15 }
-  };
+  // Calculate original total
+  let total = 0;
+  items.forEach(item => {
+    total += MENU_ITEMS[item] || 0;
+  });
   
-  let finalTotal = cart_total;
-  const discountsApplied = [];
+  const originalTotal = total;
+  let discountsApplied = [];
   
-  // VULNERABLE: No check for duplicate codes - same code can be applied multiple times
-  promo_codes.forEach(code => {
-    const upperCode = code.toUpperCase();
-    if (VALID_CODES[upperCode]) {
-      const discount = VALID_CODES[upperCode];
-      const amount = (cart_total * discount.value) / 100;
-      finalTotal -= amount;
-      discountsApplied.push({
-        code: upperCode,
-        amount: amount
-      });
+  // VULNERABLE: No check for duplicate promo codes!
+  promoCodes.forEach(code => {
+    if (code === 'TACO10') {
+      total *= 0.9;
+      discountsApplied.push('TACO10: 10% off');
+    } else if (code === 'LUNCH15') {
+      total *= 0.85;
+      discountsApplied.push('LUNCH15: 15% off');
+    } else if (code === 'FIRST5') {
+      total -= 5;
+      discountsApplied.push('FIRST5: $5 off');
     }
   });
   
-  // Check if logic flaw was exploited (total discount > 100%)
-  const totalDiscount = discountsApplied.reduce((sum, d) => sum + d.amount, 0);
-  const discountPercent = (totalDiscount / cart_total) * 100;
-  
-  if (discountPercent >= 100 || finalTotal <= 0) {
+  // Award flag if discount exceeds 50%
+  if (total < originalTotal * 0.5) {
     return res.json({
-      success: true,
       flag: 'NSA{L0G1C_FL4W_F0UND}',
-      message: 'Business logic flaw exploited! The system allowed the same promo code to be applied multiple times, resulting in over 100% discount.',
-      cart_total: cart_total,
-      discounts_applied: discountsApplied,
-      total_discount: totalDiscount.toFixed(2),
-      discount_percent: discountPercent.toFixed(1) + '%',
-      final_total: Math.max(0, finalTotal),
-      vulnerability: 'No validation to prevent duplicate promo codes from being applied'
+      message: 'Business logic flaw exploited! Promo codes stacked for extreme discount.',
+      vulnerability: 'No validation prevents duplicate promo codes from being applied',
+      originalTotal: `$${originalTotal.toFixed(2)}`,
+      finalTotal: `$${total.toFixed(2)}`,
+      discountPercent: `${((1 - total/originalTotal) * 100).toFixed(1)}%`,
+      discountsApplied,
+      codesUsed: promoCodes.length
     });
   }
   
   res.json({
-    success: true,
-    cart_total: cart_total,
-    discounts_applied: discountsApplied,
-    final_total: Math.max(0, finalTotal)
+    originalTotal: `$${originalTotal.toFixed(2)}`,
+    finalTotal: `$${total.toFixed(2)}`,
+    discountPercent: `${((1 - total/originalTotal) * 100).toFixed(1)}%`,
+    discountsApplied,
+    message: 'Try stacking more codes to exceed 50% discount!',
+    hint: 'Same code can be applied multiple times...'
   });
 });
 
-// Lab 3 - Race Condition (Concurrent Withdrawals)
-let accountBalance = 1000.00;
-
+// Lab 3 page - Race Condition
 app.get('/lab3', (req, res) => {
-  // Reset balance on page load
-  accountBalance = 1000.00;
-  
   res.send(`
     <!DOCTYPE html>
     <html>
     <head>
-      <title>SecureBank Account Withdrawal</title>
+      <title>Lab 3 - Account Balance</title>
       ${styles}
+      <style>
+        .interactive-demo {
+          background: #FFF3E0;
+          padding: 20px;
+          border-radius: 10px;
+          margin: 15px 0;
+          border-left: 3px solid #FF9800;
+        }
+        .demo-input {
+          width: 100%;
+          padding: 12px;
+          border: 2px solid #FF6B35;
+          border-radius: 8px;
+          font-size: 1em;
+          margin: 10px 0;
+        }
+        .demo-button {
+          background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+          color: white;
+          padding: 12px 24px;
+          border: none;
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+          font-size: 1em;
+          margin: 5px;
+        }
+        .demo-button:hover {
+          background: linear-gradient(135deg, #C1121F 0%, #FF6B35 100%);
+        }
+        .demo-button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        .output-box {
+          background: #f5f5f5;
+          padding: 15px;
+          border-radius: 8px;
+          margin: 15px 0;
+          font-family: 'Courier New', monospace;
+          font-size: 0.9em;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+          max-height: 400px;
+          overflow-y: auto;
+          border: 1px solid #ddd;
+        }
+        .flag-reveal {
+          background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+          color: white;
+          padding: 20px;
+          border-radius: 10px;
+          margin: 15px 0;
+          text-align: center;
+          font-weight: bold;
+          font-size: 1.2em;
+          display: none;
+        }
+        .balance-display {
+          background: #E8F5E9;
+          padding: 20px;
+          border-radius: 10px;
+          margin: 15px 0;
+          text-align: center;
+          font-size: 1.5em;
+          font-weight: bold;
+          color: #2e7d32;
+        }
+      </style>
     </head>
     <body>
       <div class="container">
-        <h1>💰 ACCOUNT WITHDRAWAL</h1>
+        <h1>💰 LAB 3: RACE CONDITION <span class="difficulty hard">HARD</span></h1>
         <div class="nav-links">
           <a href="/">🏠 Home</a>
+          <a href="/example">📚 Tutorial</a>
         </div>
 
-        <div class="challenge" style="margin: 30px 0;">
-          <h2>Withdraw Funds</h2>
-          <p>Make a withdrawal from your account balance.</p>
-          
-          <div style="background: white; padding: 30px; border-radius: 10px; max-width: 500px; margin: 30px auto;">
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 25px;">
-              <div style="font-size: 0.9em; margin-bottom: 5px;">Current Balance</div>
-              <div id="balance-display" style="font-size: 2em; font-weight: bold;">$1,000.00</div>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 10px; font-weight: 600;">Withdrawal Amount:</label>
-              <input type="number" id="withdraw-amount" value="200" min="1" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 1.2em;">
-            </div>
-            
-            <button onclick="withdraw()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: 600; cursor: pointer; margin-bottom: 10px;">
-              Withdraw Funds
-            </button>
-            
-            <button onclick="simultaneousWithdraw()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%); color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: 600; cursor: pointer;">
-              ⚡ Test: Make 10 Simultaneous Requests
-            </button>
-            
-            <button onclick="refreshBalance()" style="width: 100%; padding: 10px; background: #f5f5f5; color: #333; border: 2px solid #ddd; border-radius: 8px; font-size: 0.9em; font-weight: 600; cursor: pointer; margin-top: 15px;">
-              🔄 Refresh Balance
-            </button>
-          </div>
-          
-          <div id="withdraw-result" style="margin-top: 30px;"></div>
-          
-          <div class="hint-box" style="margin-top: 30px;">
-            <strong>💡 Discovery Tip:</strong> The system checks balance before processing withdrawal, but doesn't lock the account during the transaction.<br>
-            What happens if you send multiple withdrawal requests at exactly the same time? Try the "10 Simultaneous Requests" button!
-          </div>
+        <div class="lab-info">
+          <h3>🎯 Transfer System</h3>
+          <p><strong>Service:</strong> Transfer funds between accounts</p>
+          <p><strong>Balance:</strong> $1000.00 available</p>
+        </div>
+
+        <div class="section">
+          <h2>💰 Account Transfer</h2>
+          <p>SecureBank allows customers to transfer funds to other accounts or external recipients using available balance.</p>
+        </div>
+
+        <div class="balance-display">
+          Current Balance: <span id="balance-display">$1000.00</span>
+        </div>
+
+        <div class="section">
+          <h2>🔧 API Information</h2>
+          <p><strong>Endpoint:</strong> <code>POST /api/transfer</code></p>
+          <p><strong>Request Body:</strong></p>
+          <pre>{
+  "accountId": "acc_123",
+  "amount": 250.00,
+  "recipient": "External Account"
+}</pre>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+          <a href="/">← Back to Home</a>
         </div>
       </div>
-
-      <script>
-        async function refreshBalance() {
-          try {
-            const response = await fetch('/api/balance');
-            const data = await response.json();
-            document.getElementById('balance-display').textContent = '$' + data.balance.toFixed(2);
-          } catch (error) {
-            console.error('Error refreshing balance:', error);
-          }
-        }
-        
-        async function withdraw() {
-          const amount = parseFloat(document.getElementById('withdraw-amount').value);
-          const resultDiv = document.getElementById('withdraw-result');
-          
-          if (!amount || amount <= 0) {
-            resultDiv.innerHTML = '<div style="background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px;">Please enter a valid amount</div>';
-            return;
-          }
-          
-          try {
-            const response = await fetch('/api/withdraw', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ amount: amount })
-            });
-            
-            const data = await response.json();
-            
-            if (data.flag) {
-              resultDiv.innerHTML = \`
-                <div style="background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%); color: white; padding: 25px; border-radius: 10px;">
-                  <h3>🎯 Race Condition Exploited!</h3>
-                  <p style="font-size: 1.3em; font-weight: bold; margin: 15px 0;">\${data.flag}</p>
-                  <p>\${data.message}</p>
-                  <p style="margin-top: 15px;">Final Balance: $\${data.balance.toFixed(2)}</p>
-                </div>
-              \`;
-            } else if (data.success) {
-              resultDiv.innerHTML = \`
-                <div style="background: #e3f2fd; color: #1976d2; padding: 20px; border-radius: 8px;">
-                  <h4>✓ Withdrawal Successful</h4>
-                  <p>Amount withdrawn: $\${amount.toFixed(2)}</p>
-                  <p>New balance: $\${data.balance.toFixed(2)}</p>
-                </div>
-              \`;
-            } else {
-              resultDiv.innerHTML = \`
-                <div style="background: #ffebee; color: #c62828; padding: 20px; border-radius: 8px;">
-                  <h4>❌ Withdrawal Failed</h4>
-                  <p>\${data.message}</p>
-                </div>
-              \`;
-            }
-            
-            refreshBalance();
-          } catch (error) {
-            resultDiv.innerHTML = '<div style="background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px;">Connection error</div>';
-          }
-        }
-        
-        async function simultaneousWithdraw() {
-          const amount = parseFloat(document.getElementById('withdraw-amount').value);
-          const resultDiv = document.getElementById('withdraw-result');
-          
-          resultDiv.innerHTML = '<div style="background: #fff3e0; color: #f57c00; padding: 20px; border-radius: 8px;">⚡ Sending 10 simultaneous withdrawal requests...</div>';
-          
-          // Send 10 requests simultaneously to trigger race condition
-          const promises = [];
-          for (let i = 0; i < 10; i++) {
-            promises.push(
-              fetch('/api/withdraw', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: amount })
-              }).then(r => r.json())
-            );
-          }
-          
-          try {
-            const results = await Promise.all(promises);
-            const successful = results.filter(r => r.success).length;
-            const flagFound = results.find(r => r.flag);
-            
-            if (flagFound) {
-              resultDiv.innerHTML = \`
-                <div style="background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%); color: white; padding: 25px; border-radius: 10px;">
-                  <h3>🎯 Race Condition Exploited!</h3>
-                  <p style="font-size: 1.3em; font-weight: bold; margin: 15px 0;">\${flagFound.flag}</p>
-                  <p>\${flagFound.message}</p>
-                  <p style="margin-top: 15px;">Successful withdrawals: \${successful}/10</p>
-                  <p>Final Balance: $\${flagFound.balance.toFixed(2)}</p>
-                </div>
-              \`;
-            } else {
-              resultDiv.innerHTML = \`
-                <div style="background: #fff3e0; color: #f57c00; padding: 20px; border-radius: 8px;">
-                  <h4>Results</h4>
-                  <p>Successful withdrawals: \${successful}/10</p>
-                  <p>Try again or adjust the withdrawal amount</p>
-                </div>
-              \`;
-            }
-            
-            refreshBalance();
-          } catch (error) {
-            resultDiv.innerHTML = '<div style="background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px;">Error during simultaneous requests</div>';
-          }
-        }
-      </script>
     </body>
     </html>
   `);
 });
 
-// Lab 3 APIs
-app.get('/api/balance', (req, res) => {
+// API Endpoints
+
+// Lab 1 API - Rate Limiting vulnerability
+app.post('/api/order', (req, res) => {
+  const { item, quantity } = req.body;
+  const clientIp = req.ip || 'unknown';
+  
+  // Vulnerable: No rate limiting
+  if (!orderAttempts[clientIp]) {
+    orderAttempts[clientIp] = [];
+  }
+  
+  orderAttempts[clientIp].push({ 
+    item, 
+    quantity, 
+    timestamp: Date.now() 
+  });
+  
+  // Check if user made many rapid orders
+  const recentOrders = orderAttempts[clientIp].filter(
+    order => Date.now() - order.timestamp < 10000
+  );
+  
+  if (recentOrders.length > 20) {
+    return res.json({
+      success: true,
+      orderId: Math.random().toString(36).substr(2, 9),
+      item,
+      quantity,
+      totalOrders: recentOrders.length,
+      flag: 'NSA{N0_R4T3_L1M1T}',
+      message: '🎉 Flag captured! You exploited the missing rate limit!',
+      vulnerability: 'No rate limiting allows rapid-fire requests',
+      secureAlternative: 'Implement sliding window rate limit (e.g., max 10 orders per minute)'
+    });
+  }
+  
   res.json({
     success: true,
-    balance: accountBalance
+    orderId: Math.random().toString(36).substr(2, 9),
+    item,
+    quantity,
+    totalOrders: recentOrders.length,
+    hint: `${recentOrders.length}/20 rapid orders made`
   });
 });
 
-app.post('/api/withdraw', async (req, res) => {
-  const { amount } = req.body;
+// Lab 2 API - Logic Flaw vulnerability
+app.post('/api/apply-promo', (req, res) => {
+  const { promoCodes, cartTotal } = req.body;
   
-  if (!amount || amount <= 0) {
-    return res.status(400).json({
-      success: false,
-      message: 'Invalid withdrawal amount'
-    });
-  }
+  // Vulnerable: Allows stacking of codes that shouldn't be combined
+  let discountPercent = 0;
+  const appliedCodes = [];
   
-  // VULNERABLE: Race condition - balance check happens before deduction
-  // Multiple simultaneous requests can all pass the balance check before any deduction occurs
+  // Available codes
+  const validCodes = {
+    'FIRST10': 10,    // First order discount
+    'SAVE15': 15,     // General discount
+    'LUNCH20': 20,    // Lunch special
+    'VIP25': 25       // VIP members only
+  };
   
-  // Check if sufficient balance (vulnerable check)
-  if (accountBalance < amount) {
-    return res.status(400).json({
-      success: false,
-      message: 'Insufficient funds',
-      balance: accountBalance
-    });
-  }
+  promoCodes.forEach(code => {
+    if (validCodes[code]) {
+      discountPercent += validCodes[code];
+      appliedCodes.push(code);
+      
+      // Track usage for each session (vulnerable: no proper validation)
+      if (!promoCodeUsage[code]) {
+        promoCodeUsage[code] = 0;
+      }
+      promoCodeUsage[code]++;
+    }
+  });
   
-  // Simulate processing delay (makes race condition more likely)
-  await new Promise(resolve => setTimeout(resolve, 10));
+  const discountAmount = (cartTotal * discountPercent) / 100;
+  const finalTotal = Math.max(0, cartTotal - discountAmount);
   
-  // Deduct amount (happens after check, allowing race condition)
-  accountBalance -= amount;
-  
-  // Check if account went negative (race condition exploited)
-  if (accountBalance < 0) {
+  // Flag when discount exceeds 50%
+  if (discountPercent >= 50) {
     return res.json({
       success: true,
-      flag: 'NSA{R4C3_C0ND1T10N_3XPL01T3D}',
-      message: 'Race condition exploited! Multiple simultaneous withdrawals caused the account balance to go negative. The system lacked proper transaction locking.',
-      amount_withdrawn: amount,
-      balance: accountBalance,
-      vulnerability: 'No transaction locking allows concurrent requests to bypass balance validation'
+      originalTotal: cartTotal,
+      discountPercent,
+      discountAmount,
+      finalTotal,
+      appliedCodes,
+      flag: 'NSA{L0G1C_FL4W_F0UND}',
+      message: '🎉 Flag captured! You exploited the promo code stacking flaw!',
+      vulnerability: 'Multiple discount codes can be stacked without validation',
+      secureAlternative: 'Implement mutually exclusive discount categories'
     });
   }
   
   res.json({
     success: true,
-    message: 'Withdrawal successful',
-    amount_withdrawn: amount,
-    balance: accountBalance
+    originalTotal: cartTotal,
+    discountPercent,
+    discountAmount,
+    finalTotal,
+    appliedCodes,
+    hint: `${discountPercent}% discount applied. Try combining more codes!`
   });
+});
+
+// Lab 3 API - Race Condition vulnerability
+app.post('/api/purchase', (req, res) => {
+  const { customerId, amount, item } = req.body;
+  
+  // Vulnerable: No locking or transaction control
+  const balance = accountBalances[customerId];
+  
+  if (balance === undefined) {
+    return res.status(404).json({ 
+      success: false, 
+      message: 'Customer not found' 
+    });
+  }
+  
+  // Check balance before purchase (vulnerable to race condition)
+  if (balance >= amount) {
+    // Simulate processing delay that allows race condition
+    setTimeout(() => {
+      accountBalances[customerId] -= amount;
+      
+      orderHistory.push({
+        customerId,
+        item,
+        amount,
+        timestamp: new Date().toISOString(),
+        balanceAfter: accountBalances[customerId]
+      });
+      
+      // Check if customer went over their original balance
+      const totalSpent = 50.00 - accountBalances[customerId];
+      
+      if (accountBalances[customerId] < 0 || totalSpent > 50.00) {
+        return res.json({
+          success: true,
+          item,
+          amount,
+          newBalance: accountBalances[customerId],
+          totalSpent,
+          flag: 'NSA{R4C3_C0ND1T10N_3XPL01T3D}',
+          message: '🎉 Flag captured! You exploited the race condition!',
+          vulnerability: 'Concurrent requests processed without locking',
+          secureAlternative: 'Use database transactions with row-level locking'
+        });
+      }
+      
+      res.json({
+        success: true,
+        item,
+        amount,
+        newBalance: accountBalances[customerId],
+        totalSpent,
+        hint: 'Try sending multiple requests at the exact same time'
+      });
+    }, 10); // Small delay to make race condition easier to exploit
+  } else {
+    res.status(400).json({
+      success: false,
+      message: 'Insufficient balance',
+      balance,
+      required: amount
+    });
+  }
 });
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`\x1b[32m
 ╔════════════════════════════════════════════╗
-║   🏦 SecureBank Online Banking            ║
-║   Server running on port ${PORT}              ║
+║   � SecureBank Online Banking             ║
+║   Server running on port ${PORT}           ║
 ║                                            ║
-║   Access: http://localhost:${PORT}            ║
+║   Access the portal:                      ║
+║   http://localhost:${PORT}                    ║
 ╚════════════════════════════════════════════╝
-
-Available pages:
-  http://localhost:${PORT}/ - Home
-  http://localhost:${PORT}/example - Account Dashboard Discovery
-  http://localhost:${PORT}/lab1 - Lab 1: Rate Limiting Bypass
-  http://localhost:${PORT}/lab2 - Lab 2: Logic Flaw (Discount Stacking)
-  http://localhost:${PORT}/lab3 - Lab 3: Race Condition
 \x1b[0m`);
 });

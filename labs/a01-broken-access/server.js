@@ -203,24 +203,23 @@ app.get('/', (req, res) => {
     `);
 });
 
-// Lab 1 - Employee Directory (IDOR vulnerability)
-app.get('/lab1', (req, res) => {
+// Example - Practice Challenge
+app.get('/example', (req, res) => {
     res.send(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Employee Directory - TechCorp Global</title>
+            <title>Member Portal - TechCorp Global</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-                    background: linear-gradient(135deg, #e8f5e9 0%, #c5e1a5 100%);
+                    background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
                     min-height: 100vh;
                     padding: 20px;
-                    line-height: 1.6;
                 }
                 .container {
-                    max-width: 1000px;
+                    max-width: 900px;
                     margin: 0 auto;
                 }
                 .header {
@@ -232,59 +231,59 @@ app.get('/lab1', (req, res) => {
                     text-align: center;
                 }
                 h1 {
-                    color: #2e7d32;
-                    font-size: 2.5em;
+                    color: #1565c0;
                     margin-bottom: 10px;
                 }
-                .subtitle {
+                .info {
                     color: #666;
-                    font-size: 1.1em;
-                }
-                .tutorial-section {
-                    background: white;
-                    padding: 30px;
-                    border-radius: 15px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-                    margin-bottom: 25px;
-                    border-left: 4px solid #66bb6a;
-                }
-                .tutorial-section h2 {
-                    color: #2e7d32;
-                    margin-bottom: 15px;
-                    font-size: 1.8em;
-                }
-                .tutorial-section p {
-                    color: #555;
-                    margin-bottom: 15px;
-                    line-height: 1.7;
-                }
-                .tutorial-box {
-                    background: #f1f8e9;
-                    padding: 20px;
-                    border-radius: 10px;
-                    margin: 15px 0;
-                    border-left: 3px solid #66bb6a;
-                }
-                .interactive-demo {
-                    background: #fff3e0;
-                    padding: 20px;
-                    border-radius: 10px;
-                    margin: 15px 0;
-                    border-left: 3px solid #fb8c00;
-                }
-                .demo-controls {
-                    margin: 15px 0;
-                }
-                .demo-input {
-                    width: 100%;
-                    padding: 12px;
-                    border: 2px solid #66bb6a;
-                    border-radius: 8px;
-                    font-size: 1em;
                     margin: 10px 0;
                 }
-                .demo-button {
-                    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
+                .section {
+                    background: white;
+                    padding: 25px;
+                    border-radius: 15px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+                    margin-bottom: 20px;
+                }
+                .section h2 {
+                    color: #1565c0;
+                    margin-bottom: 15px;
+                    font-size: 1.4em;
+                }
+                .section p {
+                    color: #555;
+                    line-height: 1.6;
+                    margin-bottom: 15px;
+                }
+                .member-card {
+                    background: #f5f5f5;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    border-left: 4px solid #1976d2;
+                }
+                .member-card h3 {
+                    color: #1565c0;
+                    margin-bottom: 8px;
+                }
+                .member-card p {
+                    color: #666;
+                    margin: 5px 0;
+                    font-size: 0.95em;
+                }
+                .search-box {
+                    margin: 20px 0;
+                }
+                .search-input {
+                    width: 100%;
+                    padding: 12px;
+                    border: 2px solid #1976d2;
+                    border-radius: 8px;
+                    font-size: 1em;
+                    margin-bottom: 10px;
+                }
+                .search-button {
+                    background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
                     color: white;
                     padding: 12px 24px;
                     border: none;
@@ -292,318 +291,108 @@ app.get('/lab1', (req, res) => {
                     font-weight: 600;
                     cursor: pointer;
                     font-size: 1em;
-                    margin: 5px;
+                    width: 100%;
                 }
-                .demo-button:hover {
-                    background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+                .search-button:hover {
+                    background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
                 }
-                .demo-button:disabled {
-                    opacity: 0.5;
-                    cursor: not-allowed;
-                }
-                .output-box {
-                    background: #f5f5f5;
-                    padding: 15px;
-                    border-radius: 8px;
-                    margin: 15px 0;
-                    font-family: 'Courier New', monospace;
-                    font-size: 0.9em;
-                    white-space: pre-wrap;
-                    word-wrap: break-word;
-                    max-height: 300px;
-                    overflow-y: auto;
-                    border: 1px solid #ddd;
-                }
-                .flag-reveal {
-                    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
-                    color: white;
-                    padding: 20px;
-                    border-radius: 10px;
-                    margin: 15px 0;
-                    text-align: center;
-                    font-weight: bold;
-                    font-size: 1.2em;
-                    display: none;
-                }
-                .hint-box {
-                    background: #e3f2fd;
-                    border-left: 4px solid #2196f3;
-                    padding: 15px;
-                    margin: 15px 0;
+                .error {
+                    color: #d32f2f;
+                    padding: 10px;
+                    background: #ffebee;
                     border-radius: 5px;
+                    margin: 10px 0;
                 }
-                code {
-                    background: #f5f5f5;
-                    padding: 2px 6px;
-                    border-radius: 3px;
-                    font-family: 'Courier New', monospace;
-                    color: #c62828;
+                .loading {
+                    color: #1976d2;
+                    text-align: center;
+                    padding: 20px;
                 }
                 .back-link {
                     text-align: center;
                     margin-top: 30px;
                 }
                 .back-link a {
-                    color: #2e7d32;
+                    color: white;
                     text-decoration: none;
                     font-weight: 600;
-                }
-                ol {
-                    margin-left: 20px;
-                    margin-bottom: 15px;
-                }
-                ol li {
-                    margin: 8px 0;
-                    color: #555;
                 }
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>📚 Getting Started Guide</h1>
-                    <p class="subtitle">Learn to navigate the member portal with interactive examples</p>
+                    <h1>🏢 TechCorp Global Member Portal</h1>
+                    <p class="info">Practice Environment</p>
                 </div>
 
-                <!-- Part 1: DevTools Discovery -->
-                <div class="tutorial-section">
-                    <h2>Part 1: Browser DevTools Discovery 🔍</h2>
-                    <p>Learn how to use your browser's developer tools to explore API endpoints and discover hidden resources.</p>
-                    
-                    <div class="tutorial-box">
-                        <h3>🎯 Your Mission</h3>
-                        <p>The member directory allows you to search for members by ID. Try different IDs to discover all members, including a hidden VIP member at ID 108!</p>
-                    </div>
-
-                    <div class="interactive-demo">
-                        <h3>Interactive Demo</h3>
-                        <p>Enter a member ID to view their profile. Open your browser's DevTools (F12) to watch the network requests!</p>
-                        <div class="demo-controls">
-                            <input type="number" id="part1-id" class="demo-input" placeholder="Enter member ID (try 100-110)" value="100">
-                            <button onclick="part1Search()" class="demo-button">🔍 Search Member</button>
-                        </div>
-                        <div id="part1-output" class="output-box"></div>
-                        <div id="part1-flag" class="flag-reveal"></div>
-                    </div>
-
-                    <div class="hint-box">
-                        <strong>💡 Tip:</strong> Press F12 to open DevTools, go to the Network tab, and watch what happens when you click the search button!
-                    </div>
+                <div class="section">
+                    <h2>My Profile</h2>
+                    <div id="result"></div>
                 </div>
 
-                <!-- Part 2: cURL Command Line -->
-                <div class="tutorial-section">
-                    <h2>Part 2: Command-Line Tools 💻</h2>
-                    <p>APIs can be accessed not just through browsers, but also via command-line tools like cURL. This gives you more control over requests.</p>
-                    
-                    <div class="tutorial-box">
-                        <h3>🎯 Your Mission</h3>
-                        <p>Access the API using cURL from your terminal to get the flag. The server checks the User-Agent header!</p>
-                    </div>
-
-                    <div class="interactive-demo">
-                        <h3>Try it yourself</h3>
-                        <p>Copy and paste this command in your terminal:</p>
-                        <div class="output-box">curl http://localhost:3001/api/example/part2/test</div>
-                        <p style="margin-top: 15px;">Or test it directly from the browser (won't show the flag):</p>
-                        <button onclick="part2Test()" class="demo-button">🌐 Test from Browser</button>
-                        <div id="part2-output" class="output-box" style="display:none;"></div>
-                        <div id="part2-flag" class="flag-reveal"></div>
-                    </div>
-
-                    <div class="hint-box">
-                        <strong>💡 Tip:</strong> The server can detect whether you're using a browser or cURL by checking the User-Agent header!
-                    </div>
-                </div>
-
-                <!-- Part 3: Request Interception -->
-                <div class="tutorial-section">
-                    <h2>Part 3: Parameter Manipulation 🎛️</h2>
-                    <p>Learn how modifying request parameters can change application behavior and potentially escalate privileges.</p>
-                    
-                    <div class="tutorial-box">
-                        <h3>🎯 Your Mission</h3>
-                        <p>The portal checks your access level via a query parameter. Can you change it to gain instructor privileges?</p>
-                    </div>
-
-                    <div class="interactive-demo">
-                        <h3>Interactive Demo</h3>
-                        <p>Try different access levels and see what data you can retrieve:</p>
-                        <div class="demo-controls">
-                            <select id="part3-access" class="demo-input">
-                                <option value="member">Member Access</option>
-                                <option value="instructor">Instructor Access</option>
-                            </select>
-                            <button onclick="part3Test()" class="demo-button">🔓 Test Access Level</button>
-                        </div>
-                        <div id="part3-output" class="output-box"></div>
-                        <div id="part3-flag" class="flag-reveal"></div>
-                    </div>
-
-                    <div class="hint-box">
-                        <strong>💡 Tip:</strong> Open DevTools Network tab to see the actual URL being requested and the parameters being sent!
-                    </div>
-                </div>
-
-                <!-- Part 4: Sequential Enumeration -->
-                <div class="tutorial-section">
-                    <h2>Part 4: Sequential Enumeration 🔢</h2>
-                    <p>Many systems use sequential IDs. Attackers can enumerate through all IDs to discover all records in a database.</p>
-                    
-                    <div class="tutorial-box">
-                        <h3>🎯 Your Mission</h3>
-                        <p>Find all active members (IDs 100-105) by enumerating through the IDs. The flag appears when you've found them all!</p>
-                    </div>
-
-                    <div class="interactive-demo">
-                        <h3>Interactive Demo</h3>
-                        <p>Click to enumerate members one by one, or use the auto-enumerate feature:</p>
-                        <div class="demo-controls">
-                            <input type="number" id="part4-id" class="demo-input" placeholder="Enter member ID (100-105)" value="100">
-                            <button onclick="part4Search()" class="demo-button">🔍 Search Single ID</button>
-                            <button onclick="part4AutoEnumerate()" id="part4-auto-btn" class="demo-button">⚡ Auto-Enumerate (100-105)</button>
-                        </div>
-                        <div id="part4-output" class="output-box"></div>
-                        <div id="part4-flag" class="flag-reveal"></div>
-                    </div>
-
-                    <div class="hint-box">
-                        <strong>💡 Tip:</strong> In real attacks, scripts automate this enumeration process to quickly discover all resources!
-                    </div>
+                <div class="section">
+                    <h2>Access Control</h2>
+                    <p>Your current access level in the system.</p>
+                    <div id="accessResult"></div>
                 </div>
 
                 <div class="back-link">
-                    <a href="/">← Back to Member Portal</a>
+                    <a href="/">← Back to Main Portal</a>
                 </div>
             </div>
 
             <script>
-                // Part 1: DevTools Discovery
-                async function part1Search() {
-                    const id = document.getElementById('part1-id').value;
-                    const output = document.getElementById('part1-output');
-                    const flagDiv = document.getElementById('part1-flag');
-                    
-                    output.textContent = 'Loading...';
-                    flagDiv.style.display = 'none';
+                // Load member profile and access info on page load
+                window.addEventListener('DOMContentLoaded', () => {
+                    loadProfile();
+                    checkAccess();
+                });
+
+                async function loadProfile() {
+                    const resultDiv = document.getElementById('result');
+                    resultDiv.innerHTML = '<div class="loading">Loading profile...</div>';
                     
                     try {
-                        const response = await fetch('/api/example/part1/member/' + id);
+                        const response = await fetch('/api/example/part1/member/1');
                         const data = await response.json();
-                        output.textContent = JSON.stringify(data, null, 2);
                         
-                        if (data.flag) {
-                            flagDiv.textContent = '🎉 ' + data.flag;
-                            flagDiv.style.display = 'block';
+                        if (response.ok) {
+                            resultDiv.innerHTML = \`
+                                <div class="member-card">
+                                    <h3>\${data.name}</h3>
+                                    <p><strong>Role:</strong> \${data.role}</p>
+                                    <p><strong>Email:</strong> \${data.email}</p>
+                                    \${data.flag ? '<p style="color: #4caf50; font-weight: bold;">🎉 Flag: ' + data.flag + '</p>' : ''}
+                                </div>
+                            \`;
+                        } else {
+                            resultDiv.innerHTML = '<div class="error">' + data.error + '</div>';
                         }
                     } catch (error) {
-                        output.textContent = 'Error: ' + error.message;
+                        resultDiv.innerHTML = '<div class="error">Error: ' + error.message + '</div>';
                     }
                 }
 
-                // Part 2: cURL Test
-                async function part2Test() {
-                    const output = document.getElementById('part2-output');
-                    const flagDiv = document.getElementById('part2-flag');
-                    
-                    output.style.display = 'block';
-                    output.textContent = 'Loading...';
-                    flagDiv.style.display = 'none';
+                async function checkAccess() {
+                    const resultDiv = document.getElementById('accessResult');
+                    resultDiv.innerHTML = '<div class="loading">Checking access...</div>';
                     
                     try {
-                        const response = await fetch('/api/example/part2/test');
+                        const response = await fetch('/api/example/part3/intercept');
                         const data = await response.json();
-                        output.textContent = JSON.stringify(data, null, 2);
                         
-                        if (data.flag) {
-                            flagDiv.textContent = '🎉 ' + data.flag;
-                            flagDiv.style.display = 'block';
-                        }
+                        resultDiv.innerHTML = \`
+                            <div class="member-card">
+                                <h3>Access Level: \${data.access}</h3>
+                                <p>\${data.message}</p>
+                                <p><strong>Available Resources:</strong> \${data.data.resources.join(', ')}</p>
+                                \${data.flag ? '<p style="color: #4caf50; font-weight: bold;">🎉 Flag: ' + data.flag + '</p>' : ''}
+                            </div>
+                        \`;
                     } catch (error) {
-                        output.textContent = 'Error: ' + error.message;
+                        resultDiv.innerHTML = '<div class="error">Error: ' + error.message + '</div>';
                     }
-                }
-
-                // Part 3: Parameter Manipulation
-                async function part3Test() {
-                    const access = document.getElementById('part3-access').value;
-                    const output = document.getElementById('part3-output');
-                    const flagDiv = document.getElementById('part3-flag');
-                    
-                    output.textContent = 'Loading...';
-                    flagDiv.style.display = 'none';
-                    
-                    try {
-                        const response = await fetch('/api/example/part3/intercept?access=' + access);
-                        const data = await response.json();
-                        output.textContent = JSON.stringify(data, null, 2);
-                        
-                        if (data.flag) {
-                            flagDiv.textContent = '🎉 ' + data.flag;
-                            flagDiv.style.display = 'block';
-                        }
-                    } catch (error) {
-                        output.textContent = 'Error: ' + error.message;
-                    }
-                }
-
-                // Part 4: Sequential Enumeration
-                async function part4Search() {
-                    const id = document.getElementById('part4-id').value;
-                    const output = document.getElementById('part4-output');
-                    const flagDiv = document.getElementById('part4-flag');
-                    
-                    output.textContent = 'Loading...';
-                    flagDiv.style.display = 'none';
-                    
-                    try {
-                        const response = await fetch('/api/example/part4/enumerate/' + id);
-                        const data = await response.json();
-                        output.textContent = JSON.stringify(data, null, 2);
-                        
-                        if (data.flag) {
-                            flagDiv.textContent = '🎉 ' + data.flag;
-                            flagDiv.style.display = 'block';
-                        }
-                    } catch (error) {
-                        output.textContent = 'Error: ' + error.message;
-                    }
-                }
-
-                async function part4AutoEnumerate() {
-                    const output = document.getElementById('part4-output');
-                    const flagDiv = document.getElementById('part4-flag');
-                    const btn = document.getElementById('part4-auto-btn');
-                    
-                    btn.disabled = true;
-                    btn.textContent = 'Enumerating...';
-                    output.textContent = 'Starting enumeration...\\n\\n';
-                    flagDiv.style.display = 'none';
-                    
-                    for (let id = 100; id <= 105; id++) {
-                        try {
-                            const response = await fetch('/api/example/part4/enumerate/' + id);
-                            const data = await response.json();
-                            output.textContent += '\\n--- Member ID ' + id + ' ---\\n';
-                            output.textContent += JSON.stringify(data, null, 2) + '\\n';
-                            
-                            if (data.flag) {
-                                flagDiv.textContent = '🎉 ' + data.flag;
-                                flagDiv.style.display = 'block';
-                            }
-                            
-                            // Scroll to bottom
-                            output.scrollTop = output.scrollHeight;
-                            
-                            // Small delay between requests
-                            await new Promise(resolve => setTimeout(resolve, 300));
-                        } catch (error) {
-                            output.textContent += 'Error for ID ' + id + ': ' + error.message + '\\n';
-                        }
-                    }
-                    
-                    btn.disabled = false;
-                    btn.textContent = '⚡ Auto-Enumerate (100-105)';
                 }
             </script>
         </body>
@@ -611,7 +400,93 @@ app.get('/lab1', (req, res) => {
     `);
 });
 
-// Lab 1 - Community Directory
+// Example API Endpoints for Tutorial
+// Part 1: DevTools Discovery - Simple member lookup
+app.get('/api/example/part1/member/:id', (req, res) => {
+    const memberId = parseInt(req.params.id);
+    const members = [
+        { id: 1, name: 'Alice Johnson', role: 'Engineer', email: 'alice@techcorp.com' },
+        { id: 2, name: 'Bob Smith', role: 'Designer', email: 'bob@techcorp.com' },
+        { id: 3, name: 'Carol White', role: 'Manager', email: 'carol@techcorp.com' },
+        { id: 4, name: 'David Brown', role: 'Analyst', email: 'david@techcorp.com' },
+        { id: 108, name: 'Hidden Employee', role: 'Secret Agent', email: 'secret@techcorp.com', flag: 'NSA{D3VT00LS_M4ST3R}' }
+    ];
+    
+    const member = members.find(m => m.id === memberId);
+    if (member) {
+        res.json(member);
+    } else {
+        res.status(404).json({ error: 'Member not found' });
+    }
+});
+
+// Part 2: cURL Command Line - Detects User-Agent
+app.get('/api/example/part2/test', (req, res) => {
+    const userAgent = req.headers['user-agent'] || '';
+    const isCurl = userAgent.toLowerCase().includes('curl');
+    
+    if (isCurl) {
+        res.json({
+            message: 'Success! You are using cURL.',
+            flag: 'NSA{CURL_C0MM4ND3R}',
+            userAgent: userAgent
+        });
+    } else {
+        res.json({
+            message: 'Access via browser detected. Try using cURL from the terminal!',
+            userAgent: userAgent,
+            hint: 'The server detected a browser User-Agent. Use: curl http://localhost:3001/api/example/part2/test'
+        });
+    }
+});
+
+// Part 3: Parameter Manipulation - Access level escalation
+app.get('/api/example/part3/intercept', (req, res) => {
+    const accessLevel = req.query.access || 'member';
+    
+    if (accessLevel === 'instructor' || accessLevel === 'manager') {
+        res.json({
+            message: 'Privilege escalation successful!',
+            access: accessLevel,
+            flag: 'NSA{BURP_1NT3RC3PT0R}',
+            data: {
+                privilegedInfo: 'You now have elevated access',
+                resources: ['admin-panel', 'reports', 'user-management']
+            }
+        });
+    } else {
+        res.json({
+            message: 'Regular member access',
+            access: accessLevel,
+            data: {
+                basicInfo: 'Standard member view',
+                resources: ['profile', 'directory']
+            },
+            hint: 'Try modifying the access parameter in the URL'
+        });
+    }
+});
+
+// Part 4: Sequential Enumeration - Employee discovery
+app.get('/api/example/part4/enumerate/:id', (req, res) => {
+    const empId = parseInt(req.params.id);
+    const employees = {
+        100: { id: 100, name: 'John Doe', dept: 'Engineering' },
+        101: { id: 101, name: 'Jane Smith', dept: 'Marketing' },
+        102: { id: 102, name: 'Bob Wilson', dept: 'Sales' },
+        103: { id: 103, name: 'Alice Brown', dept: 'HR' },
+        104: { id: 104, name: 'Charlie Davis', dept: 'Finance' },
+        105: { id: 105, name: 'Diana Miller', dept: 'Operations', flag: 'NSA{3NUM3R4T10N_PR0}' }
+    };
+    
+    if (employees[empId]) {
+        res.json(employees[empId]);
+    } else {
+        res.status(404).json({ error: 'Employee not found' });
+    }
+});
+
+// Lab 1 - Employee Directory (IDOR vulnerability)
 app.get('/lab1', (req, res) => {
     res.send(`
         <!DOCTYPE html>
@@ -810,6 +685,92 @@ app.get('/lab1', (req, res) => {
     `);
 });
 
+// Lab 1 API - Static endpoints for directory enumeration
+app.get('/api', (req, res) => {
+    // Root API endpoint - discoverable by gobuster
+    res.json({
+        name: 'TechCorp Global HR API',
+        version: '2.1.0',
+        endpoints: {
+            members: '/api/members',
+            users: '/api/users',
+            profiles: '/api/profile'
+        },
+        documentation: 'https://docs.techcorp-global.com/api'
+    });
+});
+
+app.get('/api/members', (req, res) => {
+    // Returns basic directory info without details
+    res.json({
+        message: 'Employee Directory API',
+        version: '1.0',
+        totalEmployees: users.length,
+        endpoints: {
+            list: '/api/members/list',
+            search: '/api/members/search',
+            user: '/api/members/user/:id'
+        },
+        hint: 'Use the list endpoint to see available employee IDs'
+    });
+});
+
+app.get('/api/members/list', (req, res) => {
+    // Returns list of employee IDs - makes enumeration obvious
+    const employeeIds = users.map(u => ({
+        id: u.id,
+        username: u.username,
+        role: u.role
+    }));
+    
+    res.json({
+        message: 'Available employee records',
+        count: employeeIds.length,
+        employees: employeeIds,
+        note: 'Use /api/members/user/:id to get full details'
+    });
+});
+
+app.get('/api/members/search', (req, res) => {
+    // Search endpoint that hints at individual record access
+    const query = req.query.q || '';
+    
+    if (!query) {
+        return res.json({
+            message: 'Search employee directory',
+            usage: '/api/members/search?q=username',
+            example: '/api/members/search?q=jchen',
+            tip: 'Or access individual records directly at /api/members/user/:id'
+        });
+    }
+    
+    const results = users.filter(u => 
+        u.username.toLowerCase().includes(query.toLowerCase()) ||
+        u.email.toLowerCase().includes(query.toLowerCase())
+    );
+    
+    res.json({
+        query: query,
+        count: results.length,
+        results: results.map(u => ({
+            id: u.id,
+            username: u.username,
+            email: u.email,
+            role: u.role
+        }))
+    });
+});
+
+app.get('/api/users', (req, res) => {
+    // Alternative endpoint - returns count only
+    res.json({
+        totalUsers: users.length,
+        message: 'Employee directory contains ' + users.length + ' records',
+        access: 'Use /api/members/user/:id to access individual records',
+        idRange: '1-5'
+    });
+});
+
 // Lab 1 API - Community directory endpoint (vulnerable to enumeration)
 app.get('/api/members/user/:id', (req, res) => {
     const userId = parseInt(req.params.id);
@@ -866,7 +827,7 @@ app.get('/api/members/user/:id', (req, res) => {
     return res.json(response);
 });
 
-// Lab 2 - My Profile
+// Lab 2 - Cookie-Based Access Control
 app.get('/lab2', (req, res) => {
     res.send(`
         <!DOCTYPE html>
@@ -1010,115 +971,107 @@ app.get('/lab2', (req, res) => {
             <div class="container">
                 <div class="header">
                     <h1>👤 My Profile</h1>
-                    <p class="subtitle">Manage your employee information</p>
+                    <p class="subtitle">View your employee information</p>
                 </div>
 
-                <div class="profile-section">
-                    <h2>📋 Account Information</h2>
-                    <div class="profile-field">
-                        <div class="field-label">Employee ID:</div>
-                        <div class="field-value">#${CURRENT_USER_ID}</div>
-                    </div>
-                    <div class="profile-field">
-                        <div class="field-label">Name:</div>
-                        <div class="field-value">Sarah Mitchell</div>
-                    </div>
-                    <div class="profile-field">
-                        <div class="field-label">Email:</div>
-                        <div class="field-value">sarah.mitchell@techcorp-global.com</div>
-                    </div>
-                    <div class="profile-field">
-                        <div class="field-label">Department:</div>
-                        <div class="field-value">Engineering</div>
-                    </div>
-                    <div class="profile-field">
-                        <div class="field-label">Hire Date:</div>
-                        <div class="field-value">March 15, 2023</div>
-                    </div>
-                </div>
-
-                <div class="profile-section">
-                    <h2>🎫 Benefits & Compensation</h2>
-                    <div class="profile-field">
-                        <div class="field-label">Health Plan:</div>
-                        <div class="field-value">Premium Plus</div>
-                    </div>
-                    <div class="profile-field">
-                        <div class="field-label">401(k) Status:</div>
-                        <div class="field-value">✅ Active (8% contribution)</div>
-                    </div>
-                    <div class="profile-field">
-                        <div class="field-label">PTO Balance:</div>
-                        <div class="field-value">15 days remaining</div>
-                    </div>
-                    <button class="btn">Request Time Off</button>
-                </div>
-
-                <div class="profile-section">
-                    <h2>💳 Direct Deposit</h2>
-                    <div class="profile-field">
-                        <div class="field-label">Bank Account:</div>
-                        <div class="field-value">****5678 (Wells Fargo)</div>
-                    </div>
-                    <div class="profile-field">
-                        <div class="field-label">Next Paycheck:</div>
-                        <div class="field-value">January 31, 2026</div>
-                    </div>
-                </div>
+                <div id="profileContent"></div>
 
                 <div class="back-link">
                     <a href="/">← Back to HR Portal</a>
                 </div>
             </div>
+
+            <script>
+                // Load profile on page load
+                window.addEventListener('DOMContentLoaded', async () => {
+                    const contentDiv = document.getElementById('profileContent');
+                    contentDiv.innerHTML = '<div class="loading">Loading your profile...</div>';
+                    
+                    try {
+                        const response = await fetch('/api/profile');
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            contentDiv.innerHTML = \`
+                                <div class="profile-section">
+                                    <h2>📋 Account Information</h2>
+                                    <div class="profile-field">
+                                        <div class="field-label">Employee ID:</div>
+                                        <div class="field-value">#\${data.id}</div>
+                                    </div>
+                                    <div class="profile-field">
+                                        <div class="field-label">Username:</div>
+                                        <div class="field-value">\${data.username}</div>
+                                    </div>
+                                    <div class="profile-field">
+                                        <div class="field-label">Email:</div>
+                                        <div class="field-value">\${data.email}</div>
+                                    </div>
+                                    <div class="profile-field">
+                                        <div class="field-label">Role:</div>
+                                        <div class="field-value">\${data.role}</div>
+                                    </div>
+                                    <div class="profile-field">
+                                        <div class="field-label">Department:</div>
+                                        <div class="field-value">\${data.department}</div>
+                                    </div>
+                                    \${data.salary ? \`
+                                        <div class="profile-field">
+                                            <div class="field-label">Salary:</div>
+                                            <div class="field-value">$\${data.salary.toLocaleString()}</div>
+                                        </div>
+                                    \` : ''}
+                                    \${data.flag ? \`
+                                        <div class="flag-reveal">🎉 \${data.flag} 🎉</div>
+                                    \` : ''}
+                                </div>
+                            \`;
+                        } else {
+                            contentDiv.innerHTML = \`<div class="error">\${data.error}</div>\`;
+                        }
+                    } catch (error) {
+                        contentDiv.innerHTML = \`<div class="error">Error loading profile: \${error.message}</div>\`;
+                    }
+                });
+            </script>
         </body>
         </html>
     `);
 });
 
-// Lab 2 API - Profile access endpoint (vulnerable to IDOR)
-app.get('/api/profile/user/:id', (req, res) => {
-    const userId = parseInt(req.params.id);
-    const user = users.find(u => u.id === userId);
+// Lab 2 API - Profile access endpoint (vulnerable to cookie manipulation)
+app.get('/api/profile', (req, res) => {
+    // Vulnerability: Trusts client-provided cookie without server-side session validation
+    // Should validate userId against server-side session, not trust the cookie
+    const cookies = req.headers.cookie || '';
+    const userIdFromCookie = parseInt(cookies.match(/userId=(\d+)/)?.[1] || CURRENT_USER_ID);
+    
+    const user = users.find(u => u.id === userIdFromCookie);
     
     if (!user) {
         return res.status(404).json({ 
-            error: 'Member not found',
-            message: 'Invalid member ID'
+            error: 'User not found',
+            message: 'Invalid user ID in cookie'
         });
     }
     
-    // Vulnerable: Checks that someone is logged in, but not WHO is accessing
-    // Should verify: req.session.userId === userId
-    // Instead: returns data for ANY valid user ID
-    
-    // Build response with sensitive data
+    // Build response with sensitive data based on cookie value
     const profileData = {
         id: user.id,
         username: user.username,
         email: user.email,
         role: user.role,
-        membership: user.membership,
-        creditCard: user.creditCard,
-        renewalDate: user.renewalDate
+        department: user.department,
+        title: user.title
     };
     
-    // Add member-specific data
-    if (user.role === 'member') {
-        profileData.joinDate = user.joinDate;
-        profileData.favoriteClass = user.favoriteClass;
-    }
-    
-    // Add instructor-specific data
-    if (user.role === 'instructor') {
-        profileData.specialization = user.specialization;
-        profileData.yearsTeaching = user.yearsTeaching;
-        profileData.accessLevel = user.accessLevel;
-    }
-    
-    // If accessing someone else's profile (IDOR vulnerability exploited)
-    if (userId !== CURRENT_USER_ID) {
-        profileData.flag = 'NSA{1D0R_V1CT1M_4CC3SS}';
-        profileData._vuln_note = 'Unauthorized access: You accessed another member\'s private profile!';
+    // If someone manipulated their cookie to access another user's profile
+    if (userIdFromCookie !== CURRENT_USER_ID) {
+        profileData.salary = user.salary;
+        profileData.ssn = user.ssn;
+        profileData.performanceRating = user.performanceRating;
+        profileData.flag = 'NSA{C00K13_M4N1PUL4T10N}';
+        profileData._vuln_note = 'Cookie manipulation detected: You modified the userId cookie to access another employee\'s data!';
     }
     
     return res.json(profileData);
@@ -1291,148 +1244,137 @@ app.get('/lab3', (req, res) => {
                     <p class="subtitle">Human Resources Management System</p>
                 </div>
 
-                ${!isInstructor ? `
-                <div class="alert-box">
-                    <h2>🔒 Administrative Access Required</h2>
-                    <p>You are currently logged in as <strong>Employee #${userId}</strong></p>
-                    <p style="margin-top: 10px;">This area is restricted to TechCorp HR administrators and authorized personnel only. If you believe you should have access, please contact our IT department at it@techcorp-global.com.</p>
-                </div>
-
-                <div class="info-section">
-                    <h2>About the HR Dashboard</h2>
-                    <p>The TechCorp HR Dashboard provides administrators with comprehensive tools for managing employee data, benefits administration, and organizational analytics:</p>
-                    
-                    <ul class="feature-list">
-                        <li><strong>Employee Records:</strong> Access complete personnel files and documentation</li>
-                        <li><strong>Payroll Management:</strong> Process compensation and benefits administration</li>
-                        <li><strong>Performance Reviews:</strong> Track employee evaluations and development plans</li>
-                        <li><strong>Compliance Reporting:</strong> Generate regulatory and audit reports</li>
-                        <li><strong>Org Analytics:</strong> Workforce metrics and department insights</li>
-                    </ul>
-                </div>
-                ` : `
-                <div class="success-box">
-                    <h2>✅ Welcome, HR Administrator</h2>
-                    <p>Access granted. You are viewing the administrative control panel.</p>
-                </div>
-
-                <div class="flag-reveal">
-                    🎉 NSA{R00T_4CC3SS_4CH13V3D} 🎉
-                </div>
-
-                <div class="info-section">
-                    <h2>📊 HR Dashboard</h2>
-                    
-                    <div class="dashboard-card">
-                        <h3>📅 Pending Actions</h3>
-                        <div class="class-item">
-                            <strong>New Hire Onboarding:</strong> 3 employees starting next week<br>
-                            <strong>PTO Requests:</strong> 8 pending approvals<br>
-                            <strong>Performance Reviews:</strong> 12 overdue evaluations
-                        </div>
-                    </div>
-
-                    <div class="dashboard-card">
-                        <h3>📈 Workforce Metrics</h3>
-                        <p><strong>Total Employees:</strong> 1,247</p>
-                        <p><strong>Average Tenure:</strong> 3.2 years</p>
-                        <p><strong>Turnover Rate:</strong> 8.5% (Q4 2025)</p>
-                        <p><strong>Open Positions:</strong> 23</p>
-                    </div>
-
-                    <div class="dashboard-card">
-                        <h3>📚 Quick Links</h3>
-                        <ul class="feature-list">
-                            <li>Employee Directory</li>
-                            <li>Payroll Processing</li>
-                            <li>Benefits Administration</li>
-                            <li>Compliance Reports</li>
-                            <li>Training & Development</li>
-                        </ul>
-                    </div>
-                </div>
-                `}
-
-                <div class="info-section">
-                    <h2>🎓 Join Our Team</h2>
-                    <p>Interested in joining TechCorp? We're always looking for talented professionals across engineering, sales, operations, and more.</p>
-                    <p style="margin-top: 15px;">Visit <strong>careers.techcorp-global.com</strong> to view open positions and apply online.</p>
-                </div>
+                <div id="dashboardContent"></div>
 
                 <div class="back-link">
                     <a href="/">← Back to HR Portal</a>
                 </div>
             </div>
+
+            <script>
+                // Load dashboard on page load
+                window.addEventListener('DOMContentLoaded', async () => {
+                    const contentDiv = document.getElementById('dashboardContent');
+                    contentDiv.innerHTML = '<div class="loading">Loading dashboard...</div>';
+                    
+                    try {
+                        const response = await fetch('/api/admin/dashboard');
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            contentDiv.innerHTML = \`
+                                <div class="success-box">
+                                    <h2>✅ Welcome, HR Administrator</h2>
+                                    <p>Access granted. You are viewing the administrative control panel.</p>
+                                </div>
+
+                                \${data.flag ? \`
+                                    <div class="flag-reveal">🎉 \${data.flag} 🎉</div>
+                                \` : ''}
+
+                                <div class="info-section">
+                                    <h2>📊 Employee Statistics</h2>
+                                    <div class="dashboard-card">
+                                        <h3>📈 Workforce Metrics</h3>
+                                        <p><strong>Total Employees:</strong> \${data.employeeStats.totalEmployees}</p>
+                                        <p><strong>Average Salary:</strong> $\${data.employeeStats.avgSalary.toLocaleString()}</p>
+                                        <p><strong>Highest Paid:</strong> \${data.employeeStats.highestPaid.username} - $\${data.employeeStats.highestPaid.salary.toLocaleString()}</p>
+                                    </div>
+
+                                    <div class="dashboard-card">
+                                        <h3>🏢 Department Breakdown</h3>
+                                        <p><strong>Engineering:</strong> \${data.employeeStats.departmentCount.Engineering} employees</p>
+                                        <p><strong>Marketing:</strong> \${data.employeeStats.departmentCount.Marketing} employees</p>
+                                        <p><strong>Sales:</strong> \${data.employeeStats.departmentCount.Sales} employees</p>
+                                        <p><strong>HR:</strong> \${data.employeeStats.departmentCount.HR} employees</p>
+                                    </div>
+
+                                    <div class="dashboard-card">
+                                        <h3>🔒 Sensitive Information</h3>
+                                        <p><strong>Annual Payroll:</strong> \${data.sensitiveData.payrollBudget}</p>
+                                        <p><strong>Upcoming Layoffs:</strong> \${data.sensitiveData.upcomingLayoffs}</p>
+                                        <p><strong>Executive Bonuses:</strong> \${data.sensitiveData.executiveBonuses}</p>
+                                    </div>
+                                </div>
+                            \`;
+                        } else {
+                            contentDiv.innerHTML = \`
+                                <div class="alert-box">
+                                    <h2>🔒 Access Denied</h2>
+                                    <p>\${data.message}</p>
+                                    <p style="margin-top: 10px;"><strong>Your Role:</strong> \${data.yourRole}</p>
+                                    <p><strong>Required Role:</strong> \${data.requiredRole}</p>
+                                </div>
+
+                                <div class="info-section">
+                                    <h2>About the HR Dashboard</h2>
+                                    <p>The TechCorp HR Dashboard provides administrators with comprehensive tools for managing employee data, benefits administration, and organizational analytics.</p>
+                                </div>
+                            \`;
+                        }
+                    } catch (error) {
+                        contentDiv.innerHTML = \`<div class="error">Error loading dashboard: \${error.message}</div>\`;
+                    }
+                });
+            </script>
         </body>
         </html>
     `);
 });
 
-// Lab 3 API - Instructor dashboard endpoint (vulnerable to privilege escalation via IDOR)
-app.get('/api/instructor/user/:id/dashboard', (req, res) => {
-    const userId = parseInt(req.params.id);
-    const user = users.find(u => u.id === userId);
+// Lab 3 API - Admin dashboard endpoint (vulnerable to missing function-level access control)
+app.get('/api/admin/dashboard', (req, res) => {
+    // Vulnerability: Trusts userRole cookie without server-side verification
+    // Should validate role against server-side session, not trust client cookie
+    const cookies = req.headers.cookie || '';
+    const userRole = cookies.match(/userRole=([^;]+)/)?.[1] || 'employee';
+    const userId = parseInt(cookies.match(/userId=(\d+)/)?.[1] || CURRENT_USER_ID);
     
-    if (!user) {
-        return res.status(404).json({ 
-            error: 'Member not found',
-            message: 'Invalid member ID'
-        });
-    }
-    
-    // Vulnerable: No session management or authentication
-    // Should have: 
-    //   1. Session management to track current logged-in user
-    //   2. Check if req.session.userId exists and is valid
-    //   3. Verify req.session.user.role === 'instructor'
-    // Instead: Checks the role of the requested user ID (from URL parameter)
-    // This allows privilege escalation by requesting instructor IDs
-    
-    if (user.role !== 'instructor') {
+    // Only checks cookie value - can be easily manipulated!
+    if (userRole !== 'admin') {
         return res.status(403).json({ 
             error: 'Access Denied',
-            message: 'This area is restricted to TechCorp HR administrators only.',
-            yourRole: 'member',
-            requiredRole: 'instructor'
+            message: 'This area is restricted to HR administrators only.',
+            yourRole: userRole,
+            requiredRole: 'admin'
         });
     }
     
-    // If we get here, the requested user ID belongs to an instructor
-    // Build instructor dashboard data
+    // If we get here, the userRole cookie claimed admin access
+    // Build admin dashboard data
     const dashboardData = {
-        message: 'Welcome to the Instructor Dashboard',
-        instructor: {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            specialization: user.specialization,
-            yearsTeaching: user.yearsTeaching
+        message: 'Welcome to the HR Admin Dashboard',
+        user: {
+            id: userId,
+            role: userRole
         },
-        upcomingClasses: [
-            { date: '2025-01-20', time: '9:00 AM', type: 'Vinyasa Flow', enrolled: 12 },
-            { date: '2025-01-22', time: '6:00 PM', type: 'Meditation', enrolled: 8 },
-            { date: '2025-01-25', time: '10:00 AM', type: 'Power Yoga', enrolled: 15 }
-        ],
-        studentStats: {
-            totalStudents: 45,
-            averageAttendance: '87%',
-            rating: 4.8
+        employeeStats: {
+            totalEmployees: users.length,
+            avgSalary: Math.round(users.reduce((sum, u) => sum + u.salary, 0) / users.length),
+            highestPaid: users.reduce((max, u) => u.salary > max.salary ? u : max),
+            departmentCount: {
+                Engineering: users.filter(u => u.department === 'Engineering').length,
+                Marketing: users.filter(u => u.department === 'Marketing').length,
+                Sales: users.filter(u => u.department === 'Sales').length,
+                HR: users.filter(u => u.department === 'Human Resources').length
+            }
         },
-        resources: {
-            lessonPlans: '/instructor/resources/lessons',
-            studioGuidelines: '/instructor/resources/guidelines',
-            attendanceReports: '/instructor/reports/attendance'
+        sensitiveData: {
+            payrollBudget: '$12.5M annually',
+            upcomingLayoffs: '15 positions',
+            executiveBonuses: '$2.1M pool'
         }
     };
     
-    // If privilege escalation occurred (accessing instructor dashboard as regular member)
-    if (userId !== CURRENT_USER_ID) {
-        dashboardData.flag = 'NSA{R00T_4CC3SS_4CH13V3D}';
-        dashboardData._vuln_note = 'Privilege escalation detected: Regular member accessed instructor dashboard!';
+    // If privilege escalation occurred (regular employee manipulated cookie to gain admin access)
+    if (userId === CURRENT_USER_ID && userRole !== 'employee') {
+        dashboardData.flag = 'NSA{PR1V1L3G3_3SC4L4T10N}';
+        dashboardData._vuln_note = 'Privilege escalation detected: Regular employee manipulated userRole cookie to gain admin access!';
     }
     
     return res.json(dashboardData);
 });
+
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`\x1b[32m

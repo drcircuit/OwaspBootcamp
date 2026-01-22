@@ -929,6 +929,161 @@ app.get('/lab2', (req, res) => {
 });
 
 
+// Lab 2 API - VULNERABLE: .env file exposed through misconfiguration
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Platform Settings - CloudDeploy</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: 'Georgia', serif;
+                    background: linear-gradient(135deg, #6B4423 0%, #3E2723 100%);
+                    padding: 20px;
+                    min-height: 100vh;
+                    line-height: 1.6;
+                }
+                .container { max-width: 900px; margin: 0 auto; }
+                .header {
+                    background: #EFEBE9;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 25px;
+                    text-align: center;
+                    border: 2px solid #A1887F;
+                }
+                h1 { color: #3E2723; font-size: 2em; }
+                .subtitle { color: #5D4037; font-size: 1.1em; }
+                .section {
+                    background: #EFEBE9;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 20px;
+                    border: 2px solid #A1887F;
+                }
+                .section h2 { color: #3E2723; margin-bottom: 15px; }
+                .section p { color: #5D4037; line-height: 1.7; margin: 8px 0; }
+                .search-box {
+                    background: #E8F5E9;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                    border-left: 3px solid #4CAF50;
+                }
+                .demo-input {
+                    width: 100%;
+                    padding: 12px;
+                    border: 2px solid #8D6E63;
+                    border-radius: 8px;
+                    font-size: 1em;
+                    margin: 10px 0;
+                }
+                .demo-button {
+                    background: linear-gradient(135deg, #8D6E63 0%, #6D4C41 100%);
+                    color: white;
+                    padding: 12px 24px;
+                    border: none;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-size: 1em;
+                    margin: 5px;
+                    width: 100%;
+                }
+                .demo-button:hover {
+                    background: linear-gradient(135deg, #6D4C41 0%, #5D4037 100%);
+                }
+                .output-box {
+                    background: #f5f5f5;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin: 15px 0;
+                    font-family: 'Courier New', monospace;
+                    font-size: 0.9em;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                    max-height: 400px;
+                    overflow-y: auto;
+                    border: 1px solid #ddd;
+                }
+                .flag-reveal {
+                    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 1.2em;
+                }
+                .tip-box {
+                    background: #FFF3E0;
+                    border-left: 4px solid #FF9800;
+                    padding: 15px;
+                    margin: 20px 0;
+                    border-radius: 5px;
+                }
+                .warning-box {
+                    background: #FFEBEE;
+                    border-left: 4px solid #D32F2F;
+                    padding: 15px;
+                    margin: 15px 0;
+                    border-radius: 5px;
+                }
+                code {
+                    background: #D7CCC8;
+                    padding: 3px 8px;
+                    border-radius: 4px;
+                    font-family: monospace;
+                    color: #c62828;
+                }
+                .back-link { text-align: center; margin-top: 30px; }
+                .back-link a { color: #5D4037; text-decoration: none; font-weight: 600; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>⚙️ Store Settings</h1>
+                    <p class="subtitle">Configure store operations and integrations</p>
+                </div>
+
+                <div class="section">
+                    <h2>Configuration Management</h2>
+                    <p>Manage store settings, payment integrations, and operational parameters.</p>
+                    
+                    <div class="warning-box">
+                        <strong>⚠️ Manager Access:</strong> Configuration changes require manager approval.
+                    </div>
+                    
+                    <h3 style="margin-top: 20px; color: #3E2723;">Quick Settings:</h3>
+                    <ul style="color: #5D4037; line-height: 1.7; margin-left: 20px; margin-top: 10px;">
+                        <li>Store hours: Mon-Fri 6AM-8PM, Sat-Sun 7AM-9PM</li>
+                        <li>Payment processing via Square</li>
+                        <li>Low inventory alerts enabled</li>
+                        <li>Email notifications: Active</li>
+                    </ul>
+
+                    <h3 style="margin-top: 20px; color: #3E2723;">Active Integrations:</h3>
+                    <ul style="color: #5D4037; line-height: 1.7; margin-left: 20px; margin-top: 10px;">
+                        <li>✅ Square POS - Connected</li>
+                        <li>✅ Gmail SMTP - Operational</li>
+                        <li>✅ AWS S3 Storage - Active</li>
+                        <li>⏸️ Loyalty Program - Pending setup</li>
+                    </ul>
+                </div>
+
+                <div class="back-link">
+                    <a href="/">← Back to Portal</a>
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
+});
+
+// Lab 2 API - VULNERABLE: .env file exposed through misconfiguration
 app.get('/.env', (req, res) => {
     // VULNERABLE: .env file accessible due to misconfigured static file serving
     const envContent = `# CloudDeploy Platform - Environment Configuration
@@ -939,26 +1094,20 @@ PORT=3002
 
 # Database Configuration
 DB_HOST=db.clouddeploy.io
-DB_USER=deploy_admin
-DB_PASSWORD=D3pl0y$ecret2024!
+DB_USER=coffee_admin
+DB_PASSWORD=Bean$cene2024!
 DB_NAME=clouddeploy_prod
-
-# AWS Credentials
-AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
-AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-AWS_S3_BUCKET=clouddeploy-prod-backups
-AWS_REGION=us-east-1
 
 # API Keys & Secrets
 JWT_SECRET=clouddeploy_jwt_secret_key_12345
-SESSION_SECRET=clouddeploy-session-2024
-STRIPE_API_KEY=sk_live_51HvKj2LkdIyFiZACBmrE4WYDRqNH3tpAXmPLKeE
-STRIPE_WEBHOOK_SECRET=whsec_CloudDeployProductionSecret2024
+SESSION_SECRET=coffee-shop-session-2024
+SQUARE_API_KEY=sq0atp-CloudDeploy_Live_Token_xyz789
+SQUARE_MERCHANT_ID=MLHV6GRVNB4XQ
 
 # Email Service
 SMTP_HOST=smtp.gmail.com
 SMTP_USER=notifications@clouddeploy.io
-SMTP_PASS=CloudMail!2024
+SMTP_PASS=BeanMail!2024
 
 # Feature Flags
 DEBUG_MODE=true
@@ -973,13 +1122,12 @@ NSA{C0NF1G_L3AK3D}
 // Also expose .env.backup
 app.get('/.env.backup', (req, res) => {
     const envBackup = `# Backup from 2024-01-15
-DB_PASSWORD=OldD3pl0y$2023!
+DB_PASSWORD=OldBean$2023!
 JWT_SECRET=old_jwt_secret_2023
 NSA{C0NF1G_L3AK3D}
 `;
     res.type('text/plain').send(envBackup);
 });
-
 
 // Lab 3 - Manager Portal
 app.get('/lab3', (req, res) => {
@@ -987,171 +1135,172 @@ app.get('/lab3', (req, res) => {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>CloudDeploy Admin Login</title>
+            <title>Admin Console - CloudDeploy</title>
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body {
-                    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-                    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+                    font-family: 'Georgia', serif;
+                    background: linear-gradient(135deg, #6B4423 0%, #3E2723 100%);
                     padding: 20px;
                     min-height: 100vh;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
+                    line-height: 1.6;
                 }
-                .login-container {
-                    max-width: 400px;
-                    width: 100%;
-                    background: rgba(255, 255, 255, 0.95);
-                    padding: 40px;
+                .container { max-width: 900px; margin: 0 auto; }
+                .header {
+                    background: #EFEBE9;
+                    padding: 25px;
                     border-radius: 15px;
-                    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                    margin-bottom: 25px;
+                    text-align: center;
+                    border: 2px solid #A1887F;
                 }
-                .logo { text-align: center; margin-bottom: 30px; }
-                .logo h1 { color: #2c5364; font-size: 2em; }
-                .logo p { color: #666; margin-top: 5px; }
-                .form-group { margin-bottom: 20px; }
-                label { display: block; margin-bottom: 8px; color: #333; font-weight: 600; }
-                input {
+                h1 { color: #3E2723; font-size: 2em; }
+                .subtitle { color: #5D4037; font-size: 1.1em; }
+                .section {
+                    background: #EFEBE9;
+                    padding: 25px;
+                    border-radius: 15px;
+                    margin-bottom: 20px;
+                    border: 2px solid #A1887F;
+                }
+                .section h2 { color: #3E2723; margin-bottom: 15px; }
+                .section p { color: #5D4037; line-height: 1.7; margin: 8px 0; }
+                .search-box {
+                    background: #E8F5E9;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                    border-left: 3px solid #4CAF50;
+                }
+                .demo-input {
                     width: 100%;
                     padding: 12px;
-                    border: 2px solid #ddd;
+                    border: 2px solid #8D6E63;
                     border-radius: 8px;
                     font-size: 1em;
+                    margin: 10px 0;
                 }
-                input:focus { outline: none; border-color: #667eea; }
-                button {
-                    width: 100%;
-                    padding: 12px;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                .demo-button {
+                    background: linear-gradient(135deg, #8D6E63 0%, #6D4C41 100%);
                     color: white;
+                    padding: 12px 24px;
                     border: none;
                     border-radius: 8px;
-                    font-size: 1.1em;
                     font-weight: 600;
                     cursor: pointer;
+                    font-size: 1em;
+                    margin: 5px;
                 }
-                button:hover { transform: translateY(-2px); }
-                .hint { background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #2196f3; font-size: 0.9em; }
-                .error { background: #ffebee; color: #c62828; padding: 12px; border-radius: 8px; margin-bottom: 15px; display: none; }
-                .success { background: #e8f5e9; color: #2e7d32; padding: 20px; border-radius: 8px; margin-bottom: 15px; display: none; text-align: center; font-weight: 600; }
-                .back-link { text-align: center; margin-top: 20px; }
-                .back-link a { color: #667eea; text-decoration: none; font-weight: 600; }
+                .demo-button:hover {
+                    background: linear-gradient(135deg, #6D4C41 0%, #5D4037 100%);
+                }
+                .output-box {
+                    background: #f5f5f5;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin: 15px 0;
+                    font-family: 'Courier New', monospace;
+                    font-size: 0.9em;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                    max-height: 400px;
+                    overflow-y: auto;
+                    border: 1px solid #ddd;
+                }
+                .flag-reveal {
+                    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 15px 0;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 1.2em;
+                }
+                .tip-box {
+                    background: #FFF3E0;
+                    border-left: 4px solid #FF9800;
+                    padding: 15px;
+                    margin: 20px 0;
+                    border-radius: 5px;
+                }
+                .restricted {
+                    background: #FFEBEE;
+                    border-left: 4px solid #D32F2F;
+                    padding: 15px;
+                    margin: 15px 0;
+                    border-radius: 5px;
+                }
+                .dir-listing {
+                    background: white;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    margin: 15px 0;
+                    overflow: hidden;
+                }
+                .dir-item {
+                    padding: 12px;
+                    border-bottom: 1px solid #eee;
+                    cursor: pointer;
+                    transition: background 0.2s;
+                }
+                .dir-item:hover {
+                    background: #f5f5f5;
+                }
+                .dir-item:last-child {
+                    border-bottom: none;
+                }
+                code {
+                    background: #D7CCC8;
+                    padding: 3px 8px;
+                    border-radius: 4px;
+                    font-family: monospace;
+                    color: #c62828;
+                }
+                .back-link { text-align: center; margin-top: 30px; }
+                .back-link a { color: #5D4037; text-decoration: none; font-weight: 600; }
             </style>
         </head>
         <body>
-            <div class="login-container">
-                <div class="logo">
-                    <h1>☁️ CloudDeploy</h1>
-                    <p>Lab 3: Admin Console</p>
+            <div class="container">
+                <div class="header">
+                    <h1>🔐 Manager Portal</h1>
+                    <p class="subtitle">Administrative controls and reporting</p>
                 </div>
 
-                <div id="error" class="error"></div>
-                <div id="success" class="success"></div>
+                <div class="restricted">
+                    <strong>🔒 Authentication Required</strong><br>
+                    This area requires manager credentials. Please log in at the admin console.
+                </div>
 
-                <form id="loginForm" onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" name="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" required>
-                    </div>
-                    <button type="submit">Sign In</button>
-                </form>
+                <div class="section">
+                    <h2>Manager Features</h2>
+                    <p>The manager portal provides access to:</p>
+                    <ul style="color: #5D4037; line-height: 1.7; margin-left: 20px; margin-top: 10px;">
+                        <li>Financial reports and sales analytics</li>
+                        <li>Staff management and scheduling</li>
+                        <li>Inventory ordering and management</li>
+                        <li>System configuration and settings</li>
+                    </ul>
 
-                <div class="hint">
-                    <strong>💡 Tip:</strong> Many systems are deployed with default credentials that administrators forget to change. Try common admin credentials or check if there's documentation exposed.
+                    <div style="margin-top: 20px; padding: 15px; background: #FFF8E7; border-radius: 8px;">
+                        <strong>📊 Quick Stats (Manager View):</strong><br>
+                        <div style="margin-top: 10px; color: #5D4037;">
+                            Today's Revenue: $2,847<br>
+                            Active Orders: 12<br>
+                            Staff on Shift: 4<br>
+                            Low Stock Items: 3
+                        </div>
+                    </div>
                 </div>
 
                 <div class="back-link">
                     <a href="/">← Back to Portal</a>
                 </div>
             </div>
-
-            <script>
-                async function handleLogin(event) {
-                    event.preventDefault();
-                    
-                    const username = document.getElementById('username').value;
-                    const password = document.getElementById('password').value;
-                    const errorDiv = document.getElementById('error');
-                    const successDiv = document.getElementById('success');
-                    
-                    errorDiv.style.display = 'none';
-                    successDiv.style.display = 'none';
-                    
-                    try {
-                        const response = await fetch('/api/admin/login', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ username, password })
-                        });
-                        
-                        const data = await response.json();
-                        
-                        if (response.ok) {
-                            successDiv.textContent = data.flag + ' - ' + data.message;
-                            successDiv.style.display = 'block';
-                            document.getElementById('loginForm').style.display = 'none';
-                        } else {
-                            errorDiv.textContent = data.error || 'Login failed';
-                            errorDiv.style.display = 'block';
-                        }
-                    } catch (error) {
-                        errorDiv.textContent = 'Connection error';
-                        errorDiv.style.display = 'block';
-                    }
-                }
-            </script>
         </body>
         </html>
     `);
-});
-
-// Lab 3 API - Login endpoint with default credentials
-app.post('/api/admin/login', (req, res) => {
-    const { username, password } = req.body;
-    
-    // VULNERABLE: Default credentials never changed
-    if (username === adminCredentials.username && password === adminCredentials.password) {
-        return res.json({
-            success: true,
-            flag: 'NSA{D3F4ULT_CR3D5_PWN3D}',
-            message: 'Admin access granted! Default credentials were never changed.',
-            admin_token: 'cloudadmin_prod_token_xyz789abc',
-            access_level: 'full_admin'
-        });
-    }
-    
-    res.status(401).json({
-        error: 'Invalid credentials',
-        hint: 'Default credentials are often documented'
-    });
-});
-
-// Expose admin documentation file that reveals default credentials
-app.get('/admin/README.txt', (req, res) => {
-    const readme = `CloudDeploy Admin Console - Quick Start Guide
-================================================
-
-INITIAL SETUP:
-1. Login with default credentials:
-   Username: admin
-   Password: CloudDeploy123!
-
-2. IMPORTANT: Change default password immediately after first login!
-
-3. Configure AWS credentials in .env file
-
-4. Set up database connection
-
-WARNING: Do not leave default credentials in production!
-
-For support, contact devops@clouddeploy.io
-`;
-    res.type('text/plain').send(readme);
 });
 
 // Lab 3 API - VULNERABLE: Directory listing enabled
@@ -1180,7 +1329,7 @@ app.get('/admin', (req, res) => {
                 <tr><td><a href="/admin/config.json">config.json</a></td><td>2024-12-15 14:30</td><td>2.1 KB</td></tr>
                 <tr><td><a href="/admin/backup/">backup/</a></td><td>2024-12-10 09:15</td><td>-</td></tr>
                 <tr><td><a href="/admin/logs/">logs/</a></td><td>2025-01-19 10:00</td><td>-</td></tr>
-                <tr><td><a href="/admin/README.txt">README.txt</a></td><td>2024-11-20 16:45</td><td>486 bytes</td></tr>
+                <tr><td><a href="/admin/credentials.txt">credentials.txt</a></td><td>2024-11-20 16:45</td><td>156 bytes</td></tr>
             </table>
         </body>
         </html>
@@ -1201,6 +1350,22 @@ app.get('/admin/config.json', (req, res) => {
             errorReporting: "full"
         }
     });
+});
+
+app.get('/admin/credentials.txt', (req, res) => {
+    // VULNERABLE: Credentials file accessible
+    const credentials = `CloudDeploy Admin Credentials
+=================================
+Username: admin
+Password: CloudDeploy123!
+AWS Access Key: AKIAIOSFODNN7EXAMPLE
+API Token: Bearer cloudadmin_prod_token_xyz789abc
+
+NSA{4DM1N_P4N3L_PWN3D}
+
+WARNING: This file should not be web-accessible!
+`;
+    res.type('text/plain').send(credentials);
 });
 
 app.listen(PORT, '0.0.0.0', () => {

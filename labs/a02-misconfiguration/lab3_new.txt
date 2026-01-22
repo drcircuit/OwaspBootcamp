@@ -1,0 +1,172 @@
+app.get('/lab3', (req, res) => {
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>CloudDeploy Admin Login</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+                    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+                    padding: 20px;
+                    min-height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .login-container {
+                    max-width: 400px;
+                    width: 100%;
+                    background: rgba(255, 255, 255, 0.95);
+                    padding: 40px;
+                    border-radius: 15px;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                }
+                .logo { text-align: center; margin-bottom: 30px; }
+                .logo h1 { color: #2c5364; font-size: 2em; }
+                .logo p { color: #666; margin-top: 5px; }
+                .form-group { margin-bottom: 20px; }
+                label { display: block; margin-bottom: 8px; color: #333; font-weight: 600; }
+                input {
+                    width: 100%;
+                    padding: 12px;
+                    border: 2px solid #ddd;
+                    border-radius: 8px;
+                    font-size: 1em;
+                }
+                input:focus { outline: none; border-color: #667eea; }
+                button {
+                    width: 100%;
+                    padding: 12px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 1.1em;
+                    font-weight: 600;
+                    cursor: pointer;
+                }
+                button:hover { transform: translateY(-2px); }
+                .hint { background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #2196f3; font-size: 0.9em; }
+                .error { background: #ffebee; color: #c62828; padding: 12px; border-radius: 8px; margin-bottom: 15px; display: none; }
+                .success { background: #e8f5e9; color: #2e7d32; padding: 20px; border-radius: 8px; margin-bottom: 15px; display: none; text-align: center; font-weight: 600; }
+                .back-link { text-align: center; margin-top: 20px; }
+                .back-link a { color: #667eea; text-decoration: none; font-weight: 600; }
+            </style>
+        </head>
+        <body>
+            <div class="login-container">
+                <div class="logo">
+                    <h1>☁️ CloudDeploy</h1>
+                    <p>Lab 3: Admin Console</p>
+                </div>
+
+                <div id="error" class="error"></div>
+                <div id="success" class="success"></div>
+
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <button type="submit">Sign In</button>
+                </form>
+
+                <div class="hint">
+                    <strong>💡 Tip:</strong> Many systems are deployed with default credentials that administrators forget to change. Try common admin credentials or check if there's documentation exposed.
+                </div>
+
+                <div class="back-link">
+                    <a href="/">← Back to Portal</a>
+                </div>
+            </div>
+
+            <script>
+                async function handleLogin(event) {
+                    event.preventDefault();
+                    
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+                    const errorDiv = document.getElementById('error');
+                    const successDiv = document.getElementById('success');
+                    
+                    errorDiv.style.display = 'none';
+                    successDiv.style.display = 'none';
+                    
+                    try {
+                        const response = await fetch('/api/admin/login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ username, password })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            successDiv.textContent = data.flag + ' - ' + data.message;
+                            successDiv.style.display = 'block';
+                            document.getElementById('loginForm').style.display = 'none';
+                        } else {
+                            errorDiv.textContent = data.error || 'Login failed';
+                            errorDiv.style.display = 'block';
+                        }
+                    } catch (error) {
+                        errorDiv.textContent = 'Connection error';
+                        errorDiv.style.display = 'block';
+                    }
+                }
+            </script>
+        </body>
+        </html>
+    `);
+});
+
+// Lab 3 API - Login endpoint with default credentials
+app.post('/api/admin/login', (req, res) => {
+    const { username, password } = req.body;
+    
+    // VULNERABLE: Default credentials never changed
+    if (username === adminCredentials.username && password === adminCredentials.password) {
+        return res.json({
+            success: true,
+            flag: 'NSA{D3F4ULT_CR3D5_PWN3D}',
+            message: 'Admin access granted! Default credentials were never changed.',
+            admin_token: 'cloudadmin_prod_token_xyz789abc',
+            access_level: 'full_admin'
+        });
+    }
+    
+    res.status(401).json({
+        error: 'Invalid credentials',
+        hint: 'Default credentials are often documented'
+    });
+});
+
+// Expose admin documentation file that reveals default credentials
+app.get('/admin/README.txt', (req, res) => {
+    const readme = `CloudDeploy Admin Console - Quick Start Guide
+================================================
+
+INITIAL SETUP:
+1. Login with default credentials:
+   Username: admin
+   Password: CloudDeploy123!
+
+2. IMPORTANT: Change default password immediately after first login!
+
+3. Configure AWS credentials in .env file
+
+4. Set up database connection
+
+WARNING: Do not leave default credentials in production!
+
+For support, contact devops@clouddeploy.io
+`;
+    res.type('text/plain').send(readme);
+});
+

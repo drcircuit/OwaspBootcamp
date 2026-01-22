@@ -1,0 +1,32 @@
+# A05 REFACTORED SECTIONS
+
+## EXAMPLE ROUTE (lines 268-515) - Clean Product Catalog with DevTools Discovery
+- Replace tutorial-heavy content with clean e-commerce product page
+- Auto-load 4 API endpoints in background (visible in DevTools Network tab)
+- Hint: "Use browser DevTools (F12 → Network) to discover API endpoints"
+- APIs: /api/products, /api/products/list, /api/products/featured, /api/products/debug
+- Flag in debug endpoint: NSA{D3BUG_PR0DUCTS_F0UND}
+
+## LAB 1 (lines 594-700) - SQL Injection via Search (Error-Based)
+- Clean product search page with search box
+- Hint: "Try using gobuster to discover search endpoints"
+- GET /api/search?q=<query> - VULNERABLE to SQL injection
+- Invalid SQL causes error messages exposing database structure
+- Special chars like ' OR 1=1-- trigger SQL errors with flag
+- Flag: NSA{SQL_3RR0R_1NJ3CT}
+
+## LAB 2 (lines 702-850) - NoSQL Injection via Advanced Filters
+- Clean filtering interface (price, category, rating)
+- Hint: "Use gobuster to find filter endpoints: -x .json"
+- POST /api/filter with JSON body - VULNERABLE to NoSQL injection
+- Bypass with: {"price": {"$gt": 0}} or {"$where": "1==1"}
+- Flag: NSA{N0SQL_BYP4SS3D}
+
+## LAB 3 (lines 850-1045) - Command Injection via Image Processing
+- Clean image upload/processing interface
+- Hint: "Check for image processing endpoints"
+- POST /api/process-image with {filename, operation}
+- VULNERABLE: executes system commands without sanitization
+- Injection: filename=';cat /etc/passwd;' or operation='resize;ls'
+- Flag: NSA{C0MM4ND_1NJ3CT3D}
+
