@@ -420,8 +420,8 @@ app.get('/lab1', (req, res) => {
           <div id="verification-result" style="margin-top: 30px;"></div>
           
           <div class="hint-box" style="margin-top: 30px;">
-            <strong>💡 Discovery Tip:</strong> Use automation tools or scripts to test multiple PIN combinations. The PIN is a 4-digit number (0000-9999).<br>
-            Try using curl, Python requests, or browser automation to test rapidly.
+            <strong>💡 Discovery Tip:</strong> The endpoint is <code>POST /api/verify-pin</code>. The PIN is a 4-digit number.<br>
+            Try brute forcing: <code>for pin in {1000..1100}; do curl -X POST http://localhost:3006/api/verify-pin -H "Content-Type: application/json" -d "{\"account_id\":\"12345\",\"pin\":\"$pin\"}"; done</code>
           </div>
         </div>
       </div>
@@ -565,8 +565,8 @@ app.get('/lab2', (req, res) => {
           <div id="checkout-result" style="margin-top: 30px;"></div>
           
           <div class="hint-box" style="margin-top: 30px;">
-            <strong>💡 Discovery Tip:</strong> Test how the system handles multiple discount codes. What happens if you apply the same code multiple times?<br>
-            Try: <code>SAVE20,SAVE20,SAVE20</code> or similar combinations.
+            <strong>💡 Discovery Tip:</strong> The endpoint is <code>POST /api/checkout</code>. Test promo codes: <code>SAVE20</code>, <code>FIRST10</code>, <code>VIP15</code><br>
+            What happens if you apply the same code multiple times? Try: <code>SAVE20,SAVE20,SAVE20,SAVE20,SAVE20</code>
           </div>
         </div>
       </div>
@@ -743,8 +743,8 @@ app.get('/lab3', (req, res) => {
           <div id="withdraw-result" style="margin-top: 30px;"></div>
           
           <div class="hint-box" style="margin-top: 30px;">
-            <strong>💡 Discovery Tip:</strong> The system checks balance before processing withdrawal, but doesn't lock the account during the transaction.<br>
-            What happens if you send multiple withdrawal requests at exactly the same time? Try the "10 Simultaneous Requests" button!
+            <strong>💡 Discovery Tip:</strong> Endpoints: <code>GET /api/balance</code> and <code>POST /api/withdraw</code><br>
+            The system checks balance before withdrawal, but doesn't lock during the transaction. Try: <code>for i in {1..5}; do curl -X POST http://localhost:3006/api/withdraw -H "Content-Type: application/json" -d '{"amount":300}' & done</code>
           </div>
         </div>
       </div>

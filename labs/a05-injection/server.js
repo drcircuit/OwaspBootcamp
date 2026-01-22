@@ -415,8 +415,8 @@ app.get('/lab1', (req, res) => {
           <div id="search-results" style="margin-top: 30px; min-height: 100px;"></div>
           
           <div class="hint-box" style="margin-top: 30px;">
-            <strong>💡 Discovery Tip:</strong> Try using gobuster to discover search API endpoints:<br>
-            <code>gobuster dir -u http://localhost:3005 -w /path/to/wordlist.txt</code>
+            <strong>💡 Discovery Tip:</strong> The search API is at <code>/api/search?q=</code><br>
+            Try searching for normal products first, then test with special characters like <code>'</code> or <code>"</code> to see how errors are handled.
           </div>
         </div>
 
@@ -590,8 +590,8 @@ app.get('/lab2', (req, res) => {
           <div id="filter-results" style="margin-top: 30px;"></div>
           
           <div class="hint-box" style="margin-top: 30px;">
-            <strong>💡 Discovery Tip:</strong> Try using gobuster to find filter API endpoints.<br>
-            Advanced users: Check the request payload format in DevTools Network tab.
+            <strong>💡 Discovery Tip:</strong> Open DevTools (F12 → Network tab) and apply a filter to see the request format.<br>
+            The endpoint is <code>POST /api/filter</code> with JSON body. Try modifying the JSON to include MongoDB operators like <code>$gt</code>, <code>$ne</code>, or <code>$where</code>.
           </div>
         </div>
 
@@ -750,8 +750,9 @@ app.get('/lab3', (req, res) => {
           <div id="process-results" style="margin-top: 30px;"></div>
           
           <div class="hint-box" style="margin-top: 30px;">
-            <strong>💡 Discovery Tip:</strong> Use gobuster to find image processing endpoints.<br>
-            System commands often process file operations on the backend.
+            <strong>💡 Discovery Tip:</strong> The endpoint is <code>POST /api/process-image</code><br>
+            Try injecting shell metacharacters in the filename: <code>;</code> <code>|</code> <code>&</code> <code>$()</code><br>
+            Example: <code>test.jpg; ls -la</code>
           </div>
         </div>
 

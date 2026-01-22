@@ -743,7 +743,9 @@ app.get('/lab1', (req, res) => {
                     </div>
                     
                     <div class="hint">
-                        <strong>💡 Reconnaissance Tip:</strong> Try using gobuster to discover API endpoints: <code>gobuster dir -u http://localhost:3002/api -w /usr/share/wordlists/dirb/common.txt</code>
+                        <strong>💡 Reconnaissance Tip:</strong> Use gobuster to discover API endpoints, then test them with invalid inputs:<br>
+                        <code>gobuster dir -u http://localhost:3002 -w /usr/share/wordlists/dirb/common.txt</code><br>
+                        <small>Try accessing /api/deployments with various IDs to see how errors are handled.</small>
                     </div>
                 </div>
 
@@ -827,25 +829,6 @@ NSA{ST4CK_TR4C3_L34K}`;
     res.json(deployment);
 });
 
-// Lab 1 API - VULNERABLE debug endpoint
-app.get('/api/staff/system-info', (req, res) => {
-    // VULNERABLE: Debug info exposed in production
-    res.json({
-        flag: 'NSA{D3BUG_F0UND}',
-        message: 'System information retrieved successfully!',
-        vulnerability: 'Debug endpoint exposed - reveals system details',
-        system_info: {
-            node_version: process.version,
-            platform: process.platform,
-            uptime_seconds: Math.floor(process.uptime()),
-            memory_mb: Math.floor(process.memoryUsage().heapUsed / 1024 / 1024),
-            environment: process.env.NODE_ENV || 'production'
-        },
-        database_host: configData.database.host,
-        warning: 'This endpoint should not be accessible in production!'
-    });
-});
-
 
 // Lab 2 - Configuration Access  
 app.get('/lab2', (req, res) => {
@@ -915,7 +898,10 @@ app.get('/lab2', (req, res) => {
                     </ul>
                     
                     <div class="hint">
-                        <strong>💡 File Discovery Tip:</strong> Use gobuster to scan for exposed files: <code>gobuster dir -u http://localhost:3002 -w /usr/share/wordlists/dirb/common.txt -x .env,.env.backup,.git,.config</code>
+                        <strong>💡 File Discovery Tip:</strong> Many applications accidentally expose configuration files. Try:<br>
+                        <code>curl http://localhost:3002/.env</code><br>
+                        <code>curl http://localhost:3002/.env.backup</code><br>
+                        Or use gobuster: <code>gobuster dir -u http://localhost:3002 -w /usr/share/wordlists/dirb/common.txt -x .env</code>
                     </div>
                 </div>
 
