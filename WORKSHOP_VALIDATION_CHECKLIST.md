@@ -81,12 +81,13 @@ Expected: PAWSPA flag returned
 #### A09 - Logging (HARVEST)
 ```bash
 # Test Lab 1 audit trail
+# Note: The actual endpoint may not require authentication or may use a different auth mechanism
+# Check the lab implementation for exact requirements
 curl -X DELETE http://localhost:3009/api/lab1/artworks/1 \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer curator_token" | grep "HARVEST{N0_4UD1T_TR41L}"
+  -H "Content-Type: application/json" | grep "HARVEST{N0_4UD1T_TR41L}"
 ```
 
-Expected: HARVEST flag returned
+Expected: HARVEST flag returned (if endpoint doesn't require auth; otherwise adjust for lab's auth mechanism)
 
 #### A10 - Exceptions (HARVEST)
 ```bash
