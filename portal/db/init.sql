@@ -814,7 +814,7 @@ INSERT INTO challenges (owasp_category, title, description, difficulty, points, 
 
 -- Lab 1 (Analysis) - Easy
 INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order, tutorial, mission_brief) VALUES
-    ('A07', 'A07 Lab 1: Weak Password Policy', 'Test password requirements for weaknesses.', 'Easy', 100, 'NSA{W3AK_P4SS_P0L1CY}', 'Try simple passwords', 'http://localhost:3007/lab1', 'lab', 1, 5, NULL,
+    ('A07', 'A07 Lab 1: Weak Password Policy', 'Test password requirements for weaknesses.', 'Easy', 100, 'PAWSPA{W3AK_PAWSW0RD_P0L1CY}', 'Try simple passwords', 'http://localhost:3007/lab1', 'lab', 1, 5, NULL,
     '**MISSION BRIEF:** Agent, Evil Corp''s TravelHub Booking System is next on our hit list. Initial scans suggest their authentication is... questionable.
 
 **YOUR OBJECTIVE:** Document the weaknesses in their password policy that make accounts vulnerable to attack.
@@ -852,7 +852,7 @@ Document their weak password policy! 🔐❌');
 
 -- Lab 2 (Testing) - Medium
 INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order, tutorial, mission_brief) VALUES
-    ('A07', 'A07 Lab 2: Session Analysis', 'Analyze session token generation for predictability.', 'Medium', 150, 'NSA{S3SS10N_PR3D1CT4BL3}', 'Sessions are sequential', 'http://localhost:3007/lab2', 'lab', 2, 6, NULL,
+    ('A07', 'A07 Lab 2: Session Analysis', 'Analyze session token generation for predictability.', 'Medium', 150, 'PAWSPA{S3SS10N_PR3D1CT4BL3_P3TS}', 'Sessions are sequential', 'http://localhost:3007/lab2', 'lab', 2, 6, NULL,
     '**MISSION BRIEF:** Good work on password analysis, agent. Now let''s examine how Evil Corp manages user sessions.
 
 **YOUR OBJECTIVE:** Analyze their session tokens to determine if they''re predictable or can be forged.
@@ -894,7 +894,7 @@ Crack their session generation algorithm! 🎫🔮');
 
 -- Lab 3 (Hijacking) - Hard
 INSERT INTO challenges (owasp_category, title, description, difficulty, points, flag, hint, lab_url, challenge_type, lab_number, challenge_order, tutorial, mission_brief) VALUES
-    ('A07', 'A07 Lab 3: Session Hijacking', 'Hijack another user''s session to gain unauthorized access.', 'Hard', 200, 'NSA{S3SS10N_H1J4CK3D}', 'Predict or steal tokens', 'http://localhost:3007/lab3', 'lab', 3, 7, NULL,
+    ('A07', 'A07 Lab 3: Session Hijacking', 'Hijack another user''s session to gain unauthorized access.', 'Hard', 200, 'PAWSPA{S3SS10N_H1J4CK3D_SP4}', 'Predict or steal tokens', 'http://localhost:3007/lab3', 'lab', 3, 7, NULL,
     '**MISSION BRIEF:** Brilliant analysis, agent! You''ve proven their sessions are predictable. Now let''s weaponize that knowledge.
 
 **YOUR OBJECTIVE:** Hijack an active user session to gain unauthorized access to their account.
@@ -1165,7 +1165,7 @@ INSERT INTO challenges (owasp_category, title, description, difficulty, points, 
 **Step 7:** Perform malicious actions and check if they''re detected/logged
 **Step 8:** Try log tampering - can you delete or modify log entries?
 **Key Lesson:** Insufficient logging means attacks go undetected. Excessive logging means sensitive data leaks. Proper logging is a balance: log security events, protect the logs, never log secrets!', NULL),
-    ('A09', 'A09 Lab 1: Missing Logs', 'Find operations that should be logged but aren''t.', 'Easy', 100, 'NSA{N0TH1NG_L0GG3D}', 'Test critical operations', 'http://localhost:3009/lab1', 'lab', 1, 2, NULL,
+    ('A09', 'A09 Lab 1: Missing Logs', 'Find operations that should be logged but aren''t.', 'Easy', 100, 'HARVEST{N0_4UD1T_TR41L}', 'Test critical operations', 'http://localhost:3009/lab1', 'lab', 1, 2, NULL,
     '**MISSION BRIEF:** Agent, Evil Corp''s SecureVault Data Management system handles highly sensitive information. Our forensics team needs to know if they can detect intrusions.
 
 **YOUR OBJECTIVE:** Identify critical security events that aren''t being logged.
@@ -1224,7 +1224,7 @@ INSERT INTO challenges (owasp_category, title, description, difficulty, points, 
 - Maintain persistent access without being caught
 
 Expose their logging blind spots! 🙈📝'),
-    ('A09', 'A09 Lab 2: Log Data Leak', 'Find sensitive data that''s being leaked in logs.', 'Medium', 150, 'NSA{L0G_D4T4_L3AK}', 'Passwords shouldn''t be logged', 'http://localhost:3009/lab2', 'lab', 2, 3, NULL,
+    ('A09', 'A09 Lab 2: Log Data Leak', 'Find sensitive data that''s being leaked in logs.', 'Medium', 150, 'HARVEST{P11_1N_L0GS}', 'Passwords shouldn''t be logged', 'http://localhost:3009/lab2', 'lab', 2, 3, NULL,
     '**MISSION BRIEF:** Good work identifying missing logs, agent. Now let''s find the opposite problem: logs that contain TOO MUCH information.
 
 **YOUR OBJECTIVE:** Discover sensitive data being leaked through verbose logging.
@@ -1282,7 +1282,7 @@ Expose their logging blind spots! 🙈📝'),
 - Fuzzing to trigger verbose errors
 
 Find the data they''re carelessly logging! 📋💔'),
-    ('A09', 'A09 Lab 3: Cover Your Tracks', 'Exploit logging failures to hide evidence of intrusion.', 'Hard', 200, 'NSA{N0_L0GS_N0_CR1M3}', 'No audit trail exists', 'http://localhost:3009/lab3', 'lab', 3, 4, NULL,
+    ('A09', 'A09 Lab 3: Cover Your Tracks', 'Exploit logging failures to hide evidence of intrusion.', 'Hard', 200, 'HARVEST{L0G_T4MP3R1NG}', 'No audit trail exists', 'http://localhost:3009/lab3', 'lab', 3, 4, NULL,
     '**MISSION BRIEF:** Exceptional work, agent. You''ve proven Evil Corp can''t see attacks and leaks data in logs. Now use this knowledge to operate completely undetected.
 
 **YOUR OBJECTIVE:** Perform a sophisticated attack while leaving no trace in Evil Corp''s logging or monitoring systems.
@@ -1384,7 +1384,7 @@ INSERT INTO challenges (owasp_category, title, description, difficulty, points, 
 **Step 7:** Check if sensitive operations fail silently (hiding attacks) or noisily (revealing vulnerabilities)
 **Step 8:** Try edge cases: null values, extremely long inputs, special characters, negative numbers
 **Key Lesson:** Proper error handling means: generic messages to users, detailed logging for developers, graceful degradation without crashes, no information leakage!', NULL),
-    ('A10', 'A10 Lab 1: Trigger Errors', 'Cause errors that reveal information about the system.', 'Easy', 100, 'NSA{3RR0RS_T3LL_T4L3S}', 'Invalid input reveals info', 'http://localhost:3010/lab1', 'lab', 1, 2, NULL,
+    ('A10', 'A10 Lab 1: Trigger Errors', 'Cause errors that reveal information about the system.', 'Easy', 100, 'HARVEST{V3RB0S3_3RR0RS}', 'Invalid input reveals info', 'http://localhost:3010/lab1', 'lab', 1, 2, NULL,
     '**MISSION BRIEF:** Agent, Evil Corp''s API Gateway is the front door to their entire infrastructure. Our intelligence suggests poor error handling may leak critical information.
 
 **YOUR OBJECTIVE:** Trigger errors that reveal detailed information about Evil Corp''s system architecture.
@@ -1445,7 +1445,7 @@ INSERT INTO challenges (owasp_category, title, description, difficulty, points, 
 **THE PRIZE:** Each error message is a piece of the puzzle. Collect enough pieces and you''ll have a complete map of Evil Corp''s infrastructure.
 
 Make their errors work for you! ⚠️🔍'),
-    ('A10', 'A10 Lab 2: Stack Trace Recon', 'Extract detailed information from stack traces.', 'Medium', 150, 'NSA{ST4CK_TR4C3_1NF0}', 'Full paths revealed', 'http://localhost:3010/lab2', 'lab', 2, 3, NULL,
+    ('A10', 'A10 Lab 2: Stack Trace Recon', 'Extract detailed information from stack traces.', 'Medium', 150, 'HARVEST{ST4CK_TR4C3_L34K}', 'Full paths revealed', 'http://localhost:3010/lab2', 'lab', 2, 3, NULL,
     '**MISSION BRIEF:** Excellent work triggering errors, agent. Now let''s dig deeper into those stack traces for actionable intelligence.
 
 **YOUR OBJECTIVE:** Extract detailed system information from verbose stack traces and error messages.
@@ -1523,7 +1523,7 @@ Error: Cannot read property ''name'' of undefined
 - Path traversal testing tools
 
 Turn their verbose errors into your attack map! 📍🗺️'),
-    ('A10', 'A10 Lab 3: Suppress Evidence', 'Use error handling flaws to hide exploitation activities.', 'Hard', 200, 'NSA{S1L3NCE_1S_G0LD3N}', 'Generic errors hide attacks', 'http://localhost:3010/lab3', 'lab', 3, 4, NULL,
+    ('A10', 'A10 Lab 3: Suppress Evidence', 'Use error handling flaws to hide exploitation activities.', 'Hard', 200, 'HARVEST{S1L3NT_F41LUR3}', 'Generic errors hide attacks', 'http://localhost:3010/lab3', 'lab', 3, 4, NULL,
     '**MISSION BRIEF:** Brilliant reconnaissance, agent. You''ve mapped their system through error messages. Now let''s weaponize poor error handling to hide your attacks.
 
 **YOUR OBJECTIVE:** Exploit error handling flaws to execute attacks that remain undetected by security monitoring.
